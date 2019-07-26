@@ -38,6 +38,7 @@ line4`,
 				Routes: Routes{
 					&Route{
 						Suffix:  ".txt",
+						Prefix:  "/folder/",
 						DestURL: "mem://localhost/cloned/data",
 					},
 				},
@@ -53,7 +54,7 @@ line4`,
 		},
 		{
 			description: "no split transfer, folder depth = 2",
-			sourceURL:   "mem://localhost/folder/subfolder/file1.txt",
+			sourceURL:   "mem://localhost/folder/subfolder/file2.txt",
 			sourceContent: `line1,
 line2,
 line3,
@@ -68,11 +69,11 @@ line4`,
 				},
 			},
 			expectedURLs: map[string]int{
-				"mem://localhost/cloned/data/folder/subfolder/file1.txt": 26,
-				"mem://localhost/folder/subfolder/file1.txt":             26,
+				"mem://localhost/cloned/data/folder/subfolder/file2.txt": 26,
+				"mem://localhost/folder/subfolder/file2.txt":             26,
 			},
 			expectResponse: `{
-	"DestURLs": ["mem://localhost/cloned/data/folder/subfolder/file1.txt"],
+	"DestURLs": ["mem://localhost/cloned/data/folder/subfolder/file2.txt"],
 	"Status": "ok"
 }`,
 		},
@@ -109,7 +110,6 @@ line4`,
 	"Status": "ok"
 }`,
 		},
-
 
 		{
 			description: "compressed transfer",
@@ -245,10 +245,10 @@ line4`,
 					&Route{
 						Suffix:  ".txt",
 						DestURL: "mem://localhost/cloned/data",
-						OnCompletion:job.Completion{
-							OnSuccess:[]*job.Action{
+						OnCompletion: job.Completion{
+							OnSuccess: []*job.Action{
 								{
-									Name:job.ActionDelete,
+									Action: job.ActionDelete,
 								},
 							},
 						},
@@ -276,11 +276,11 @@ line4`,
 					&Route{
 						Suffix:  ".txt",
 						DestURL: "mem://localhost/cloned/data",
-						OnCompletion:job.Completion{
-							OnSuccess:[]*job.Action{
+						OnCompletion: job.Completion{
+							OnSuccess: []*job.Action{
 								{
-									Name: job.ActionMove,
-									URL:  "mem://localhost/processed",
+									Action: job.ActionMove,
+									URL:    "mem://localhost/processed",
 								},
 							},
 						},
@@ -290,7 +290,7 @@ line4`,
 			expectedURLs: map[string]int{
 				"mem://localhost/cloned/data/file1.txt":      26,
 				"mem://localhost/folder/subfolder/file1.txt": 0,
-				"mem://localhost/processed/file1.txt":26,
+				"mem://localhost/processed/file1.txt":        26,
 			},
 			expectResponse: `{
 	"DestURLs": ["mem://localhost/cloned/data/file1.txt"],
@@ -300,12 +300,9 @@ line4`,
 	}
 
 	memStorage := storage.NewMemoryService()
-
 	for _, useCase := range useCases {
-
 		initUseCase(useCase, memStorage, t)
-
-		service := New(useCase.config)
+		service, _ := New(useCase.config)
 		response := service.Mirror(&Request{URL: useCase.sourceURL})
 		if !assertly.AssertValues(t, useCase.expectResponse, response, useCase.description) {
 			_ = toolbox.DumpIndent(response, true)
@@ -313,7 +310,6 @@ line4`,
 		if len(useCase.expectedURLs) == 0 {
 			continue
 		}
-
 		for URL, expectedSize := range useCase.expectedURLs {
 			reader, err := memStorage.DownloadWithURL(URL)
 			if expectedSize == 0 { //DO NOT EXPECT ASSET IN THAT URL
@@ -321,16 +317,13 @@ line4`,
 					continue
 				}
 			}
-			if ! assert.Nil(t, err, useCase.description + " on " + URL) {
+			if !assert.Nil(t, err, useCase.description+" on "+URL) {
 				continue
 			}
-
 			data, err := ioutil.ReadAll(reader)
 			assert.Nil(t, err, useCase.description)
 			assert.Equal(t, expectedSize, len(data), useCase.description)
-
 		}
-
 	}
 
 }

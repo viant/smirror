@@ -1,0 +1,30 @@
+init:
+  appPath: $Pwd(../..)
+  gsBucket: e2etst
+
+pipeline:
+
+  package:
+    action: exec:run
+    target: $target
+    commands:
+      - unset GOPATH
+      - cd ${appPath}
+      - export GO111MODULE=on
+      - go mod vendor
+
+  deploy:
+    action: gcp/cloudfunctions:deploy
+    credentials: gcp-e2e
+    '@name': MyGsBucketToS3Mirror
+    entryPoint: Fn
+    runtime: go111
+    eventTrigger:
+      eventType: google.storage.object.finalize
+      resource: projects/_/buckets/${gsBucket}
+    environmentVariables:
+      LOGGING: 'true'
+      CONFIG: gs://gsBucket/mirror/config/gs.json
+    source:
+      URL: ${appPath}/
+    sleepTimeMs: 5000

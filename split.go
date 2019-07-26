@@ -14,15 +14,15 @@ type Split struct {
 }
 
 //Name returns a chunk name for supplied URL and mirrorSplittedAsset number
-func (s *Split) Name(router *Route, URL string, counter int32) (string) {
+func (s *Split) Name(router *Route, URL string, counter int32) string {
 	name := router.Name(URL)
 	destName := ""
 	ext := ""
 	if extIndex := strings.Index(name, "."); extIndex != -1 {
 		ext = string(name[extIndex+1:])
-		name  = string(name[:extIndex])
+		name = string(name[:extIndex])
 	}
-	if s.Template != ""  {
+	if s.Template != "" {
 		lastIndex := strings.LastIndex(s.Template, "%")
 		nameIndex := strings.Index(s.Template, "%v")
 		if nameIndex == lastIndex {

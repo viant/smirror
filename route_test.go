@@ -7,95 +7,91 @@ import (
 
 func TestRoute_HasMatch(t *testing.T) {
 
-
-	var useCases = []struct{
+	var useCases = []struct {
 		description string
 		Route
-		URL string
+		URL    string
 		expect bool
 	}{
 		{
-			description:"prefix match",
-			Route:Route{
-				Prefix:"/folder/",
+			description: "prefix match",
+			Route: Route{
+				Prefix: "/folder/",
 			},
-			URL: "ssh:///folder/abc.xom",
-			expect:true,
+			URL:    "ssh:///folder/abc.xom",
+			expect: true,
 		},
 		{
-			description:"prefix no match",
-			Route:Route{
-				Prefix:"folder/",
+			description: "prefix no match",
+			Route: Route{
+				Prefix: "folder/",
 			},
-			URL: "ssh:///f/abc.xom",
-			expect:false,
+			URL:    "ssh:///f/abc.xom",
+			expect: false,
 		},
 		{
-			description:"suffix match",
-			Route:Route{
-				Suffix:".csv",
+			description: "suffix match",
+			Route: Route{
+				Suffix: ".csv",
 			},
-			URL: "ssh:///folder/abc.csv",
-			expect:true,
+			URL:    "ssh:///folder/abc.csv",
+			expect: true,
 		},
 		{
-			description:"suffix no match",
-			Route:Route{
-				Suffix:".tsv",
+			description: "suffix no match",
+			Route: Route{
+				Suffix: ".tsv",
 			},
-			URL: "ssh:///f/abc.ts",
-			expect:false,
+			URL:    "ssh:///f/abc.ts",
+			expect: false,
 		},
 	}
 
 	for _, useCase := range useCases {
-		actual :=useCase.HasMatch(useCase.URL)
+		actual := useCase.HasMatch(useCase.URL)
 		assert.EqualValues(t, useCase.expect, actual, useCase.description)
 	}
 
 }
 
-
 func TestRoutes_HasMatch(t *testing.T) {
-	var useCases = []struct{
+	var useCases = []struct {
 		description string
 		Routes
-		URL string
+		URL       string
 		expectURL string
 	}{
 		{
-			description:"suffix match",
-			Routes:Routes{
+			description: "suffix match",
+			Routes: Routes{
 				&Route{
-					Suffix:".tsv",
-					DestURL:"dst://abc",
+					Suffix:  ".tsv",
+					DestURL: "dst://abc",
 				},
 				&Route{
-					Suffix:".csv",
-					DestURL:"dst://xyz",
+					Suffix:  ".csv",
+					DestURL: "dst://xyz",
 				},
-
 			},
 
-			URL:"ssh://zz/folder/a.csv",
-			expectURL:"dst://xyz",
+			URL:       "ssh://zz/folder/a.csv",
+			expectURL: "dst://xyz",
 		},
 		{
-			description:"prefix np match",
-			Routes:Routes{
+			description: "prefix np match",
+			Routes: Routes{
 				&Route{
-					Prefix:"/s",
-					DestURL:"dst://abc",
+					Prefix:  "/s",
+					DestURL: "dst://abc",
 				},
 				&Route{
-					Prefix:"/g",
-					DestURL:"dst://xyz",
+					Prefix:  "/g",
+					DestURL: "dst://xyz",
 				},
-
 			},
 
-			URL:"ssh://zz/folder/a.csv",
-			expectURL:"",
+			URL:       "ssh://zz/folder/a.csv",
+			expectURL: "",
 		},
 	}
 
@@ -106,7 +102,7 @@ func TestRoutes_HasMatch(t *testing.T) {
 			continue
 		}
 
-		if ! assert.NotNil(t, actual, useCase.description) {
+		if !assert.NotNil(t, actual, useCase.description) {
 			continue
 		}
 
@@ -114,57 +110,55 @@ func TestRoutes_HasMatch(t *testing.T) {
 	}
 }
 
-
-
 func TestRoute_Name(t *testing.T) {
 
-	var useCases =[]struct{
+	var useCases = []struct {
 		description string
 		Route
-		URL string
+		URL    string
 		expect string
 	}{
 		{
-			description:"no folder depth",
-			URL:"s3://myducket/folder/asset1.txt",
-			expect:"asset1.txt",
+			description: "no folder depth",
+			URL:         "s3://myducket/folder/asset1.txt",
+			expect:      "asset1.txt",
 		},
 		{
-			description:"folder depth = 1",
-			Route:Route{
-				FolderDepth:1,
+			description: "folder depth = 1",
+			Route: Route{
+				FolderDepth: 1,
 			},
-			URL:"s3://myducket/folder/sub/asset1.txt",
-			expect:"sub/asset1.txt",
+			URL:    "s3://myducket/folder/sub/asset1.txt",
+			expect: "sub/asset1.txt",
 		},
 		{
-			description:"folder depth = 2",
-			Route:Route{
-				FolderDepth:2,
+			description: "folder depth = 2",
+			Route: Route{
+				FolderDepth: 2,
 			},
-			URL:"s3://myducket/folder/sub/asset1.txt",
-			expect:"folder/sub/asset1.txt",
+			URL:    "s3://myducket/folder/sub/asset1.txt",
+			expect: "folder/sub/asset1.txt",
 		},
 		{
-			description:"folder depth exceeded path",
-			Route:Route{
-				FolderDepth:4,
+			description: "folder depth exceeded path",
+			Route: Route{
+				FolderDepth: 4,
 			},
-			URL:"s3://myducket/folder/sub/asset1.txt",
-			expect:"folder/sub/asset1.txt",
+			URL:    "s3://myducket/folder/sub/asset1.txt",
+			expect: "folder/sub/asset1.txt",
 		},
 		{
-			description:"gzip compression",
-			Route:Route{
-				Compression: &Compression{Codec:GZipCodec},
+			description: "gzip compression",
+			Route: Route{
+				Compression: &Compression{Codec: GZipCodec},
 			},
-			URL:"s3://myducket/folder/sub/asset1.txt",
-			expect:"asset1.txt.gz",
+			URL:    "s3://myducket/folder/sub/asset1.txt",
+			expect: "asset1.txt.gz",
 		},
 	}
 
 	for _, useCase := range useCases {
-		actual :=useCase.Name(useCase.URL)
+		actual := useCase.Name(useCase.URL)
 		assert.EqualValues(t, useCase.expect, actual, useCase.description)
 	}
 

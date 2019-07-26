@@ -7,6 +7,7 @@ type Completion struct {
 
 func (c *Completion) Run(context *Context) error {
 	actions := c.OnSuccess
+	isError := context.Error != nil
 	if context.Error != nil {
 		actions = c.OnFailure
 	}
@@ -14,7 +15,11 @@ func (c *Completion) Run(context *Context) error {
 		return nil
 	}
 	for _, action := range actions {
-		if err := action.Do(context);err != nil {
+		err := action.Do(context)
+		if err == nil && isError {
+			err = action.WriteError(context)
+		}
+		if err != nil {
 			return err
 		}
 	}

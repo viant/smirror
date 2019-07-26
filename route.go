@@ -23,7 +23,6 @@ type Route struct {
 
 type Routes []*Route
 
-
 //HasMatch returns true if URL matches prefix or suffix
 func (r *Route) HasMatch(URL string) bool {
 	resource := url.NewResource(URL)
@@ -40,7 +39,6 @@ func (r *Route) HasMatch(URL string) bool {
 	}
 	return true
 }
-
 
 //Name return route dest asset name
 func (r *Route) Name(URL string) string {
@@ -69,9 +67,6 @@ func (r *Route) Name(URL string) string {
 	return path.Join(folderPath, name)
 }
 
-
-
-
 //HasMatch returns the first match route
 func (r Routes) HasMatch(URL string) *Route {
 	for i := range r {
@@ -81,4 +76,3 @@ func (r Routes) HasMatch(URL string) *Route {
 	}
 	return nil
 }
-

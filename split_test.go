@@ -7,45 +7,44 @@ import (
 
 func TestSplit_Name(t *testing.T) {
 
-
-	var useCases = []struct{
+	var useCases = []struct {
 		description string
 		counter     int32
 		URL         string
 		split       *Split
-		route     *Route
+		route       *Route
 		expect      string
 	}{
 		{
-			description:"prefix template",
-			route: &Route{},
-			split:&Split{
-				Template:"%03d_%v",
+			description: "prefix template",
+			route:       &Route{},
+			split: &Split{
+				Template: "%03d_%v",
 			},
-			URL:"gs://bucket/folder/data.csv.gz",
-			expect:"000_data.csv.gz",
+			URL:    "gs://bucket/folder/data.csv.gz",
+			expect: "000_data.csv.gz",
 		},
 		{
-			description:"suffix template",
-			route: &Route{},
-			counter:2,
-			split:&Split{
-				Template:"%v_abc_%03d",
+			description: "suffix template",
+			route:       &Route{},
+			counter:     2,
+			split: &Split{
+				Template: "%v_abc_%03d",
 			},
-			URL:"gs://bucket/folder/data.csv.gz",
-			expect:"data_abc_002.csv.gz",
+			URL:    "gs://bucket/folder/data.csv.gz",
+			expect: "data_abc_002.csv.gz",
 		},
 		{
-			description:"suffix template with 2 depth",
+			description: "suffix template with 2 depth",
 			route: &Route{
-				FolderDepth:2,
+				FolderDepth: 2,
 			},
-			counter:32,
-			split:&Split{
-				Template:"%v_%03d",
+			counter: 32,
+			split: &Split{
+				Template: "%v_%03d",
 			},
-			URL:"gs://bucket/folder1/subfolder/data.csv.gz",
-			expect:"folder1/subfolder/data_032.csv.gz",
+			URL:    "gs://bucket/folder1/subfolder/data.csv.gz",
+			expect: "folder1/subfolder/data_032.csv.gz",
 		},
 	}
 

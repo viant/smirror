@@ -18,18 +18,15 @@ type Writer struct {
 	buffer     *bytes.Buffer
 	gzipWriter *gzip.Writer
 	listener   OnClose
-
 }
 
-
 //NewWriter returns a route writer
-func NewWriter(route *Route,listener OnClose) io.WriteCloser {
+func NewWriter(route *Route, listener OnClose) io.WriteCloser {
 	buffer := new(bytes.Buffer)
-	result :=  &Writer{
+	result := &Writer{
 		WriteCloser: ioutils.NopWriteCloser(buffer),
 		buffer:      buffer,
 		listener:    listener,
-
 	}
 	if route.Compression != nil {
 		if route.Codec == GZipCodec {
@@ -40,20 +37,16 @@ func NewWriter(route *Route,listener OnClose) io.WriteCloser {
 	return result
 }
 
-
 //Close closes writer and notifies listener
-func (w  *Writer) Close() error {
+func (w *Writer) Close() error {
 	if w.gzipWriter != nil {
-		if err := w.gzipWriter.Flush();err != nil {
+		if err := w.gzipWriter.Flush(); err != nil {
 			return err
 		}
 	}
-	if err := w.WriteCloser.Close();err != nil {
+	if err := w.WriteCloser.Close(); err != nil {
 		return err
 	}
 	w.Reader = w.buffer
 	return w.listener(w)
 }
-
-
-

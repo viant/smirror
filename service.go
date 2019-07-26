@@ -1,10 +1,15 @@
 package mirror
 
 import (
-	"smirror/job"
+	"context"
+	"fmt"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/storage"
+	"github.com/viant/toolbox/storage/gs"
+	"github.com/viant/toolbox/storage/s3"
 	"io"
+	"smirror/job"
+	"smirror/secret"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -53,8 +58,7 @@ func (s *service) mirror(request *Request, response *Response) error {
 	return err
 }
 
-
-func (s *service) mirrorAsset(route *Route, URL string,  storageService storage.Service, response *Response) error {
+func (s *service) mirrorAsset(route *Route, URL string, storageService storage.Service, response *Response) error {
 	reader, err := storageService.DownloadWithURL(URL)
 	//TODO optimze copy if dest uses the same compression, at the moment we decompress and comress it again
 	if err == nil {
@@ -104,7 +108,6 @@ func (s *service) copy(copy *Copy, response *Response) error {
 	return nil
 }
 
-
 func (s *service) chunkWriter(URL string, route *Route, counter *int32, waitGroup *sync.WaitGroup, response *Response) func() io.WriteCloser {
 	return func() io.WriteCloser {
 		splitCount := atomic.AddInt32(counter, 1)
@@ -123,7 +126,29 @@ func (s *service) chunkWriter(URL string, route *Route, counter *int32, waitGrou
 	}
 }
 
+func (s *service) initSecrets() error {
+	if len(s.config.Secrets) == 0 {
+		return nil
+	}
+	for i, config := range s.config.Secrets {
+		credConfig, err := secret.New(context.Background(), s.config.Secrets[i])
+		if err != nil {
+			return err
+		}
+		switch config.TargetScheme {
+		case "gs":
+			gs.SetProvider(credConfig)
+		case "s3":
+			s3.SetProvider(credConfig)
+		default:
+			return fmt.Errorf("unsupported scheme: %v", config.TargetScheme)
+		}
+	}
+	return nil
+}
+
 //New creates a new mirror service
-func New(config *Config) Service {
-	return &service{config:config}
+func New(config *Config) (Service, error) {
+	result := &service{config: config}
+	return result, result.initSecrets()
 }

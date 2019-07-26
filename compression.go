@@ -2,7 +2,6 @@ package mirror
 
 import "strings"
 
-
 const (
 	GZipCodec     = "gzip"
 	GZIPExtension = ".gz"
@@ -16,7 +15,7 @@ type Compression struct {
 //NewCompressionForURL returns compression for matched codec or nil
 func NewCompressionForURL(URL string) *Compression {
 	if strings.HasSuffix(URL, GZIPExtension) {
-		return &Compression{ Codec: GZipCodec}
+		return &Compression{Codec: GZipCodec}
 	}
 	return nil
 }

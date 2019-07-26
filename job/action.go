@@ -2,6 +2,7 @@ package job
 
 import (
 	"github.com/viant/toolbox"
+	"strings"
 )
 
 const (
@@ -10,13 +11,19 @@ const (
 )
 
 type Action struct {
-	Name string //empty Delete,Move
-	URL  string
+	Action string //empty Delete,Move
+	URL    string
+}
+
+func (a Action) WriteError(context *Context) error {
+	_, name := toolbox.URLSplit(context.SourceURL)
+	moveURL := toolbox.URLPathJoin(a.URL, name) + "-error"
+	return context.Storage.Upload(moveURL, strings.NewReader(context.Error.Error()))
 }
 
 func (a Action) Do(context *Context) error {
-	URL  := context.SourceURL
-	switch a.Name {
+	URL := context.SourceURL
+	switch a.Action {
 	case ActionDelete:
 		if object, err := context.Storage.StorageObject(URL); err == nil {
 			return context.Storage.Delete(object)
@@ -32,7 +39,6 @@ func (a Action) Do(context *Context) error {
 		if err := context.Storage.Upload(moveURL, rawData); err != nil {
 			return err
 		}
-
 
 		if object, err := context.Storage.StorageObject(URL); err == nil {
 			return context.Storage.Delete(object)

@@ -1,0 +1,55 @@
+{
+  "Routes": [
+    {
+      "Prefix": "/data/",
+      "Suffix": ".csv.gz",
+      "DestURL": "s3://destBucket/data",
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "gs://sourceBucket/data/errors/"
+          }
+        ]
+      },
+      "Codec": "gzip",
+      "FolderDepth": 1
+    },
+    {
+      "Prefix": "/large/data/",
+      "Suffix": ".csv.gz",
+      "DestURL": "s3://destBucket/data/chunks/",
+      "Split": {
+        "MaxLines": 10000,
+        "Template": "%s_%05d"
+      },
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "gs://sourceBucket/data/errors/"
+          }
+        ]
+      },
+      "Codec": "gzip",
+      "FolderDepth": 1
+    }
+  ],
+  "Secrets": [
+    {
+      "TargetScheme": "s3",
+      "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+      "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+    }
+  ]
+}

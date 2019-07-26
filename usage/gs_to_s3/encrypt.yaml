@@ -1,0 +1,28 @@
+init:
+  gsBucket: e2etst
+pipeline:
+  secure:
+    deployKey:
+      action: gcp/kms:deployKey
+      credentials: gcp-e2e
+      ring: my_ring
+      key: my_key
+      logging: false
+      purpose: ENCRYPT_DECRYPT
+      bindings:
+        - role: roles/cloudkms.cryptoKeyEncrypterDecrypter
+          members:
+            - serviceAccount:$gcp.serviceAccount
+
+    encrypt:
+      action: gcp/kms:encrypt
+      logging: false
+      ring: my_ring
+      key: my_key
+      source:
+        URL: config.json
+      dest:
+        URL: gs://$gsBucket/mirror/config/config.json.enc
+    info:
+      action: print
+      message: ${encrypt.CipherBase64Text}

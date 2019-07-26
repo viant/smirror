@@ -18,23 +18,20 @@ func TestNewReader(t *testing.T) {
 	}{
 
 		{
-			description:"raw data",
-			data:"abc",
-
+			description: "raw data",
+			data:        "abc",
 		},
 
 		{
-			description:"compressed data",
-			data:"abcd",
-			compression:&Compression{Codec:GZipCodec},
-
+			description: "compressed data",
+			data:        "abcd",
+			compression: &Compression{Codec: GZipCodec},
 		},
 		{
-			description:"unknown code error",
-			data:"abcd",
-			compression:&Compression{Codec:"abc"},
-			hasError:true,
-
+			description: "unknown code error",
+			data:        "abcd",
+			compression: &Compression{Codec: "abc"},
+			hasError:    true,
 		},
 	}
 
@@ -58,7 +55,7 @@ func TestNewReader(t *testing.T) {
 			assert.NotNil(t, err, useCase.description)
 			continue
 		}
-		if ! assert.Nil(t, err, useCase.description) {
+		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 

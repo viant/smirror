@@ -7,23 +7,22 @@ import (
 
 func TestNewCompressionForURL(t *testing.T) {
 
-	var useCases = []struct{
+	var useCases = []struct {
 		description string
-		URL string
-		expect string
+		URL         string
+		expect      string
 	}{
 		{
-			description:"gzip code",
-			URL:"ssh://asdsd/folder/file.txt.gz",
-			expect:GZipCodec,
+			description: "gzip code",
+			URL:         "ssh://asdsd/folder/file.txt.gz",
+			expect:      GZipCodec,
 		},
 		{
-			description:"empty code",
-			URL:"ssh://asdsd/folder/file.txt.x",
-			expect:"",
+			description: "empty code",
+			URL:         "ssh://asdsd/folder/file.txt.x",
+			expect:      "",
 		},
 	}
-
 
 	for _, useCase := range useCases {
 		actual := NewCompressionForURL(useCase.URL)
@@ -31,7 +30,7 @@ func TestNewCompressionForURL(t *testing.T) {
 			assert.Nil(t, actual, useCase.description)
 			continue
 		}
-		if ! assert.NotNil(t, actual, useCase.description) {
+		if !assert.NotNil(t, actual, useCase.description) {
 			continue
 		}
 
