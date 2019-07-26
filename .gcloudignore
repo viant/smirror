@@ -6,3 +6,6 @@ go.mod
 go.sum
 e2e/**
 usage/**
+logs/**
+images/**
+*.md

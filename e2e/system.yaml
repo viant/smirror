@@ -1,0 +1,39 @@
+init:
+  s3Secrets: ${secrets.$awsCredentials}
+  mirrorConfig: $Cat(config/gs_to_s3.json)
+  mirrorConfigJSON: $AsJSON($mirrorConfig)
+
+
+pipeline:
+
+  uploadConfig:
+    action: storage:upload
+    sourceKey: mirrorConfigJSON
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsBucket}/e2e-mirror/config/mirror.json
+
+  deployKey:
+    action: gcp/kms:deployKey
+    credentials: $gcpCredentials
+    ring: gs_mirror_ring
+    key: gs_mirror_key
+    purpose: ENCRYPT_DECRYPT
+    logging: false
+    bindings:
+      - role: roles/cloudkms.cryptoKeyEncrypterDecrypter
+        members:
+          - serviceAccount:${gcp.serviceAccount}
+
+  encrypt:
+    action: gcp/kms:encrypt
+    ring: gs_mirror_ring
+    key: gs_mirror_key
+    plainData: $AsJSON($s3Secrets)
+    dest:
+      URL: gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc
+    logging: false
+
+  info:
+    action: print
+    message: 'encrypted s3 credentials: ${encrypt.CipherBase64Text}'

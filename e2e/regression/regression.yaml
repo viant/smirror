@@ -1,0 +1,16 @@
+pipeline:
+  test:
+    tag: $pathMatch
+    description: '@info'
+    subPath: 'cases/${index}_*'
+    range: 1..001
+    template:
+
+      setVars:
+        action: nop
+        comments: use case init
+        skip: $HasResource(${path}/skip.txt)
+
+      test:
+        action: run
+        request: '@test'

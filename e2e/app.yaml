@@ -1,0 +1,31 @@
+init:
+  fnAppPath: $Pwd(..)
+pipeline:
+
+  package:
+    action: exec:run
+    target: $target
+    checkError: true
+    commands:
+      - unset GOPATH
+      - cd ${fnAppPath}
+      - export GO111MODULE=on
+      - go mod vendor
+
+  deploy:
+    action: gcp/cloudfunctions:deploy
+    credentials: $gcpCredentials
+    '@name': E2ETstMirror
+    entryPoint: Fn
+    serviceAccount: ${gcp.serviceAccount}
+    runtime: go111
+    availableMemoryMB: 256
+    eventTrigger:
+      eventType: google.storage.object.finalize
+      resource: projects/_/buckets/${gsBucket}
+    environmentVariables:
+      LOGGING: 'true'
+      CONFIG: gs://${gsBucket}/e2e-mirror/config/mirror.json
+    source:
+      URL: ${fnAppPath}/
+    sleepTimeMs: 5000

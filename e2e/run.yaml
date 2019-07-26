@@ -1,0 +1,22 @@
+init:
+  gsBucket: e2etst
+  s3Bucket: e2etst
+  gcpCredentials: gcp-e2e
+  awsCredentials: aws-e2e
+pipeline:
+
+  system:
+    action: run
+    request: '@system'
+    tasks: '*'
+
+  app:
+    action: run
+    request: '@app'
+    tasks: '*'
+
+  test:
+    action: run
+    request: '@regression/regression'
+    tasks: '*'
+
