@@ -18,6 +18,7 @@ type Action struct {
 	URL    string
 }
 
+//WriteError writes an error file if context has error
 func (a Action) WriteError(context *Context) error {
 	_, name := toolbox.URLSplit(context.SourceURL)
 	moveURL := toolbox.URLPathJoin(a.URL, name) + "-error"
