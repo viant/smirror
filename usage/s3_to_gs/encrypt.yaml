@@ -1,0 +1,17 @@
+init:
+  awsCredentials: aws-e2e
+  gcpSecrets: $Cat(gcp-cred.json)
+
+pipeline:
+  secure:
+    credentials: $awsCredentials
+    action: aws/kms:setupKey
+    aliasName: alias/smirror
+
+  encrypt:
+    action: aws/ssm:setParameter
+    name: smirror.gcp
+    '@description': Google Storage credentials
+    type: SecureString
+    keyId: alias/smirror
+    value: $gcpSecrets

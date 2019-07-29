@@ -1,0 +1,56 @@
+{
+  "Routes": [
+    {
+      "Prefix": "/data/",
+      "Suffix": ".csv.gz",
+      "DestURL": "gs://destBucket/data",
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "s3://sourceBucket/data/errors/"
+          }
+        ]
+      },
+      "Codec": "gzip",
+      "FolderDepth": 1
+    },
+    {
+      "Prefix": "/large/data/",
+      "Suffix": ".csv.gz",
+      "DestURL": "gs://destBucket/data/chunks/",
+      "Split": {
+        "MaxLines": 10000,
+        "Template": "%s_%05d"
+      },
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "s3://sourceBucket/data/errors/"
+          }
+        ]
+      },
+      "Codec": "gzip",
+      "FolderDepth": 1
+    }
+  ],
+  "Secrets": [
+    {
+      "Provider": "s3",
+      "TargetScheme": "gcp",
+      "Parameter": "smirror.gs",
+      "Key": "smirror"
+    }
+  ]
+}

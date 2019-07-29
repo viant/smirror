@@ -1,0 +1,43 @@
+init:
+  appPath: $Pwd(../..)
+  gsBucket: e2etst
+  codeZip: ${appPath}/aws/smirror.zip
+  functionName: E2etstMirror
+  privilegePolicy: privilege-policy.json
+  awsCredentials: aws-e2e
+
+pipeline:
+
+  package:
+    action: exec:run
+    target: $target
+    checkError: true
+    commands:
+      - unset GOPATH
+      - cd ${appPath}
+      - export GO111MODULE=on
+      - go mod vendor
+      - cd aws
+      - go build -o smirror
+      - zip -j smirror.zip smirror
+
+  deployLambda:
+    action: aws/lambda:deploy
+    credentials: $awsCredentials
+    functionname: $functionName
+    runtime:  go1.x
+    handler: smirror
+    timeout: 360
+    environment:
+      variables:
+        LOGGING: 'true'
+        CONFIG: s3://${s3Bucket}/e2e-mirror/config/mirror.json
+    code:
+      zipfile: $LoadBinary(${codeZip})
+    rolename: lambda-${functionName}-executor
+    define:
+      - policyname: kms-${functionName}-role
+        policydocument: $Cat('${privilegePolicy}')
+    attach:
+      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+

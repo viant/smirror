@@ -239,19 +239,185 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \
 
 ### S3 to GS mirror
 
+To mirror data from S3 that match /data/ prefix and '.csv.gz' suffix to gs://destBucket/data
+preserving parent folder (folderDepth:1) the following configuration can be used with Mirror cloud function
+
+[@gs://sourceBucket/config/config.json](usage/s3_to_gs/config.json)
+```json
+{
+  "Routes": [
+    {
+      "Prefix": "/data/",
+      "Suffix": ".csv.gz",
+      "DestURL": "gs://destBucket/data",
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "s3://sourceBucket/data/errors/"
+          }
+        ]
+      },
+      "Codec": "gzip",
+      "FolderDepth": 1
+    },
+    {
+      "Prefix": "/large/data/",
+      "Suffix": ".csv.gz",
+      "DestURL": "gs://destBucket/data/chunks/",
+      "Split": {
+        "MaxLines": 10000,
+        "Template": "%s_%05d"
+      },
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "s3://sourceBucket/data/errors/"
+          }
+        ]
+      },
+      "Codec": "gzip",
+      "FolderDepth": 1
+    }
+  ],
+  "Secrets": [
+    {
+      "Provider": "s3",
+      "TargetScheme": "gcp",
+      "Parameter": "smirror.gs",
+      "Key": "smirror"
+    }
+  ]
+}
+```
 
 
 
+###### Encrypting AWS credentials with GCP KMS 
+
+In our example AWS System Manager  'smirror.gcp' parameters is encrypted version of [@gcp-cred.json](usage/s3_to_gs/gcp-cred.json) Google Secrets.
+
+The following step can be used to encrypt a google secrets.
+
+- With **endly cli**
+
+[@encrypt.yaml](usage/s3_to_gs/encrypt.yaml)
+```yaml
+init:
+  awsCredentials: aws-e2e
+  gcpSecrets: $Cat(gcp-cred.json)
+
+pipeline:
+  secure:
+    credentials: $awsCredentials
+    action: aws/kms:setupKey
+    aliasName: alias/smirror
+
+  encrypt:
+    action: aws/ssm:setParameter
+    name: smirror.gcp
+    '@description': Google Storage credentials
+    type: SecureString
+    keyId: alias/smirror
+    value: $gcpSecrets
+```
 
 
+- With **aws cli**
+
+```bash
+- aws kms create-key  
+- aws kms create-alias --alias-name=smirror --target-key-id=KEY_ID
+- aws ssm put-parameter \
+    --name "smirror.gs" \
+    --value 'CONTENT OF GOOGLE SECRETE HERE' \
+    --type SecureString \
+    --key-id alias/smirror
+
+```
+
+
+###### Deploying lambda
+
+- With **endly cli**
+
+```bash
+endly deploy
+```
+
+[@deploy.yaml](usage/s3_to_gs/deploy.yaml)
+```yaml
+init:
+  appPath: $Pwd(../..)
+  gsBucket: e2etst
+  codeZip: ${appPath}/aws/smirror.zip
+  functionName: E2etstMirror
+  privilegePolicy: privilege-policy.json
+  awsCredentials: aws-e2e
+
+pipeline:
+
+  package:
+    action: exec:run
+    target: $target
+    checkError: true
+    commands:
+      - unset GOPATH
+      - cd ${appPath}
+      - export GO111MODULE=on
+      - go mod vendor
+      - cd aws
+      - go build -o smirror
+      - zip -j smirror.zip smirror
+
+  deployLambda:
+    action: aws/lambda:deploy
+    credentials: $awsCredentials
+    functionname: $functionName
+    runtime:  go1.x
+    handler: smirror
+    timeout: 360
+    environment:
+      variables:
+        LOGGING: 'true'
+        CONFIG: s3://${s3Bucket}/e2e-mirror/config/mirror.json
+    code:
+      zipfile: $LoadBinary(${codeZip})
+    rolename: lambda-${functionName}-executor
+    define:
+      - policyname: kms-${functionName}-role
+        policydocument: $Cat('${privilegePolicy}')
+    attach:
+      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+```
+
+- With **aws cli** 
+-[Serverless-deploying](https://docs.aws.amazon.com/lambda/latest/dg/with-userapp.html)
+
+- With **sam cli**
+-[Serverless-deploying](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-deploying.html)
 
 ## End to end testing
+
 
 ### Prerequisites:
 
   - [Endly e2e runner](https://github.com/viant/endly/releases) or [endly docker image](https://github.com/viant/endly/tree/master/docker)
   - [Google secrets](https://github.com/viant/endly/tree/master/doc/secrets#google-cloud-credentials) for dedicated e2e project  ~/.secret/gcp-e2e.json 
   - [AWS secrets](https://github.com/viant/endly/tree/master/doc/secrets#asw-credentials) for dedicated e2e account ~/.secret/aws-e2e.json 
+
+
 
 
 
