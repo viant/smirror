@@ -5,7 +5,7 @@ import "strings"
 const (
 	//GZipCodec gzip code
 	GZipCodec = "gzip"
-	//GZIP extension
+	//GZIPExtension gzip extension
 	GZIPExtension = ".gz"
 )
 

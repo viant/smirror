@@ -6,11 +6,13 @@ import (
 )
 
 const (
+	//ActionDelete delete action
 	ActionDelete = "delete"
+	//ActionMove move action
 	ActionMove   = "move"
 )
 
-//Action represets an action
+//Action represents an action
 type Action struct {
 	Action string //empty Delete,Move
 	URL    string

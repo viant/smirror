@@ -2,7 +2,7 @@ package job
 
 import "github.com/viant/toolbox/storage"
 
-//represents job context
+//Context represents job context
 type Context struct {
 	Error     error
 	Storage   storage.Service
