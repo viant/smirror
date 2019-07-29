@@ -1,4 +1,4 @@
-package mirror
+package smirror
 
 import (
 	"encoding/json"
@@ -9,6 +9,9 @@ import (
 	"smirror/secret"
 	"strings"
 )
+
+//ConfigEnvKey config eng key
+const ConfigEnvKey = "CONFIG"
 
 //Config represents routes
 type Config struct {

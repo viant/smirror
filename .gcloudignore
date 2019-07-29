@@ -8,5 +8,8 @@ e2e/**
 usage/**
 logs/**
 images/**
+aws/**
 *.md
 .DS_Store
+*.zip
+smirror

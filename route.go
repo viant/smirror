@@ -1,4 +1,4 @@
-package mirror
+package smirror
 
 import (
 	"github.com/viant/toolbox"

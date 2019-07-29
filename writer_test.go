@@ -1,1 +1,1 @@
-package mirror
+package smirror

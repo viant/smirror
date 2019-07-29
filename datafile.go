@@ -1,4 +1,4 @@
-package mirror
+package smirror
 
 //Datafile represents a data file
 type Datafile struct {

@@ -239,6 +239,12 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \
 
 ### S3 to GS mirror
 
+
+
+
+
+
+
 ## End to end testing
 
 ### Prerequisites:
@@ -248,7 +254,12 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \
   - [AWS secrets](https://github.com/viant/endly/tree/master/doc/secrets#asw-credentials) for dedicated e2e account ~/.secret/aws-e2e.json 
 
 
+
+
+
 ## Monitoring and limitation
+
+
 
 
 ## Code Coverage

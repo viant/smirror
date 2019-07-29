@@ -3,6 +3,7 @@ module smirror
 go 1.12
 
 require (
+	github.com/aws/aws-lambda-go v1.12.0
 	github.com/aws/aws-sdk-go v1.21.4 // indirect
 	github.com/docker/docker v1.13.1
 	github.com/go-errors/errors v1.0.1 // indirect

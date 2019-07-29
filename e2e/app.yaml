@@ -1,31 +1,60 @@
 init:
   fnAppPath: $Pwd(..)
+  codeZip: $Pwd(../aws/smirror.zip)
+  functionName: E2etstMirror
+  privilegePolicy: privilege-policy.json
+
 pipeline:
 
-  package:
-    action: exec:run
-    target: $target
-    checkError: true
-    commands:
-      - unset GOPATH
-      - cd ${fnAppPath}
-      - export GO111MODULE=on
-      - go mod vendor
 
-  deploy:
-    action: gcp/cloudfunctions:deploy
-    credentials: $gcpCredentials
-    '@name': E2ETstMirror
-    entryPoint: Fn
-    serviceAccount: ${gcp.serviceAccount}
-    runtime: go111
-    availableMemoryMB: 256
-    eventTrigger:
-      eventType: google.storage.object.finalize
-      resource: projects/_/buckets/${gsBucket}
-    environmentVariables:
-      LOGGING: 'true'
-      CONFIG: gs://${gsBucket}/e2e-mirror/config/mirror.json
-    source:
-      URL: ${fnAppPath}/
-    sleepTimeMs: 5000
+    package:
+      action: exec:run
+      target: $target
+      checkError: true
+      commands:
+        - unset GOPATH
+        - cd ${fnAppPath}
+        - export GO111MODULE=on
+        - go mod vendor
+        - cd aws
+        - go build -o smirror
+        - zip -j smirror.zip smirror
+
+    deployCloudFunction:
+      action: gcp/cloudfunctions:deploy
+      credentials: $gcpCredentials
+      '@name': $functionName
+      entryPoint: Fn
+      serviceAccount: ${gcp.serviceAccount}
+      runtime: go111
+      availableMemoryMB: 256
+      eventTrigger:
+        eventType: google.storage.object.finalize
+        resource: projects/_/buckets/${gsBucket}
+      environmentVariables:
+        LOGGING: 'true'
+        CONFIG: gs://${gsBucket}/e2e-mirror/config/mirror.json
+      source:
+        URL: ${fnAppPath}/
+      sleepTimeMs: 5000
+
+    deployLambda:
+      action: aws/lambda:deploy
+      credentials: $awsCredentials
+      functionname: $functionName
+      runtime:  go1.x
+      handler: smirror
+      timeout: 360
+      environment:
+        variables:
+          LOGGING: 'true'
+          CONFIG: s3://${s3Bucket}/e2e-mirror/config/mirror.json
+      code:
+        zipfile: $LoadBinary(${codeZip})
+      rolename: lambda-${functionName}-executor
+      define:
+        - policyname: kms-${functionName}-role
+          policydocument: $Cat('${privilegePolicy}')
+      attach:
+        - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
