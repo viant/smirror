@@ -9,7 +9,7 @@ const (
 	//ActionDelete delete action
 	ActionDelete = "delete"
 	//ActionMove move action
-	ActionMove   = "move"
+	ActionMove = "move"
 )
 
 //Action represents an action
