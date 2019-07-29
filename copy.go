@@ -13,6 +13,7 @@ type Copy struct {
 	Dest   *Datafile
 }
 
+//GetReader returns a reader
 func (c *Copy) GetReader() (io.Reader, error) {
 	if c.Dest.Compression == nil {
 		return c.Reader, nil

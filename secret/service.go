@@ -11,6 +11,7 @@ import (
 	"github.com/viant/toolbox/kms/gcp"
 )
 
+//New creates a new secret service
 func New(ctx context.Context, config *Config) (*cred.Config, error) {
 	switch config.Provider {
 	case "aws":

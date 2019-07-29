@@ -3,7 +3,9 @@ package mirror
 import "strings"
 
 const (
-	GZipCodec     = "gzip"
+	//GZipCodec gzip code
+	GZipCodec = "gzip"
+	//GZIP extension
 	GZIPExtension = ".gz"
 )
 

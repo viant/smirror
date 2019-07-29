@@ -1,10 +1,12 @@
 package job
 
+//Completion represents a job completion
 type Completion struct {
 	OnSuccess []*Action
 	OnFailure []*Action
 }
 
+//Run run completion
 func (c *Completion) Run(context *Context) error {
 	actions := c.OnSuccess
 	isError := context.Error != nil

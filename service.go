@@ -63,6 +63,9 @@ func (s *service) mirrorAsset(route *Route, URL string, storageService storage.S
 	//TODO optimze copy if dest uses the same compression, at the moment we decompress and comress it again
 	if err == nil {
 		reader, err = NewReader(reader, NewCompressionForURL(URL))
+		if err != nil {
+			return err
+		}
 	}
 	defer func() { _ = reader.Close() }()
 	destName := route.Name(URL)
@@ -75,6 +78,9 @@ func (s *service) mirrorChunkeddAsset(route *Route, storageService storage.Servi
 	reader, err := storageService.DownloadWithURL(request.URL)
 	if err == nil {
 		reader, err = NewReader(reader, NewCompressionForURL(request.URL))
+		if err != nil {
+			return err
+		}
 	}
 	defer func() { _ = reader.Close() }()
 	counter := int32(0)

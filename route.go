@@ -21,6 +21,7 @@ type Route struct {
 	FolderDepth int
 }
 
+//Routes represents route slice
 type Routes []*Route
 
 //HasMatch returns true if URL matches prefix or suffix

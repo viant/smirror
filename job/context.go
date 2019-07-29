@@ -10,6 +10,7 @@ type Context struct {
 	SourceURL string
 }
 
+//NewContext creates a context
 func NewContext(err error, storage storage.Service, sourceURL string) *Context {
 	return &Context{
 		Error:     err,

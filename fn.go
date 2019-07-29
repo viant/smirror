@@ -11,9 +11,13 @@ import (
 	"time"
 )
 
+//ConfigEnvKey config eng key
 const ConfigEnvKey = "CONFIG"
-const LoggingKey = "LOGGING"
 
+//LoggingEnvKey logging key
+const LoggingEnvKey = "LOGGING"
+
+//Fn cloud function entry point
 func Fn(ctx context.Context, event gs.Event) (err error) {
 	start := time.Now()
 	//defer func() {
@@ -29,8 +33,8 @@ func Fn(ctx context.Context, event gs.Event) (err error) {
 		return err
 	}
 
-	if isFnLoggingEnabled(LoggingKey) {
-		fmt.Printf("mirrorred %v: %v in %v", response.Status, event.URL(), elapsed)
+	if isFnLoggingEnabled(LoggingEnvKey) {
+		fmt.Printf("mirrored %v: %v in %v", response.Status, event.URL(), elapsed)
 	}
 	return err
 }
@@ -45,11 +49,11 @@ func fn(ctx context.Context, event gs.Event) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	if isFnLoggingEnabled(LoggingKey) {
+	if isFnLoggingEnabled(LoggingEnvKey) {
 		fmt.Printf("uses service %p, %v\n", service, err)
 	}
 	response := service.Mirror(NewRequest(event.URL()))
-	if isFnLoggingEnabled(LoggingKey) {
+	if isFnLoggingEnabled(LoggingEnvKey) {
 		toolbox.Dump(response)
 	}
 	if response.Error != "" {

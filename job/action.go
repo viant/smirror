@@ -10,6 +10,7 @@ const (
 	ActionMove   = "move"
 )
 
+//Action represets an action
 type Action struct {
 	Action string //empty Delete,Move
 	URL    string
@@ -21,6 +22,7 @@ func (a Action) WriteError(context *Context) error {
 	return context.Storage.Upload(moveURL, strings.NewReader(context.Error.Error()))
 }
 
+//Do perform an action
 func (a Action) Do(context *Context) error {
 	URL := context.SourceURL
 	switch a.Action {
