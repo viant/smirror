@@ -18,11 +18,14 @@ func (c *Copy) GetReader() (io.Reader, error) {
 		return c.Reader, nil
 	}
 	if c.Dest.Codec == GZipCodec {
+
 		buffer := new(bytes.Buffer)
 		gzipWriter := gzip.NewWriter(buffer)
 		_, err := io.Copy(gzipWriter, c.Reader)
 		if err == nil {
-			err = gzipWriter.Flush()
+			if err = gzipWriter.Flush(); err == nil {
+				err = gzipWriter.Close()
+			}
 		}
 		return buffer, err
 	}

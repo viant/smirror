@@ -1,0 +1,1 @@
+gs://e2etst/data/p1/events.csv chunks to s3

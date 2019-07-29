@@ -47,7 +47,7 @@ func (s *service) mirror(request *Request, response *Response) error {
 		return err
 	}
 	if route.Split != nil {
-		err = s.mirrorSplittedAsset(route, storageService, request, response)
+		err = s.mirrorChunkeddAsset(route, storageService, request, response)
 	} else {
 		err = s.mirrorAsset(route, request.URL, storageService, response)
 	}
@@ -71,7 +71,7 @@ func (s *service) mirrorAsset(route *Route, URL string, storageService storage.S
 	return s.copy(dataCopy, response)
 }
 
-func (s *service) mirrorSplittedAsset(route *Route, storageService storage.Service, request *Request, response *Response) error {
+func (s *service) mirrorChunkeddAsset(route *Route, storageService storage.Service, request *Request, response *Response) error {
 	reader, err := storageService.DownloadWithURL(request.URL)
 	if err == nil {
 		reader, err = NewReader(reader, NewCompressionForURL(request.URL))
@@ -130,6 +130,7 @@ func (s *service) initSecrets() error {
 	if len(s.config.Secrets) == 0 {
 		return nil
 	}
+
 	for i, config := range s.config.Secrets {
 		credConfig, err := secret.New(context.Background(), s.config.Secrets[i])
 		if err != nil {
@@ -141,7 +142,7 @@ func (s *service) initSecrets() error {
 		case "s3":
 			s3.SetProvider(credConfig)
 		default:
-			return fmt.Errorf("unsupported scheme: %v", config.TargetScheme)
+			return fmt.Errorf("unsupported target scheme: %v", config.TargetScheme)
 		}
 	}
 	return nil
@@ -150,5 +151,9 @@ func (s *service) initSecrets() error {
 //New creates a new mirror service
 func New(config *Config) (Service, error) {
 	result := &service{config: config}
-	return result, result.initSecrets()
+	err := result.initSecrets()
+	if err != nil {
+		return nil, err
+	}
+	return result, err
 }

@@ -21,8 +21,52 @@
     },
     {
       "Prefix": "/data/p2",
+      "Suffix": ".csv.gz",
+      "DestURL": "s3://${s3Bucket}/data",
+      "Codec": "gzip",
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+          }
+        ]
+      },
+      "FolderDepth": 1
+    },
+    {
+      "Prefix": "/data/p3",
       "Suffix": ".csv",
       "DestURL": "s3://${s3Bucket}/data",
+      "Split": {
+        "MaxLines": 10,
+        "Template": "%s_%05d"
+      },
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+          }
+        ]
+      },
+      "FolderDepth": 1
+    },
+    {
+      "Prefix": "/data/p4",
+      "Suffix": ".csv",
+      "DestURL": "s3://${s3Bucket}/data",
+      "Codec": "gzip",
       "Split": {
         "MaxLines": 10,
         "Template": "%s_%05d"
@@ -45,9 +89,10 @@
   ],
   "Secrets": [
     {
+      "Provider": "gcp",
       "TargetScheme": "s3",
       "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
-      "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+      "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
     }
   ]
 }

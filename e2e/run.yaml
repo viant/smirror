@@ -3,6 +3,7 @@ init:
   s3Bucket: e2etst
   gcpCredentials: gcp-e2e
   awsCredentials: aws-e2e
+  gcpProject: viant-e2e
 pipeline:
 
   system:

@@ -1,8 +1,4 @@
 pipeline:
-  info:
-    action: print
-    message: trigger 1
-
   trigger:
     action: storage:copy
     sleepTimeMs: 20000

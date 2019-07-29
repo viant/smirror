@@ -13,7 +13,7 @@ type Split struct {
 	Template string
 }
 
-//Name returns a chunk name for supplied URL and mirrorSplittedAsset number
+//Name returns a chunk name for supplied URL and mirrorChunkeddAsset number
 func (s *Split) Name(router *Route, URL string, counter int32) string {
 	name := router.Name(URL)
 	destName := ""

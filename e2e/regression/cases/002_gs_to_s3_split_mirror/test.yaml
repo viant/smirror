@@ -1,4 +1,0 @@
-pipeline:
-  trigger:
-    action: print
-    message: trigger 2

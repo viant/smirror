@@ -3,6 +3,7 @@ package mirror
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/viant/toolbox"
 )
 
 var singleton Service
@@ -17,6 +18,8 @@ func NewFromEnv(envKey string) (Service, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create config from env key "+envKey)
 	}
+	toolbox.Dump(config)
+
 	service, err := New(config)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to create service from config %v", config))

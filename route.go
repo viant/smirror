@@ -43,16 +43,21 @@ func (r *Route) HasMatch(URL string) bool {
 //Name return route dest asset name
 func (r *Route) Name(URL string) string {
 	parent, name := toolbox.URLSplit(URL)
+
 	ext := path.Ext(name)
 	if r.Compression != nil {
 		switch r.Compression.Codec {
 		case GZipCodec:
-
 			if ext != GZIPExtension {
 				name += GZIPExtension
 			}
 		}
+	} else {
+		if ext == GZIPExtension {
+			name = string(name[:len(name)-len(ext)])
+		}
 	}
+
 	if r.FolderDepth == 0 {
 		return name
 	}

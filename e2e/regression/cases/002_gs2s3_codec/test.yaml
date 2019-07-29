@@ -1,0 +1,18 @@
+pipeline:
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 20000
+    source:
+      URL: ${parent.path}/data/prepare/events.csv.gz
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsBucket}/data/p2/events.csv.gz
+
+  validate:
+    action: storage:download
+    source:
+      credentials: $awsCredentials
+      URL: s3://${gsBucket}/data/p2/events.csv.gz
+    udf: UnzipText
+    destKey: events
+    expect: $Cat('${parent.path}/data/expect/events.csv')

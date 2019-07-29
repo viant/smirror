@@ -10,23 +10,62 @@ import (
 	"io"
 	"io/ioutil"
 	"smirror/job"
+	"smirror/secret"
 	"strings"
 	"testing"
 )
 
 type serviceUseCase struct {
-	description    string
-	sourceURL      string
-	sourceContent  string
-	config         *Config
-	compress       bool
-	expectResponse interface{}
-	expectedURLs   map[string]int
+	description     string
+	sourceURL       string
+	sourceContent   string
+	config          *Config
+	compress        bool
+	expectResponse  interface{}
+	expectedURLs    map[string]int
+	hasServiceError bool
 }
 
 func TestService_Mirror(t *testing.T) {
 
 	var useCases = []*serviceUseCase{
+
+		{
+			description: "compressed transfer",
+			sourceURL:   "mem://localhost/folder/subfolder/file1.txt",
+			sourceContent: `line1,
+line2,
+line3,
+line4,
+line5,
+line6,
+line7,
+line8,
+line9
+`,
+			config: &Config{
+				Routes: Routes{
+					&Route{
+						Suffix:  ".txt",
+						DestURL: "mem://localhost/data",
+						Compression: &Compression{
+							Codec: GZipCodec,
+						},
+					},
+				},
+			},
+			expectedURLs: map[string]int{
+				"mem://localhost/folder/subfolder/file1.txt": 62,
+				"mem://localhost/data/file1.txt.gz":          58,
+			},
+			expectResponse: `{
+	"DestURLs": [
+		"mem://localhost/data/file1.txt.gz"
+	],
+	"Status": "ok"
+}`,
+		},
+
 		{
 			description: "no split transfer, folder depth = 0",
 			sourceURL:   "mem://localhost/folder/subfolder/file1.txt",
@@ -106,40 +145,6 @@ line4`,
 	"DestURLs": [
 		"mem://localhost/cloned/data/file1_00001.txt",
 		"mem://localhost/cloned/data/file1_00002.txt"
-	],
-	"Status": "ok"
-}`,
-		},
-
-		{
-			description: "compressed transfer",
-			sourceURL:   "mem://localhost/folder/subfolder/file1.txt",
-			sourceContent: `line1,
-line2,
-line3,
-line4,
-line5,
-line6,
-line7,
-line8`,
-			config: &Config{
-				Routes: Routes{
-					&Route{
-						Suffix:  ".txt",
-						DestURL: "mem://localhost/data",
-						Compression: &Compression{
-							Codec: GZipCodec,
-						},
-					},
-				},
-			},
-			expectedURLs: map[string]int{
-				"mem://localhost/folder/subfolder/file1.txt": 54,
-				"mem://localhost/data/file1.txt.gz":          41,
-			},
-			expectResponse: `{
-	"DestURLs": [
-		"mem://localhost/data/file1.txt.gz"
 	],
 	"Status": "ok"
 }`,
@@ -297,12 +302,47 @@ line4`,
 	"Status": "ok"
 }`,
 		},
+		{
+			description: "no split transfer, folder depth = 0",
+			sourceURL:   "mem://localhost/folder/subfolder/file1.txt",
+			sourceContent: `line1,
+line2,
+line3,
+line4`,
+			config: &Config{
+				Routes: Routes{
+					&Route{
+						Suffix:  ".txt",
+						Prefix:  "/folder/",
+						DestURL: "mem://localhost/cloned/data",
+					},
+				},
+				Secrets: []*secret.Config{
+
+					{
+
+						TargetScheme: "s3",
+						URL:          "",
+					},
+				},
+			},
+			hasServiceError: true,
+		},
 	}
 
 	memStorage := storage.NewMemoryService()
+
 	for _, useCase := range useCases {
 		initUseCase(useCase, memStorage, t)
-		service, _ := New(useCase.config)
+		service, err := New(useCase.config)
+
+		if useCase.hasServiceError {
+			assert.NotNil(t, err, useCase.description)
+			continue
+		}
+		if !assert.Nil(t, err, useCase.description) {
+			continue
+		}
 		response := service.Mirror(&Request{URL: useCase.sourceURL})
 		if !assertly.AssertValues(t, useCase.expectResponse, response, useCase.description) {
 			_ = toolbox.DumpIndent(response, true)
