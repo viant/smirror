@@ -20,6 +20,16 @@
       ]
     },
     {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${s3Bucket}",
+        "arn:aws:s3:::${s3Bucket}/*"
+      ]
+    },
+    {
       "Sid": "Stmt1482841948000",
       "Effect": "Allow",
       "Action": [

@@ -1,7 +1,7 @@
 {
   "Routes": [
     {
-      "Prefix": "/data/p1",
+      "Prefix": "/data/p5",
       "Suffix": ".csv",
       "DestURL": "gs://${s3Bucket}/data",
       "OnCompletion": {
@@ -23,7 +23,7 @@
   "Secrets": [
     {
       "Provider": "aws",
-      "TargetScheme": "s3",
+      "TargetScheme": "gs",
       "Parameter": "smirror.gs",
       "Key": "alias/smirror"
     }

@@ -4,11 +4,16 @@
 node_modules
 go.mod
 go.sum
+e2e/
 e2e/**
 usage/**
+usage/
 logs/**
+logs/
 images/**
+images/
 aws/**
+aws/
 *.md
 .DS_Store
 *.zip

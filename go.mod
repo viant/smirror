@@ -11,7 +11,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.3.0
 	github.com/viant/assertly v0.5.1
-	github.com/viant/toolbox v0.26.0
+	github.com/viant/toolbox v0.26.2
 	google.golang.org/api v0.7.0 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )

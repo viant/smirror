@@ -1,0 +1,2 @@
+- Add cloud functions/lamda for checking error folder
+- In checksum error maybe retry on copy

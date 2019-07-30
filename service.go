@@ -67,7 +67,12 @@ func (s *service) mirrorAsset(route *Route, URL string, storageService storage.S
 			return err
 		}
 	}
-	defer func() { _ = reader.Close() }()
+	defer func() {
+		if reader != nil {
+			_ = reader.Close()
+		}
+	}()
+
 	destName := route.Name(URL)
 	destURL := toolbox.URLPathJoin(route.DestURL, destName)
 	dataCopy := &Copy{Reader: reader, Dest: NewDatafile(destURL, route.Compression)}
@@ -82,7 +87,11 @@ func (s *service) mirrorChunkeddAsset(route *Route, storageService storage.Servi
 			return err
 		}
 	}
-	defer func() { _ = reader.Close() }()
+	defer func() {
+		if reader != nil {
+			_ = reader.Close()
+		}
+	}()
 	counter := int32(0)
 	waitGroup := &sync.WaitGroup{}
 	err = toolbox.SplitTextStream(reader, s.chunkWriter(request.URL, route, &counter, waitGroup, response), route.Split.MaxLines)

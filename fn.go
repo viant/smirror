@@ -40,7 +40,7 @@ func fn(ctx context.Context, event gs.Event) (*Response, error) {
 		return nil, err
 	}
 	if IsFnLoggingEnabled(LoggingEnvKey) {
-		fmt.Printf("uses service %p, %v\n", service, err)
+		fmt.Printf("uses service %T(%p), err: %v\n", service, service, err)
 	}
 	response := service.Mirror(NewRequest(event.URL()))
 	if IsFnLoggingEnabled(LoggingEnvKey) {

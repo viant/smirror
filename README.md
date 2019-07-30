@@ -377,6 +377,8 @@ pipeline:
       - cd ${appPath}
       - export GO111MODULE=on
       - go mod vendor
+      - export GOOS=linux
+      - export GOARCH=amd64
       - cd aws
       - go build -o smirror
       - zip -j smirror.zip smirror
@@ -418,10 +420,12 @@ pipeline:
   - [AWS secrets](https://github.com/viant/endly/tree/master/doc/secrets#asw-credentials) for dedicated e2e account ~/.secret/aws-e2e.json 
 
 
-
-
-
-
+```bash
+git clone https://github.com/viant/smirror.git
+cd smirror/e2e
+### Update mirrors bucket for both S3, GS in e2e/run.yaml (gsBucket, s3Bucket)
+endly 
+```
 
 ## Monitoring and limitation
 

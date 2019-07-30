@@ -23,7 +23,7 @@ pipeline:
     sourceKey: mirrorS3ConfigJSON
     dest:
       credentials: $awsCredentials
-      URL: s3://${gsBucket}/e2e-mirror/config/mirror.json
+      URL: s3://${s3Bucket}/e2e-mirror/config/mirror.json
 
 
   s3Secret:

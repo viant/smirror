@@ -17,6 +17,8 @@ pipeline:
       - cd ${appPath}
       - export GO111MODULE=on
       - go mod vendor
+      - export GOOS=linux
+      - export GOARCH=amd64
       - cd aws
       - go build -o smirror
       - zip -j smirror.zip smirror
@@ -41,3 +43,15 @@ pipeline:
     attach:
       - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
+  setTrigger:
+    action: aws/s3:setupBucketNotification
+    sleepTimeMs: 20000
+    bucket: ${s3Bucket}
+    lambdaFunctionConfigurations:
+      - functionName: $functionName
+        id: ObjectCreatedEvents
+        events:
+          - s3:ObjectCreated:*
+        filter:
+          prefix:
+            - data

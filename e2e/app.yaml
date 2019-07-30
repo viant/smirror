@@ -15,28 +15,30 @@ pipeline:
         - unset GOPATH
         - cd ${fnAppPath}
         - export GO111MODULE=on
+        - export GOOS=linux
+        - export GOARCH=amd64
         - go mod vendor
         - cd aws
         - go build -o smirror
         - zip -j smirror.zip smirror
 
-    deployCloudFunction:
-      action: gcp/cloudfunctions:deploy
-      credentials: $gcpCredentials
-      '@name': $functionName
-      entryPoint: Fn
-      serviceAccount: ${gcp.serviceAccount}
-      runtime: go111
-      availableMemoryMB: 256
-      eventTrigger:
-        eventType: google.storage.object.finalize
-        resource: projects/_/buckets/${gsBucket}
-      environmentVariables:
-        LOGGING: 'true'
-        CONFIG: gs://${gsBucket}/e2e-mirror/config/mirror.json
-      source:
-        URL: ${fnAppPath}/
-      sleepTimeMs: 5000
+#    deployCloudFunction:
+#      action: gcp/cloudfunctions:deploy
+#      credentials: $gcpCredentials
+#      '@name': $functionName
+#      entryPoint: Fn
+#      serviceAccount: ${gcp.serviceAccount}
+#      runtime: go111
+#      availableMemoryMB: 256
+#      eventTrigger:
+#        eventType: google.storage.object.finalize
+#        resource: projects/_/buckets/${gsBucket}
+#      environmentVariables:
+#        LOGGING: 'true'
+#        CONFIG: gs://${gsBucket}/e2e-mirror/config/mirror.json
+#      source:
+#        URL: ${fnAppPath}/
+#      sleepTimeMs: 5000
 
     deployLambda:
       action: aws/lambda:deploy
@@ -58,3 +60,15 @@ pipeline:
       attach:
         - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
+    setTrigger:
+      action: aws/s3:setupBucketNotification
+      sleepTimeMs: 20000
+      bucket: ${s3Bucket}
+      lambdaFunctionConfigurations:
+        - functionName: $functionName
+          id: ObjectCreatedEvents
+          events:
+            - s3:ObjectCreated:*
+          filter:
+            prefix:
+              - data
