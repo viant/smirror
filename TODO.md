@@ -1,2 +1,2 @@
-- Add cloud functions/lamda for checking error folder
-- In checksum error maybe retry on copy
+- Add cloud functions/lambda for checking error folder
+- On upload error due to checksum  - investigate current impelementation and may be retry
