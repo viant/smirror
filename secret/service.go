@@ -35,7 +35,6 @@ func newAwsCredConfig(ctx context.Context, config *Config) (*cred.Config, error)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode")
 	}
-	toolbox.Dump(credConfig)
 	return credConfig, nil
 }
 
@@ -44,7 +43,6 @@ func newGcpCredConfig(ctx context.Context, config *Config) (*cred.Config, error)
 	decoderFactory := toolbox.NewJSONDecoderFactory()
 	credConfig := &cred.Config{}
 	kmsService := gcp.New()
-	toolbox.Dump(decryptRequest)
 	err := kmsService.Decode(ctx, decryptRequest, decoderFactory, credConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode")
