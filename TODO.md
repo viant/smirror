@@ -1,2 +1,2 @@
 - Add cloud functions/lambda for checking error folder
-- On upload error due to checksum  - investigate current impelementation and may be retry
+- On upload error due to checksum  - investigate current impl and may be retry
