@@ -12,8 +12,6 @@ logs/**
 logs/
 images/**
 images/
-aws/**
-aws/
 *.md
 .DS_Store
 *.zip
