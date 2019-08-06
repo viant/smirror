@@ -3,7 +3,6 @@ package smirror
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/viant/toolbox"
 )
 
 var singleton Service
