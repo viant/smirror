@@ -239,7 +239,7 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \
 
 ### S3 to GS mirror
 
-[![Google storage to S3 mirror](images/g3Tos3Mirror.png)](images/s3to_gs_mirror.png)
+[![Google storage to S3 mirror](images/s3to_gs_mirror.png)](images/s3to_gs_mirror.png)
 
 
 To mirror data from S3 that match /data/ prefix and '.csv.gz' suffix to gs://destBucket/data
