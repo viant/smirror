@@ -239,6 +239,9 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \
 
 ### S3 to GS mirror
 
+[![Google storage to S3 mirror](images/g3Tos3Mirror.png)](images/s3to_gs_mirror.png)
+
+
 To mirror data from S3 that match /data/ prefix and '.csv.gz' suffix to gs://destBucket/data
 preserving parent folder (folderDepth:1) the following configuration can be used with Mirror cloud function
 
@@ -402,6 +405,18 @@ pipeline:
         policydocument: $Cat('${privilegePolicy}')
     attach:
       - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  setTrigger:
+      action: aws/s3:setupBucketNotification
+      sleepTimeMs: 20000
+      bucket: ${s3Bucket}
+      lambdaFunctionConfigurations:
+        - functionName: $functionName
+          id: ObjectCreatedEvents
+          events:
+            - s3:ObjectCreated:*
+          filter:
+            prefix:
+              - data 
 ```
 
 - With **aws cli** 
