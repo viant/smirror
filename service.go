@@ -60,9 +60,14 @@ func (s *service) mirror(request *Request, response *Response) error {
 
 func (s *service) mirrorAsset(route *Route, URL string, storageService storage.Service, response *Response) error {
 	reader, err := storageService.DownloadWithURL(URL)
-	//TODO optimze copy if dest uses the same compression, at the moment we decompress and comress it again
+	sourceCompression := NewCompressionForURL(URL)
+	destCompression := route.Compression
+	if sourceCompression.Equals(destCompression) {
+		sourceCompression = nil
+		destCompression = nil
+	}
 	if err == nil {
-		reader, err = NewReader(reader, NewCompressionForURL(URL))
+		reader, err = NewReader(reader, sourceCompression)
 		if err != nil {
 			return err
 		}
@@ -75,7 +80,7 @@ func (s *service) mirrorAsset(route *Route, URL string, storageService storage.S
 
 	destName := route.Name(URL)
 	destURL := toolbox.URLPathJoin(route.DestURL, destName)
-	dataCopy := &Copy{Reader: reader, Dest: NewDatafile(destURL, route.Compression)}
+	dataCopy := &Copy{Reader: reader, Dest: NewDatafile(destURL, destCompression)}
 	return s.copy(dataCopy, response)
 }
 
