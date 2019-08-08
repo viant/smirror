@@ -14,6 +14,10 @@ pipeline:
           members:
             - serviceAccount:$gcp.serviceAccount
 
+    keyInfo:
+      action: print
+      message: 'Deployed Key: ${deployKey.Name}'
+
     encrypt:
       action: gcp/kms:encrypt
       logging: false

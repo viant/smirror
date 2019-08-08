@@ -117,6 +117,8 @@ endly encryt
 
 [@encrypt.yaml](usage/gs_to_s3/encrypt.yaml)
 ```yaml
+init:
+  gsBucket: e2etst
 pipeline:
   secure:
     deployKey:
@@ -131,6 +133,10 @@ pipeline:
           members:
             - serviceAccount:$gcp.serviceAccount
 
+    keyInfo:
+      action: print
+      message: 'Deployed Key: ${deployKey.Name}'
+
     encrypt:
       action: gcp/kms:encrypt
       logging: false
@@ -139,22 +145,22 @@ pipeline:
       source:
         URL: config.json
       dest:
+        URL: gs://$gsBucket/mirror/config/config.json.enc
         credentials: gcp-credentials
-        URL: gs://sourceBucket/secret/s3-cred.json.enc
         
     info:
       action: print
-      message: ${encrypt.CipherData}
+      message: ${encrypt.CipherBase64Text}
+
 ```
 
 Where [gcp-credentials](https://github.com/viant/endly/tree/master/doc/secrets#gc) is service account based GCP secrets
 stored in ~/.secret/gcp-credentials.json
 
+
 - With **gcloud cli**
 
 ```bash
-
-## Crate symmetric key
 
 gcloud kms keyrings create my_ring --location us-central1
 gcloud kms keys create my_key --location us-central1 \
