@@ -19,6 +19,11 @@ type Config struct {
 	Secrets []*secret.Config
 }
 
+//Init initialises routes
+func (c *Config) Init() error {
+	return c.Routes.Init()
+}
+
 //NewConfigFromEnv returns new config from env
 func NewConfigFromEnv(key string) (*Config, error) {
 	JSONOrURL := strings.TrimSpace(os.Getenv(key))
@@ -32,6 +37,9 @@ func NewConfigFromEnv(key string) (*Config, error) {
 func NewConfigFromJSON(payload string) (*Config, error) {
 	config := &Config{}
 	err := json.NewDecoder(strings.NewReader(payload)).Decode(config)
+	if err == nil {
+		err = config.Init()
+	}
 	return config, err
 }
 
@@ -49,6 +57,9 @@ func NewConfigFromURL(URL string) (*Config, error) {
 	err = json.NewDecoder(reader).Decode(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode "+URL)
+	}
+	if err == nil {
+		err = config.Init()
 	}
 	return config, err
 }

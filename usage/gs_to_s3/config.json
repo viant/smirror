@@ -21,7 +21,7 @@
       "FolderDepth": 1
     },
     {
-      "Prefix": "/large/data/",
+      "Filter": "^\/[a-z]+/data/\\d+/",
       "Suffix": ".csv.gz",
       "DestURL": "s3://destBucket/data/chunks/",
       "Split": {

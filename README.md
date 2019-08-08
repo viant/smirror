@@ -67,7 +67,7 @@ preserving parent folder (folderDepth:1) the following configuration can be used
       "FolderDepth": 1
     },
     {
-      "Prefix": "/large/data/",
+      "Filter": "^\/[a-z]+/data/\\d+/",
       "Suffix": ".csv.gz",
       "DestURL": "s3://destBucket/data/chunks/",
       "Split": {

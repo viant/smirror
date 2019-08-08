@@ -45,9 +45,30 @@ func TestRoute_HasMatch(t *testing.T) {
 			URL:    "ssh:///f/abc.ts",
 			expect: false,
 		},
+		{
+			description: "filter no match",
+			Route: Route{
+				Suffix: ".tsv",
+				Filter:`^[a-z]*/data/\\d+/`,
+			},
+			URL:    "ssh://host/123/abc.tsv",
+			expect: false,
+		},
+		{
+			description: "filter match",
+			Route: Route{
+				Suffix: ".tsv",
+				Filter:`^\/[a-z]+/data/\d+/`,
+			},
+			URL:    "ssh://host/aa/data/002/abc.tsv",
+			expect: true,
+		},
+
 	}
 
 	for _, useCase := range useCases {
+		err := useCase.Init()
+		assert.Nil(t, err, useCase.description)
 		actual := useCase.HasMatch(useCase.URL)
 		assert.EqualValues(t, useCase.expect, actual, useCase.description)
 	}

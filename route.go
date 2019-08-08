@@ -4,17 +4,20 @@ import (
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/url"
 	"path"
+	"regexp"
 	"smirror/job"
 	"strings"
 )
 
 //Route represent matching resource route
 type Route struct {
-	Prefix       string
-	Suffix       string
-	DestURL      string
-	Split        *Split
-	OnCompletion job.Completion
+	Prefix         string
+	Suffix         string
+	Filter         string
+	compiledFilter *regexp.Regexp
+	DestURL        string
+	Split          *Split
+	OnCompletion   job.Completion
 	*Compression
 
 	//FolderDepth  - preserves specified folder depth in dest URL
@@ -24,10 +27,35 @@ type Route struct {
 //Routes represents route slice
 type Routes []*Route
 
+func (r Routes) Init() error {
+	for i := range r {
+		if err := r[i].Init();err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+
+func (r *Route) Init() error {
+	var err error
+	if r.Filter != "" && r.compiledFilter == nil {
+		r.compiledFilter, err = regexp.Compile(r.Filter)
+	}
+	return err
+}
+
 //HasMatch returns true if URL matches prefix or suffix
 func (r *Route) HasMatch(URL string) bool {
 	resource := url.NewResource(URL)
 	location := resource.ParsedURL.Path
+
+	if r.compiledFilter != nil {
+		if ! r.compiledFilter.MatchString(location) {
+			return false
+		}
+	}
+
 	if r.Prefix != "" {
 		if !strings.HasPrefix(location, r.Prefix) {
 			return false
