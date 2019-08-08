@@ -123,7 +123,7 @@ pipeline:
   secure:
     deployKey:
       action: gcp/kms:deployKey
-      credentials: gcp-credentials
+      credentials: gcp-e2e
       ring: my_ring
       key: my_key
       logging: false
@@ -143,11 +143,10 @@ pipeline:
       ring: my_ring
       key: my_key
       source:
-        URL: config.json
+        URL: s3-cred.json
       dest:
-        URL: gs://$gsBucket/mirror/config/config.json.enc
-        credentials: gcp-credentials
-        
+        credentials: gcp-e2e
+        URL: gs://$gsBucket/mirror/config/s3-cred.json.enc
     info:
       action: print
       message: ${encrypt.CipherBase64Text}
