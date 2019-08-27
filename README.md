@@ -77,7 +77,6 @@ preserving parent folder (folderDepth:1) the following configuration can be used
        "Suffix": ".csv.gz",
        "Dest": {
          "URL": "s3://destBucket/data/chunks/",
-         ,
          "Credentials": {
            "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
            "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
