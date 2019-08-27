@@ -45,61 +45,66 @@ preserving parent folder (folderDepth:1) the following configuration can be used
 [@gs://sourceBucket/config/config.json](usage/gs_to_s3/config.json)
 ```json
 {
-  "Routes": [
-    {
-      "Prefix": "/data/",
-      "Suffix": ".csv.gz",
-      "DestURL": "s3://destBucket/data",
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnError": [
-          {
-            "Action": "move",
-            "URL": "gs://sourceBucket/data/errors/"
-          }
-        ]
-      },
-      "Codec": "gzip",
-      "FolderDepth": 1
-    },
-    {
-      "Filter": "^\/[a-z]+/data/\\d+/",
-      "Suffix": ".csv.gz",
-      "DestURL": "s3://destBucket/data/chunks/",
-      "Split": {
-        "MaxLines": 10000,
-        "Template": "%s_%05d"
-      },
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnError": [
-          {
-            "Action": "move",
-            "URL": "gs://sourceBucket/data/errors/"
-          }
-        ]
-      },
-      "Codec": "gzip",
-      "FolderDepth": 1
-    }
-  ],
-  "Secrets": [
-    {
-      "Provider": "gcp",
-      "TargetScheme": "s3",
-      "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
-      "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
-    }
-  ]
-}
+   "Routes": [
+     {
+       "Prefix": "/data/",
+       "Suffix": ".csv.gz",
+       "Dest": {
+         "URL": "s3://destBucket/data",
+         "Credentials": {
+           "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+           "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+         }
+       },
+       "OnCompletion": {
+         "OnSuccess": [
+           {
+             "Action": "delete"
+           }
+         ],
+         "OnError": [
+           {
+             "Action": "move",
+             "URL": "gs://sourceBucket/data/errors/"
+           }
+         ]
+       },
+       "Codec": "gzip",
+       "FolderDepth": 1
+     },
+     {
+       "Filter": "^\/[a-z]+/data/\\d+/",
+       "Suffix": ".csv.gz",
+       "Dest": {
+         "URL": "s3://destBucket/data/chunks/",
+         ,
+         "Credentials": {
+           "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+           "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+         }
+       },
+       "Split": {
+         "MaxLines": 10000,
+         "Template": "%s_%05d"
+       },
+       "OnCompletion": {
+         "OnSuccess": [
+           {
+             "Action": "delete"
+           }
+         ],
+         "OnError": [
+           {
+             "Action": "move",
+             "URL": "gs://sourceBucket/data/errors/"
+           }
+         ]
+       },
+       "Codec": "gzip",
+       "FolderDepth": 1
+     }
+   ]
+ }
 ```
 
 ###### Encrypting AWS credentials with GCP KMS 
@@ -257,7 +262,13 @@ preserving parent folder (folderDepth:1) the following configuration can be used
     {
       "Prefix": "/data/",
       "Suffix": ".csv.gz",
-      "DestURL": "gs://destBucket/data",
+      "Dest": {
+        "URL": "gs://destBucket/data",
+        "Credentials": {
+          "Parameter": "smirror.gs",
+          "Key": "smirror"
+        }
+      },
       "OnCompletion": {
         "OnSuccess": [
           {
@@ -277,7 +288,13 @@ preserving parent folder (folderDepth:1) the following configuration can be used
     {
       "Prefix": "/large/data/",
       "Suffix": ".csv.gz",
-      "DestURL": "gs://destBucket/data/chunks/",
+      "Dest": {
+        "URL": "gs://destBucket/data/chunks/",
+        "Credentials": {
+          "Parameter": "smirror.gs",
+          "Key": "smirror"
+        }
+      },
       "Split": {
         "MaxLines": 10000,
         "Template": "%s_%05d"
@@ -297,14 +314,6 @@ preserving parent folder (folderDepth:1) the following configuration can be used
       },
       "Codec": "gzip",
       "FolderDepth": 1
-    }
-  ],
-  "Secrets": [
-    {
-      "Provider": "s3",
-      "TargetScheme": "gcp",
-      "Parameter": "smirror.gs",
-      "Key": "smirror"
     }
   ]
 }

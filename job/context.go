@@ -1,20 +1,22 @@
 package job
 
-import "github.com/viant/toolbox/storage"
+import (
+	"context"
+)
 
 //Context represents job context
 type Context struct {
+	context.Context
 	Error     error
-	Storage   storage.Service
 	Name      string
 	SourceURL string
 }
 
 //NewContext creates a context
-func NewContext(err error, storage storage.Service, sourceURL string) *Context {
+func NewContext(ctx context.Context, err error, sourceURL string) *Context {
 	return &Context{
+		Context:   ctx,
 		Error:     err,
-		Storage:   storage,
 		SourceURL: sourceURL,
 	}
 }

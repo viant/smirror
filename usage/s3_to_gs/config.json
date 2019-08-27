@@ -3,7 +3,13 @@
     {
       "Prefix": "/data/",
       "Suffix": ".csv.gz",
-      "DestURL": "gs://destBucket/data",
+      "Dest": {
+        "URL": "gs://destBucket/data",
+        "Credentials": {
+          "Parameter": "smirror.gs",
+          "Key": "smirror"
+        }
+      },
       "OnCompletion": {
         "OnSuccess": [
           {
@@ -23,7 +29,13 @@
     {
       "Prefix": "/large/data/",
       "Suffix": ".csv.gz",
-      "DestURL": "gs://destBucket/data/chunks/",
+      "Dest": {
+        "URL": "gs://destBucket/data/chunks/",
+        "Credentials": {
+          "Parameter": "smirror.gs",
+          "Key": "smirror"
+        }
+      },
       "Split": {
         "MaxLines": 10000,
         "Template": "%s_%05d"
@@ -43,14 +55,6 @@
       },
       "Codec": "gzip",
       "FolderDepth": 1
-    }
-  ],
-  "Secrets": [
-    {
-      "Provider": "s3",
-      "TargetScheme": "gcp",
-      "Parameter": "smirror.gs",
-      "Key": "smirror"
     }
   ]
 }

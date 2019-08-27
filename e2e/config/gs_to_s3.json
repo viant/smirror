@@ -3,7 +3,13 @@
     {
       "Prefix": "/data/p1",
       "Suffix": ".csv",
-      "DestURL": "s3://${s3Bucket}/data",
+      "Dest": {
+        "URL": "s3://${s3Bucket}/data",
+        "Credentials": {
+          "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
+          "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
+        }
+      },
       "OnCompletion": {
         "OnSuccess": [
           {
@@ -22,7 +28,13 @@
     {
       "Prefix": "/data/p2",
       "Suffix": ".csv.gz",
-      "DestURL": "s3://${s3Bucket}/data",
+      "Dest": {
+        "URL": "s3://${s3Bucket}/data",
+        "Credentials": {
+          "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
+          "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
+        }
+      },
       "Codec": "gzip",
       "OnCompletion": {
         "OnSuccess": [
@@ -42,7 +54,13 @@
     {
       "Prefix": "/data/p3",
       "Suffix": ".csv",
-      "DestURL": "s3://${s3Bucket}/data",
+      "Dest": {
+        "URL": "s3://${s3Bucket}/data",
+        "Credentials": {
+          "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
+          "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
+        }
+      },
       "Split": {
         "MaxLines": 10,
         "Template": "%s_%05d"
@@ -65,7 +83,13 @@
     {
       "Prefix": "/data/p4",
       "Suffix": ".csv",
-      "DestURL": "s3://${s3Bucket}/data",
+      "Dest": {
+        "URL": "s3://${s3Bucket}/data",
+        "Credentials": {
+          "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
+          "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
+        }
+      },
       "Codec": "gzip",
       "Split": {
         "MaxLines": 10,
@@ -85,14 +109,6 @@
         ]
       },
       "FolderDepth": 1
-    }
-  ],
-  "Secrets": [
-    {
-      "Provider": "gcp",
-      "TargetScheme": "s3",
-      "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
-      "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
     }
   ]
 }

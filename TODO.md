@@ -1,2 +1,3 @@
 - Add cloud functions/lambda for checking error folder
-- On upload error due to checksum  - investigate current impl and may be retry
+- E2E test with custom key encyption
+- Scheduled pull

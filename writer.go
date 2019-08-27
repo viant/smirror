@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"github.com/docker/docker/pkg/ioutils"
 	"io"
+	"smirror/config"
 )
 
 //OnClose represents on close writer listener
@@ -14,14 +15,14 @@ type OnClose func(writer *Writer) error
 type Writer struct {
 	io.WriteCloser
 	Reader     io.Reader
-	route      *Route
+	route      *config.Route
 	buffer     *bytes.Buffer
 	gzipWriter *gzip.Writer
 	listener   OnClose
 }
 
 //NewWriter returns a route writer
-func NewWriter(route *Route, listener OnClose) io.WriteCloser {
+func NewWriter(route *config.Route, listener OnClose) io.WriteCloser {
 	buffer := new(bytes.Buffer)
 	result := &Writer{
 		WriteCloser: ioutils.NopWriteCloser(buffer),
@@ -29,7 +30,7 @@ func NewWriter(route *Route, listener OnClose) io.WriteCloser {
 		listener:    listener,
 	}
 	if route.Compression != nil {
-		if route.Codec == GZipCodec {
+		if route.Codec == config.GZipCodec {
 			result.gzipWriter = gzip.NewWriter(buffer)
 			result.WriteCloser = result.gzipWriter
 		}

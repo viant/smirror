@@ -1,5 +1,7 @@
 package job
 
+import "github.com/viant/afs"
+
 //Completion represents a job completion
 type Completion struct {
 	OnSuccess []*Action
@@ -7,7 +9,7 @@ type Completion struct {
 }
 
 //Run run completion
-func (c *Completion) Run(context *Context) error {
+func (c *Completion) Run(context *Context, service afs.Service) error {
 	actions := c.OnSuccess
 	isError := context.Error != nil
 	if context.Error != nil {
@@ -17,9 +19,9 @@ func (c *Completion) Run(context *Context) error {
 		return nil
 	}
 	for _, action := range actions {
-		err := action.Do(context)
+		err := action.Do(context, service)
 		if err == nil && isError {
-			err = action.WriteError(context)
+			err = action.WriteError(context, service)
 		}
 		if err != nil {
 			return err

@@ -3,7 +3,13 @@
     {
       "Prefix": "/data/p5",
       "Suffix": ".csv",
-      "DestURL": "gs://${s3Bucket}/data",
+      "Dest": {
+        "URL": "gs://${s3Bucket}/data",
+        "Credentials": {
+          "Parameter": "smirror.gs",
+          "Key": "alias/smirror"
+        }
+      },
       "OnCompletion": {
         "OnSuccess": [
           {
@@ -18,14 +24,6 @@
         ]
       },
       "FolderDepth": 1
-    }
-  ],
-  "Secrets": [
-    {
-      "Provider": "aws",
-      "TargetScheme": "gs",
-      "Parameter": "smirror.gs",
-      "Key": "alias/smirror"
     }
   ]
 }

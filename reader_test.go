@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"smirror/config"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestNewReader(t *testing.T) {
 	var useCases = []struct {
 		description string
 		data        string
-		compression *Compression
+		compression *config.Compression
 		hasError    bool
 	}{
 
@@ -25,12 +26,12 @@ func TestNewReader(t *testing.T) {
 		{
 			description: "compressed data",
 			data:        "abcd",
-			compression: &Compression{Codec: GZipCodec},
+			compression: &config.Compression{Codec: config.GZipCodec},
 		},
 		{
 			description: "unknown code error",
 			data:        "abcd",
-			compression: &Compression{Codec: "abc"},
+			compression: &config.Compression{Codec: "abc"},
 			hasError:    true,
 		},
 	}
@@ -40,7 +41,7 @@ func TestNewReader(t *testing.T) {
 		data := []byte(useCase.data)
 		if useCase.compression != nil {
 			switch useCase.compression.Codec {
-			case GZipCodec:
+			case config.GZipCodec:
 				buffer := new(bytes.Buffer)
 				writer := gzip.NewWriter(buffer)
 				_, _ = writer.Write(data)

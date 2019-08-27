@@ -2,14 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/viant/toolbox"
-	"github.com/viant/toolbox/cred"
-	_ "github.com/viant/toolbox/storage/gs"
-	"github.com/viant/toolbox/storage/s3"
-	_ "github.com/viant/toolbox/storage/s3"
+	_ "github.com/viant/afsc/gs"
+	_ "github.com/viant/afsc/s3"
 	"runtime/debug"
 	"smirror"
 )
@@ -28,8 +26,7 @@ func handleRequest(ctx context.Context, s3Event events.S3Event) error {
 	if len(s3Event.Records) == 0 {
 		return nil
 	}
-	s3.SetProvider(&cred.Config{Region: s3Event.Records[0].AWSRegion})
-	service, err := smirror.NewFromEnv(smirror.ConfigEnvKey)
+	service, err := smirror.NewFromEnv(ctx, smirror.ConfigEnvKey)
 	if err != nil {
 		return err
 	}
@@ -42,8 +39,11 @@ func handleRequest(ctx context.Context, s3Event events.S3Event) error {
 		if smirror.IsFnLoggingEnabled(smirror.LoggingEnvKey) {
 			fmt.Printf("triggered by  %v\n", URL)
 		}
-		response := service.Mirror(smirror.NewRequest(URL))
-		toolbox.Dump(response)
+		response := service.Mirror(ctx, smirror.NewRequest(URL))
+		if data, err := json.Marshal(response);err == nil {
+			fmt.Print(string(data))
+		}
+
 
 	}
 	return nil

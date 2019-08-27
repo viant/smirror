@@ -1,12 +1,15 @@
 package smirror
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/pkg/errors"
+	"github.com/viant/afs"
+	"github.com/viant/afsc/gs"
+	"github.com/viant/afsc/s3"
 	"github.com/viant/toolbox"
-	"github.com/viant/toolbox/storage"
 	"os"
-	"smirror/secret"
+	"smirror/config"
 	"strings"
 )
 
@@ -15,22 +18,47 @@ const ConfigEnvKey = "CONFIG"
 
 //Config represents routes
 type Config struct {
-	Routes  Routes
-	Secrets []*secret.Config
+	Routes config.Routes
+	//SourceScheme, currently gs or s3
+	SourceScheme string
 }
+
 
 //Init initialises routes
 func (c *Config) Init() error {
-	return c.Routes.Init()
+	if c.SourceScheme == "" {
+		if os.Getenv("GCLOUD_PROJECT") != "" {
+			c.SourceScheme = gs.Scheme
+		} else if os.Getenv("AWS_LAMBDA_FUNCTION_NAME") != "" {
+			c.SourceScheme = s3.Scheme
+		}
+	}
+	return nil
 }
 
+
+//Resources returns
+func (c *Config) Resources() []*config.Resource {
+	var result = make([]*config.Resource,0)
+	for _, resource := range c.Routes {
+		if resource.Source != nil {
+			result = append(result, resource.Source)
+		}
+		if resource.Dest.Credentials != nil || resource.Dest.CustomKey != nil {
+			result = append(result, resource.Source)
+		}
+	}
+	return result
+}
+
+
 //NewConfigFromEnv returns new config from env
-func NewConfigFromEnv(key string) (*Config, error) {
+func NewConfigFromEnv(ctx context.Context, key string) (*Config, error) {
 	JSONOrURL := strings.TrimSpace(os.Getenv(key))
 	if toolbox.IsStructuredJSON(JSONOrURL) {
 		return NewConfigFromJSON(JSONOrURL)
 	}
-	return NewConfigFromURL(JSONOrURL)
+	return NewConfigFromURL(ctx, JSONOrURL)
 }
 
 //NewConfigFromJSON creates a new config from env
@@ -44,22 +72,16 @@ func NewConfigFromJSON(payload string) (*Config, error) {
 }
 
 //NewConfigFromURL creates a new config from env
-func NewConfigFromURL(URL string) (*Config, error) {
-	storageService, err := storage.NewServiceForURL(URL, "")
+func NewConfigFromURL(ctx context.Context, URL string) (*Config, error) {
+	service := afs.New()
+	reader, err := service.DownloadWithURL(ctx, URL)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get storage service "+URL)
-	}
-	reader, err := storageService.DownloadWithURL(URL)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to download "+URL)
+		return nil, errors.Wrapf(err, "failed to download: %v", URL)
 	}
 	config := &Config{}
 	err = json.NewDecoder(reader).Decode(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to decode "+URL)
+		return nil, errors.Wrapf(err, "failed to decode: %v ", URL)
 	}
-	if err == nil {
-		err = config.Init()
-	}
-	return config, err
+	return config, config.Init()
 }

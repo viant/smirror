@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"smirror/config"
 )
 
 //NewReader returns compression or regular reader
-func NewReader(reader io.ReadCloser, compression *Compression) (io.ReadCloser, error) {
+func NewReader(reader io.ReadCloser, compression *config.Compression) (io.ReadCloser, error) {
 	if compression == nil {
 		return reader, nil
 	}
@@ -18,7 +19,7 @@ func NewReader(reader io.ReadCloser, compression *Compression) (io.ReadCloser, e
 	if err != nil {
 		return nil, err
 	}
-	if compression.Codec == GZipCodec {
+	if compression.Codec == config.GZipCodec {
 		return gzip.NewReader(bytes.NewReader(payload))
 	}
 	return nil, fmt.Errorf("unsupported code: %v", compression.Codec)

@@ -1,6 +1,9 @@
 package job
 
 import (
+	"fmt"
+	"github.com/viant/afs"
+	"github.com/viant/afs/file"
 	"github.com/viant/toolbox"
 	"strings"
 )
@@ -19,36 +22,25 @@ type Action struct {
 }
 
 //WriteError writes an error file if context has error
-func (a Action) WriteError(context *Context) error {
+func (a Action) WriteError(context *Context, service afs.Service) error {
 	_, name := toolbox.URLSplit(context.SourceURL)
 	moveURL := toolbox.URLPathJoin(a.URL, name) + "-error"
-	return context.Storage.Upload(moveURL, strings.NewReader(context.Error.Error()))
+	return service.Upload(context.Context, moveURL, file.DefaultFileOsMode, strings.NewReader(context.Error.Error()))
 }
 
 //Do perform an action
-func (a Action) Do(context *Context) error {
+func (a Action) Do(context *Context, service afs.Service) error {
 	URL := context.SourceURL
 	switch a.Action {
 	case ActionDelete:
-		if object, err := context.Storage.StorageObject(URL); err == nil {
-			return context.Storage.Delete(object)
-		}
+		return service.Delete(context.Context, URL)
 	case ActionMove:
-		//TODO optimize it
-		rawData, err := context.Storage.DownloadWithURL(URL)
-		if err != nil {
-			return err
-		}
 		_, name := toolbox.URLSplit(context.SourceURL)
-		moveURL := toolbox.URLPathJoin(a.URL, name)
-		if err := context.Storage.Upload(moveURL, rawData); err != nil {
-			return err
-		}
+		targetURL := toolbox.URLPathJoin(a.URL, name)
 
-		if object, err := context.Storage.StorageObject(URL); err == nil {
-			return context.Storage.Delete(object)
-		}
+		fmt.Printf("move: %v -> %v\n", URL, targetURL)
 
+		return service.Move(context.Context, URL, targetURL)
 	}
 	return nil
 }

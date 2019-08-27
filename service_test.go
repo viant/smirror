@@ -3,14 +3,18 @@ package smirror
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"github.com/viant/afs/matcher"
+	"github.com/viant/afs/mem"
+	"github.com/viant/afs/storage"
 	"github.com/viant/assertly"
 	"github.com/viant/toolbox"
-	"github.com/viant/toolbox/storage"
 	"io"
 	"io/ioutil"
+	"smirror/config"
 	"smirror/job"
-	"smirror/secret"
 	"strings"
 	"testing"
 )
@@ -44,12 +48,16 @@ line8,
 line9
 `,
 			config: &Config{
-				Routes: Routes{
-					&Route{
-						Suffix:  ".txt",
-						DestURL: "mem://localhost/data",
-						Compression: &Compression{
-							Codec: GZipCodec,
+				Routes: config.Routes{
+					&config.Route{
+						Basic: matcher.Basic{
+							Suffix: ".txt",
+						},
+						Dest: config.Resource{
+							URL: "mem://localhost/data",
+						},
+						Compression: &config.Compression{
+							Codec: config.GZipCodec,
 						},
 					},
 				},
@@ -74,11 +82,15 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Routes: Routes{
-					&Route{
-						Suffix:  ".txt",
-						Prefix:  "/folder/",
-						DestURL: "mem://localhost/cloned/data",
+				Routes: config.Routes{
+					&config.Route{
+						Basic: matcher.Basic{
+							Suffix: ".txt",
+							Prefix: "/folder/",
+						},
+						Dest: config.Resource{
+							URL: "mem://localhost/cloned/data",
+						},
 					},
 				},
 			},
@@ -99,11 +111,15 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Routes: Routes{
-					&Route{
+				Routes: config.Routes{
+					&config.Route{
 						FolderDepth: 2,
-						Suffix:      ".txt",
-						DestURL:     "mem://localhost/cloned/data",
+						Basic: matcher.Basic{
+							Suffix: ".txt",
+						},
+						Dest: config.Resource{
+							URL: "mem://localhost/cloned/data",
+						},
 					},
 				},
 			},
@@ -125,11 +141,15 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Routes: Routes{
-					&Route{
-						Suffix:  ".txt",
-						DestURL: "mem://localhost/cloned/data",
-						Split: &Split{
+				Routes: config.Routes{
+					&config.Route{
+						Basic: matcher.Basic{
+							Suffix: ".txt",
+						},
+						Dest: config.Resource{
+							URL: "mem://localhost/cloned/data",
+						},
+						Split: &config.Split{
 							MaxLines: 3,
 							Template: "%v_%05d",
 						},
@@ -166,16 +186,20 @@ line10,
 line11
 `,
 			config: &Config{
-				Routes: Routes{
-					&Route{
-						Suffix:  ".txt",
-						DestURL: "mem://localhost/data",
-						Split: &Split{
+				Routes: config.Routes{
+					&config.Route{
+						Basic: matcher.Basic{
+							Suffix: ".txt",
+						},
+						Dest: config.Resource{
+							URL: "mem://localhost/data",
+						},
+						Split: &config.Split{
 							MaxLines: 10,
 							Template: "%v_%05d",
 						},
-						Compression: &Compression{
-							Codec: GZipCodec,
+						Compression: &config.Compression{
+							Codec: config.GZipCodec,
 						},
 					},
 				},
@@ -210,16 +234,20 @@ line10,
 line11
 `,
 			config: &Config{
-				Routes: Routes{
-					&Route{
-						Suffix:  ".txt.gz",
-						DestURL: "mem://localhost/data",
-						Split: &Split{
+				Routes: config.Routes{
+					&config.Route{
+						Basic: matcher.Basic{
+							Suffix: ".txt.gz",
+						},
+						Dest: config.Resource{
+							URL: "mem://localhost/data",
+						},
+						Split: &config.Split{
 							MaxLines: 10,
 							Template: "%v_%05d",
 						},
-						Compression: &Compression{
-							Codec: GZipCodec,
+						Compression: &config.Compression{
+							Codec: config.GZipCodec,
 						},
 					},
 				},
@@ -246,10 +274,14 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Routes: Routes{
-					&Route{
-						Suffix:  ".txt",
-						DestURL: "mem://localhost/cloned/data",
+				Routes: config.Routes{
+					&config.Route{
+						Basic: matcher.Basic{
+							Suffix: ".txt",
+						},
+						Dest: config.Resource{
+							URL: "mem://localhost/cloned/data",
+						},
 						OnCompletion: job.Completion{
 							OnSuccess: []*job.Action{
 								{
@@ -277,10 +309,14 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Routes: Routes{
-					&Route{
-						Suffix:  ".txt",
-						DestURL: "mem://localhost/cloned/data",
+				Routes: config.Routes{
+					&config.Route{
+						Basic: matcher.Basic{
+							Suffix: ".txt",
+						},
+						Dest: config.Resource{
+							URL: "mem://localhost/cloned/data",
+						},
 						OnCompletion: job.Completion{
 							OnSuccess: []*job.Action{
 								{
@@ -302,39 +338,14 @@ line4`,
 	"Status": "ok"
 }`,
 		},
-		{
-			description: "no split transfer, folder depth = 0",
-			sourceURL:   "mem://localhost/folder/subfolder/file1.txt",
-			sourceContent: `line1,
-line2,
-line3,
-line4`,
-			config: &Config{
-				Routes: Routes{
-					&Route{
-						Suffix:  ".txt",
-						Prefix:  "/folder/",
-						DestURL: "mem://localhost/cloned/data",
-					},
-				},
-				Secrets: []*secret.Config{
-
-					{
-
-						TargetScheme: "s3",
-						URL:          "",
-					},
-				},
-			},
-			hasServiceError: true,
-		},
 	}
 
-	memStorage := storage.NewMemoryService()
-
+	ctx := context.Background()
+	mgr := mem.Singleton()
 	for _, useCase := range useCases {
-		initUseCase(useCase, memStorage, t)
-		service, err := New(useCase.config)
+
+		initUseCase(ctx, useCase, mgr, t)
+		service, err := New(ctx, useCase.config)
 
 		if useCase.hasServiceError {
 			assert.NotNil(t, err, useCase.description)
@@ -343,15 +354,19 @@ line4`,
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
-		response := service.Mirror(&Request{URL: useCase.sourceURL})
+		response := service.Mirror(ctx, &Request{URL: useCase.sourceURL})
 		if !assertly.AssertValues(t, useCase.expectResponse, response, useCase.description) {
 			_ = toolbox.DumpIndent(response, true)
 		}
 		if len(useCase.expectedURLs) == 0 {
 			continue
 		}
+
+
 		for URL, expectedSize := range useCase.expectedURLs {
-			reader, err := memStorage.DownloadWithURL(URL)
+
+			fmt.Printf("dow: %v\n", URL)
+			reader, err := mgr.DownloadWithURL(ctx, URL)
 			if expectedSize == 0 { //DO NOT EXPECT ASSET IN THAT URL
 				if assert.NotNil(t, err, useCase.description) {
 					continue
@@ -368,9 +383,10 @@ line4`,
 
 }
 
-func initUseCase(useCase *serviceUseCase, memStorage storage.Service, t *testing.T) {
+func initUseCase(ctx context.Context, useCase *serviceUseCase, memStorage storage.Manager, t *testing.T) {
 	var sourceReader io.Reader = strings.NewReader(useCase.sourceContent)
-	if strings.HasSuffix(useCase.sourceURL, GZIPExtension) {
+
+	if strings.HasSuffix(useCase.sourceURL, config.GZIPExtension) {
 		buffer := new(bytes.Buffer)
 		writer := gzip.NewWriter(buffer)
 		_, _ = io.Copy(writer, sourceReader)
@@ -378,6 +394,6 @@ func initUseCase(useCase *serviceUseCase, memStorage storage.Service, t *testing
 		_ = writer.Close()
 		sourceReader = buffer
 	}
-	err := memStorage.Upload(useCase.sourceURL, sourceReader)
+	err := memStorage.Upload(ctx, useCase.sourceURL, 0644, sourceReader)
 	assert.Nil(t, err, useCase.description)
 }

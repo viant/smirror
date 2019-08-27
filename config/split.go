@@ -1,4 +1,4 @@
-package smirror
+package config
 
 import (
 	"fmt"

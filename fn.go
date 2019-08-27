@@ -2,11 +2,10 @@ package smirror
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/viant/toolbox"
 	"runtime/debug"
-
 	"smirror/gs"
 	"time"
 )
@@ -35,16 +34,18 @@ func Fn(ctx context.Context, event gs.Event) (err error) {
 
 func fn(ctx context.Context, event gs.Event) (*Response, error) {
 	fmt.Printf("triggered by  %v\n", event.URL())
-	service, err := NewFromEnv(ConfigEnvKey)
+	service, err := NewFromEnv(ctx, ConfigEnvKey)
 	if err != nil {
 		return nil, err
 	}
 	if IsFnLoggingEnabled(LoggingEnvKey) {
 		fmt.Printf("uses service %T(%p), err: %v\n", service, service, err)
 	}
-	response := service.Mirror(NewRequest(event.URL()))
+	response := service.Mirror(ctx, NewRequest(event.URL()))
 	if IsFnLoggingEnabled(LoggingEnvKey) {
-		toolbox.Dump(response)
+		if data, err := json.Marshal(response);err == nil {
+			fmt.Print(string(data))
+		}
 	}
 	if response.Error != "" {
 		return nil, fmt.Errorf(response.Error)

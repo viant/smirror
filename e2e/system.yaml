@@ -46,6 +46,7 @@ pipeline:
       plainData: $AsJSON($s3Secrets)
       dest:
         URL: gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc
+        credentials: ${gcpCredentials}
       logging: false
 
   gsSecret:

@@ -3,7 +3,13 @@
     {
       "Prefix": "/data/",
       "Suffix": ".csv.gz",
-      "DestURL": "s3://destBucket/data",
+      "Dest": {
+        "URL": "s3://destBucket/data",
+        "Credentials": {
+          "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+          "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+        }
+      },
       "OnCompletion": {
         "OnSuccess": [
           {
@@ -23,7 +29,14 @@
     {
       "Filter": "^\/[a-z]+/data/\\d+/",
       "Suffix": ".csv.gz",
-      "DestURL": "s3://destBucket/data/chunks/",
+      "Dest": {
+        "URL": "s3://destBucket/data/chunks/",
+        ,
+        "Credentials": {
+          "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+          "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+        }
+      },
       "Split": {
         "MaxLines": 10000,
         "Template": "%s_%05d"
@@ -43,14 +56,6 @@
       },
       "Codec": "gzip",
       "FolderDepth": 1
-    }
-  ],
-  "Secrets": [
-    {
-      "Provider": "gcp",
-      "TargetScheme": "s3",
-      "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
-      "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
     }
   ]
 }
