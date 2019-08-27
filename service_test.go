@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/mem"
@@ -364,8 +363,6 @@ line4`,
 
 
 		for URL, expectedSize := range useCase.expectedURLs {
-
-			fmt.Printf("dow: %v\n", URL)
 			reader, err := mgr.DownloadWithURL(ctx, URL)
 			if expectedSize == 0 { //DO NOT EXPECT ASSET IN THAT URL
 				if assert.NotNil(t, err, useCase.description) {
