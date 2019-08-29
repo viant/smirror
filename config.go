@@ -21,36 +21,55 @@ type Config struct {
 	Routes config.Routes
 	//SourceScheme, currently gs or s3
 	SourceScheme string
+	ProjectID    string
+	Region       string
 }
-
 
 //Init initialises routes
 func (c *Config) Init() error {
+	var projectID string
 	if c.SourceScheme == "" {
-		if os.Getenv("GCLOUD_PROJECT") != "" {
+		if projectID = os.Getenv("GCLOUD_PROJECT"); projectID != "" {
 			c.SourceScheme = gs.Scheme
+			if c.ProjectID == "" {
+				c.ProjectID = projectID
+			}
+
 		} else if os.Getenv("AWS_LAMBDA_FUNCTION_NAME") != "" {
 			c.SourceScheme = s3.Scheme
 		}
 	}
+
+	for i := range c.Routes {
+		c.Routes[i].Dest.Init(projectID)
+	}
+
 	return nil
 }
 
+func (c *Config) UseMessageDest() bool {
+	for _, resource := range c.Routes {
+		if resource.Dest.Topic != "" {
+			return true
+		}
+	}
+	return false
+}
 
 //Resources returns
 func (c *Config) Resources() []*config.Resource {
-	var result = make([]*config.Resource,0)
+	var result = make([]*config.Resource, 0)
+
 	for _, resource := range c.Routes {
 		if resource.Source != nil {
 			result = append(result, resource.Source)
 		}
 		if resource.Dest.Credentials != nil || resource.Dest.CustomKey != nil {
-			result = append(result, resource.Source)
+			result = append(result, &resource.Dest)
 		}
 	}
 	return result
 }
-
 
 //NewConfigFromEnv returns new config from env
 func NewConfigFromEnv(ctx context.Context, key string) (*Config, error) {
@@ -63,12 +82,12 @@ func NewConfigFromEnv(ctx context.Context, key string) (*Config, error) {
 
 //NewConfigFromJSON creates a new config from env
 func NewConfigFromJSON(payload string) (*Config, error) {
-	config := &Config{}
-	err := json.NewDecoder(strings.NewReader(payload)).Decode(config)
+	cfg := &Config{}
+	err := json.NewDecoder(strings.NewReader(payload)).Decode(cfg)
 	if err == nil {
-		err = config.Init()
+		err = cfg.Init()
 	}
-	return config, err
+	return cfg, err
 }
 
 //NewConfigFromURL creates a new config from env
@@ -78,10 +97,10 @@ func NewConfigFromURL(ctx context.Context, URL string) (*Config, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to download: %v", URL)
 	}
-	config := &Config{}
-	err = json.NewDecoder(reader).Decode(config)
+	cfg := &Config{}
+	err = json.NewDecoder(reader).Decode(cfg)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to decode: %v ", URL)
 	}
-	return config, config.Init()
+	return cfg, cfg.Init()
 }

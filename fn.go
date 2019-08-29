@@ -43,7 +43,7 @@ func fn(ctx context.Context, event gs.Event) (*Response, error) {
 	}
 	response := service.Mirror(ctx, NewRequest(event.URL()))
 	if IsFnLoggingEnabled(LoggingEnvKey) {
-		if data, err := json.Marshal(response);err == nil {
+		if data, err := json.Marshal(response); err == nil {
 			fmt.Print(string(data))
 		}
 	}

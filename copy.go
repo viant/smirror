@@ -8,17 +8,17 @@ import (
 	"smirror/config"
 )
 
-//Copy represents a data copy
-type Copy struct {
+//Transfer represents a data transfer
+type Transfer struct {
 	Resource *config.Resource
-	Reader io.Reader
-	Dest   *Datafile
+	Reader   io.Reader
+	Dest     *Datafile
 }
 
 //GetReader returns a reader
-func (c *Copy) GetReader() (io.Reader, error) {
+func (c *Transfer) GetReader() (io.Reader, error) {
 	if c.Reader == nil {
-		return nil, fmt.Errorf("copy reader was empty")
+		return nil, fmt.Errorf("transfer reader was empty")
 	}
 	if c.Dest.Compression == nil {
 		return c.Reader, nil

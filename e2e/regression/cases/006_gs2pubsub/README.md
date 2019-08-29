@@ -1,6 +1,6 @@
 #### Scenario:
 
-Data from gs://${gsBucket}/data/p1 and suffixed *.csv is mirrored to s3://${s3Bucket}/data
+Mirror suffixed *.csv data from gs://${gsBucket}/data/p1 to smirrorTopic topic, where each message is max 10 lines.
 
 #### Input:
 
@@ -8,12 +8,17 @@ Configuration:
 
 * Route:
 
-[@config,json](../../../config/gs_to_s3.json)
+[@config,json](../../../config/gs.json)
 ```json
- {
-      "Prefix": "/data/p1",
+  {
+      "Prefix": "/data/p6",
       "Suffix": ".csv",
-      "DestURL": "s3://${s3Bucket}/data",
+      "Dest": {
+        "Topic": "smirrorTopic"
+      },
+      "Split": {
+        "MaxLines": 10
+      },
       "OnCompletion": {
         "OnSuccess": [
           {
@@ -28,20 +33,9 @@ Configuration:
         ]
       },
       "FolderDepth": 1
- }
-```
- 
-* Secret:
-
-```json
-    {
-      "Provider": "gcp",
-      "TargetScheme": "s3",
-      "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
-      "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
     }
-
 ```
+
 
 * Trigger:
 
@@ -52,11 +46,9 @@ Configuration:
   - LOGGING: 'true'
   - CONFIG: gs://${gsBucket}/e2e-mirror/config/mirror.json
  
-
-
 Data:
 - gs://${gsBucket}/data/p1/events.csv
 
-
 Output:
 - s3://${gsBucket}/data/p1/events.csv
+

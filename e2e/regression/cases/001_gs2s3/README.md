@@ -1,6 +1,6 @@
 #### Scenario:
 
-Data from gs://${gsBucket}/data/p1 and suffixed *.csv is mirrored to s3://${s3Bucket}/data
+Mirror data from gs://${gsBucket}/data/p1 and suffixed *.csv to s3://${s3Bucket}/data
 
 #### Input:
 
@@ -8,12 +8,18 @@ Configuration:
 
 * Route:
 
-[@config,json](../../../config/s3_to_gs.json)
+[@config,json](../../../config/gs.json)
 ```json
-    {
+ {
       "Prefix": "/data/p1",
       "Suffix": ".csv",
-      "DestURL": "gs://${s3Bucket}/data",
+      "Dest":{
+          "URL": "s3://${s3Bucket}/data",
+          "Credentials": {
+            "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
+            "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
+          }
+      },
       "OnCompletion": {
         "OnSuccess": [
           {
@@ -23,25 +29,15 @@ Configuration:
         "OnError": [
           {
             "Action": "move",
-            "URL": "s3:///${gsBucket}/e2e-mirror/errors/"
+            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
           }
         ]
       },
       "FolderDepth": 1
-    }
+ }
 ```
  
-* Secret:
 
-```json
-   {
-     "Provider": "aws",
-     "TargetScheme": "s3",
-     "Parameter": "smirror.gs",
-     "Key": "alias/smirror"
-   }
-
-```
 
 * Trigger:
 

@@ -1,0 +1,24 @@
+pipeline:
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 20000
+    source:
+      URL: ${parent.path}/data/prepare/events.csv
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsBucket}/data/p6/events.csv
+
+  validate:
+    action: msg:pull
+    timeoutMs: 10000
+    source:
+      URL: smirrorSubscription
+      type: subscription
+      vendor: gcp
+      credentials: $gcpCredentials
+    count: 2
+    expect:
+      - Transformed:
+          message: "this is my 1st message"
+          projectID: $projectID
+          source: /proxySourceTopic/

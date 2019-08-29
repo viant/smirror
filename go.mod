@@ -10,8 +10,8 @@ require (
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.3.0
-	github.com/viant/afs v0.0.0-20190827223745-e5d8ad4989fd
-	github.com/viant/afsc v0.0.0-20190827161741-1ee406549a0f
+	github.com/viant/afs v0.0.0-20190829204622-69cd9f1a4afd
+	github.com/viant/afsc v0.0.0-20190829205231-4f867c3cde22
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.26.2
 	google.golang.org/api v0.7.0

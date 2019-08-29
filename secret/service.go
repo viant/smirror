@@ -36,13 +36,16 @@ func (s service) Kms(service afs.Service) (kms.Service, error) {
 	return nil, fmt.Errorf("unsupported scheme: %v", s.sourceScheme)
 }
 
-func (s service) Init(ctx context.Context, service afs.Service, resources []*config.Resource) error {
+func (s *service) Init(ctx context.Context, service afs.Service, resources []*config.Resource) error {
 	kmsService, err := s.Kms(service)
 	if err != nil {
 		return err
 	}
 	for i := range resources {
 		resource := resources[i]
+		if resource == nil {
+			continue
+		}
 		if resource.Credentials != nil {
 			data, err := kmsService.Decrypt(ctx, &resource.Credentials.Secret);
 			if err != nil {
@@ -56,6 +59,7 @@ func (s service) Init(ctx context.Context, service afs.Service, resources []*con
 				return err
 			}
 			data = decodeBase64IfNeeded(data)
+
 			if resources[i].CustomKey.AES256Key, err = option.NewAES256Key(data);err != nil {
 				return err
 			}

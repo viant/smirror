@@ -22,23 +22,23 @@ pipeline:
         - go build -o smirror
         - zip -j smirror.zip smirror
 
-#    deployCloudFunction:
-#      action: gcp/cloudfunctions:deploy
-#      credentials: $gcpCredentials
-#      '@name': $functionName
-#      entryPoint: Fn
-#      serviceAccount: ${gcp.serviceAccount}
-#      runtime: go111
-#      availableMemoryMB: 256
-#      eventTrigger:
-#        eventType: google.storage.object.finalize
-#        resource: projects/_/buckets/${gsBucket}
-#      environmentVariables:
-#        LOGGING: 'true'
-#        CONFIG: gs://${gsBucket}/e2e-mirror/config/mirror.json
-#      source:
-#        URL: ${fnAppPath}/
-#      sleepTimeMs: 5000
+    deployCloudFunction:
+      action: gcp/cloudfunctions:deploy
+      credentials: $gcpCredentials
+      '@name': $functionName
+      entryPoint: Fn
+      serviceAccount: ${gcp.serviceAccount}
+      runtime: go111
+      availableMemoryMB: 256
+      eventTrigger:
+        eventType: google.storage.object.finalize
+        resource: projects/_/buckets/${gsBucket}
+      environmentVariables:
+        LOGGING: 'true'
+        CONFIG: gs://${gsBucket}/e2e-mirror/config/mirror.json
+      source:
+        URL: ${fnAppPath}/
+      sleepTimeMs: 5000
 
     deployLambda:
       action: aws/lambda:deploy

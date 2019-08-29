@@ -22,18 +22,18 @@ type Request struct {
 //Response represents a response
 type Response struct {
 	DestURLs    []string
+	MessageIDs  []string
 	TimeTakenMs int
 	Status      string
 	Error       string
-
-	startTime time.Time
-	mutext    *sync.Mutex
+	startTime   time.Time
+	mutex       *sync.Mutex
 }
 
 //AddURL adds url to dest urls
 func (r *Response) AddURL(URL string) {
-	r.mutext.Lock()
-	defer r.mutext.Unlock()
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 	r.DestURLs = append(r.DestURLs, URL)
 }
 
@@ -45,9 +45,10 @@ func NewRequest(URL string) *Request {
 //NewResponse returns a new response
 func NewResponse() *Response {
 	return &Response{
-		Status:    StatusOK,
-		startTime: time.Now(),
-		DestURLs:  make([]string, 0),
-		mutext:    &sync.Mutex{},
+		Status:     StatusOK,
+		startTime:  time.Now(),
+		DestURLs:   make([]string, 0),
+		MessageIDs: make([]string, 0),
+		mutex:      &sync.Mutex{},
 	}
 }

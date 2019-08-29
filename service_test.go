@@ -361,7 +361,6 @@ line4`,
 			continue
 		}
 
-
 		for URL, expectedSize := range useCase.expectedURLs {
 			reader, err := mgr.DownloadWithURL(ctx, URL)
 			if expectedSize == 0 { //DO NOT EXPECT ASSET IN THAT URL

@@ -3,13 +3,18 @@ package smirror
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
+	"github.com/viant/afsc/gs"
 	"github.com/viant/toolbox"
 	"io"
+	"io/ioutil"
 	"smirror/config"
 	"smirror/job"
+	"smirror/msgbus"
+	"smirror/msgbus/pubsub"
 	"smirror/secret"
 	"sync"
 	"sync/atomic"
@@ -26,6 +31,7 @@ type service struct {
 	config *Config
 	afs.Service
 	secret secret.Service
+	msgbus msgbus.Service
 }
 
 func (s *service) Mirror(ctx context.Context, request *Request) *Response {
@@ -89,11 +95,11 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 		return fmt.Errorf("reader was empty")
 	}
 
-	dataCopy := &Copy{
+	dataCopy := &Transfer{
 		Resource: &route.Dest,
 		Reader:   reader,
 		Dest:     NewDatafile(destURL, destCompression)}
-	return s.copy(ctx, dataCopy, response)
+	return s.transfer(ctx, dataCopy, response)
 }
 
 func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, request *Request, response *Response) error {
@@ -115,32 +121,57 @@ func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, r
 	}()
 	counter := int32(0)
 	waitGroup := &sync.WaitGroup{}
-	err = toolbox.SplitTextStream(reader, s.chunkWriter(ctx, request.URL, route, &counter, waitGroup, response), route.Split.MaxLines)
+	err = Split(reader, s.chunkWriter(ctx, request.URL, route, &counter, waitGroup, response), route.Split.MaxLines)
 	if err == nil {
 		waitGroup.Wait()
-	}
-	jobContent := job.NewContext(ctx, err, request.URL)
-	if e := route.OnCompletion.Run(jobContent, s.Service); e != nil {
-		err = e
 	}
 	return err
 }
 
-func (s *service) copy(ctx context.Context, copy *Copy, response *Response) error {
+func (s *service) transfer(ctx context.Context, transfer *Transfer, response *Response) error {
+	if transfer.Resource.URL != "" {
+		return s.upload(ctx, transfer, response)
+	}
+	if transfer.Resource.Topic != "" {
+		return s.publish(ctx, transfer, response)
+	}
+	return fmt.Errorf("invalid transfer: %v", transfer)
+}
 
-	reader, err := copy.GetReader()
+func (s *service) publish(ctx context.Context, transfer *Transfer, response *Response) error {
+	reader, err := transfer.GetReader()
 	if err != nil {
 		return err
 	}
-	options, err := s.secret.StorageOpts(ctx, copy.Resource)
+	data, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return err
 	}
-	if err = s.Service.Upload(ctx, copy.Dest.URL, file.DefaultFileOsMode, reader, options...); err != nil {
+	switch s.config.SourceScheme {
+	case gs.Scheme:
+		messageIDs, err := s.msgbus.Publish(ctx, transfer.Resource.Topic, data)
+		if err != nil {
+			return err
+		}
+		response.MessageIDs = append(response.MessageIDs, messageIDs...)
+		return nil
+	}
+	return fmt.Errorf("unsupported message msgbus %v", s.config.SourceScheme)
+}
+
+func (s *service) upload(ctx context.Context, transfer *Transfer, response *Response) error {
+	reader, err := transfer.GetReader()
+	if err != nil {
 		return err
 	}
-	response.AddURL(copy.Dest.URL)
-
+	options, err := s.secret.StorageOpts(ctx, transfer.Resource)
+	if err != nil {
+		return err
+	}
+	if err = s.Service.Upload(ctx, transfer.Dest.URL, file.DefaultFileOsMode, reader, options...); err != nil {
+		return err
+	}
+	response.AddURL(transfer.Dest.URL)
 	return nil
 }
 
@@ -155,12 +186,12 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rou
 			}
 			waitGroup.Add(1)
 			defer waitGroup.Done()
-			dataCopy := &Copy{
+			dataCopy := &Transfer{
 				Resource: &route.Dest,
 				Reader:   writer.Reader,
 				Dest:     NewDatafile(destURL, nil),
 			}
-			return s.copy(ctx, dataCopy, response)
+			return s.transfer(ctx, dataCopy, response)
 		})
 	}
 }
@@ -173,9 +204,18 @@ func New(ctx context.Context, config *Config) (Service, error) {
 	}
 	result := &service{config: config,
 		Service: afs.New(),
-		secret:  secret.New(config.SourceScheme)}
+		secret:  secret.New(config.SourceScheme),
+	}
 	if resources := config.Resources(); len(resources) > 0 {
 		err = result.secret.Init(ctx, result.Service, resources)
+	}
+
+	if config.UseMessageDest() {
+		if config.SourceScheme == gs.Scheme {
+			if result.msgbus, err = pubsub.New(ctx); err != nil {
+				return nil, errors.Wrapf(err, "unable to create publisher for %v", config.SourceScheme)
+			}
+		}
 	}
 	return result, err
 }

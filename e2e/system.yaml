@@ -2,10 +2,10 @@ init:
   s3Secrets: ${secrets.$awsCredentials}
   gcpSecrets:  ${secrets.$gcpCredentials}
 
-  mirrorGSConfig: $Cat(config/gs_to_s3.json)
+  mirrorGSConfig: $Cat(config/gs.json)
   mirrorGSConfigJSON: $AsJSON($mirrorGSConfig)
 
-  mirrorS3Config: $Cat(config/s3_to_gs.json)
+  mirrorS3Config: $Cat(config/s3.json)
   mirrorS3ConfigJSON: $AsJSON($mirrorS3Config)
 
 
@@ -25,6 +25,21 @@ pipeline:
       credentials: $awsCredentials
       URL: s3://${s3Bucket}/e2e-mirror/config/mirror.json
 
+  setupMessageBus:
+    action: msg:setupResource
+    resources:
+      - URL: smirrorTopic
+        type: topic
+        vendor: gcp
+        credentials: $gcpCredentials
+
+      - URL: smirrorSubscription
+        type: subscription
+        vendor: gcp
+        credentials: $gcpCredentials
+        config:
+          topic:
+            URL: /projects/${gcp.projectID}/topics/smirrorTopic
 
   s3Secret:
     deployGCPKey:
@@ -62,6 +77,8 @@ pipeline:
      type: SecureString
      keyId: alias/dstransfer
      value: $gcpSecrets.Data
+
+
 
   info:
    action: print

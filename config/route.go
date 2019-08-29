@@ -25,6 +25,7 @@ type Route struct {
 
 
 
+
 //HasMatch returns true if URL matches prefix or suffix
 func (r *Route) HasMatch(URL string) bool {
 	location := url.Path(URL)

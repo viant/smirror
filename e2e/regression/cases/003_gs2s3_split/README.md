@@ -1,6 +1,6 @@
 #### Scenario:
 
-Data from gs://${gsBucket}/data/p1 and suffixed *.csv is chunked and compressed (by max rows=10) to s3://${s3Bucket}/data
+Data from gs://${gsBucket}/data/p1 and suffixed *.csv is chunked (by max rows=10) to s3://${s3Bucket}/data
 
 #### Input:
 
@@ -8,13 +8,18 @@ Configuration:
 
 * Route:
 
-[@config,json](../../../config/gs_to_s3.json)
+[@config,json](../../../config/gs.json)
 ```json
-   {
-      "Prefix": "/data/p4",
+ {
+      "Prefix": "/data/p3",
       "Suffix": ".csv",
-      "DestURL": "s3://${s3Bucket}/data",
-      "Codec": "gzip",
+      "Dest": {
+        "URL": "s3://${s3Bucket}/data",
+        "Credentials": {
+          "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
+           "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
+        }
+      },
       "Split": {
         "MaxLines": 10,
         "Template": "%s_%05d"
@@ -36,17 +41,6 @@ Configuration:
     }
 ```
  
-* Secret:
-
-```json
-    {
-      "Provider": "gcp",
-      "TargetScheme": "s3",
-      "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
-      "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
-    }
-
-```
 
 * Trigger:
 

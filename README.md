@@ -26,6 +26,7 @@ When dealing with various cloud providers, it is a frequent use case to move sea
 In some scenarios, you may also need to split transferred content into a few smaller chunks. 
 In any cases facilitating compression and post processing for both successful and failed transfer would be just additional requirement.
 
+
 ## Introduction
 
 This project provide serverless implementation for cloud storage mirror. All external secrets/credentials are secured with KMS. 

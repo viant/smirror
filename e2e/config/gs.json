@@ -109,6 +109,30 @@
         ]
       },
       "FolderDepth": 1
+    },
+    {
+      "Prefix": "/data/p6",
+      "Suffix": ".csv",
+      "Dest": {
+        "Topic": "smirrorTopic"
+      },
+      "Split": {
+        "MaxLines": 10
+      },
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+          }
+        ]
+      },
+      "FolderDepth": 1
     }
   ]
 }
