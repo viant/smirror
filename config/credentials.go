@@ -5,5 +5,3 @@ type Credentials struct {
 	Secret
 	Auth []byte
 }
-
-

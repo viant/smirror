@@ -1,6 +1,5 @@
 package config
 
-
 //Routes represents route slice
 type Routes []*Route
 
@@ -13,4 +12,3 @@ func (r Routes) HasMatch(URL string) *Route {
 	}
 	return nil
 }
-

@@ -9,7 +9,6 @@ import (
 	"github.com/viant/afs/mem"
 	"github.com/viant/afs/storage"
 	"github.com/viant/assertly"
-	"github.com/viant/toolbox"
 	"io"
 	"io/ioutil"
 	"smirror/config"
@@ -355,7 +354,7 @@ line4`,
 		}
 		response := service.Mirror(ctx, &Request{URL: useCase.sourceURL})
 		if !assertly.AssertValues(t, useCase.expectResponse, response, useCase.description) {
-			_ = toolbox.DumpIndent(response, true)
+
 		}
 		if len(useCase.expectedURLs) == 0 {
 			continue

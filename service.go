@@ -8,7 +8,6 @@ import (
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
 	"github.com/viant/afsc/gs"
-	"github.com/viant/toolbox"
 	"io"
 	"io/ioutil"
 	"smirror/config"
@@ -129,11 +128,11 @@ func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, r
 }
 
 func (s *service) transfer(ctx context.Context, transfer *Transfer, response *Response) error {
-	if transfer.Resource.URL != "" {
-		return s.upload(ctx, transfer, response)
-	}
 	if transfer.Resource.Topic != "" {
 		return s.publish(ctx, transfer, response)
+	}
+	if transfer.Resource.URL != "" {
+		return s.upload(ctx, transfer, response)
 	}
 	return fmt.Errorf("invalid transfer: %v", transfer)
 }
@@ -149,7 +148,9 @@ func (s *service) publish(ctx context.Context, transfer *Transfer, response *Res
 	}
 	switch s.config.SourceScheme {
 	case gs.Scheme:
-		messageIDs, err := s.msgbus.Publish(ctx, transfer.Resource.Topic, data)
+		attributes := make(map[string]interface{})
+		attributes["Dest"] = transfer.Dest.URL
+		messageIDs, err := s.msgbus.Publish(ctx, transfer.Resource.Topic, data, attributes)
 		if err != nil {
 			return err
 		}
@@ -179,7 +180,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rou
 	return func() io.WriteCloser {
 		splitCount := atomic.AddInt32(counter, 1)
 		destName := route.Split.Name(route, URL, splitCount)
-		destURL := toolbox.URLPathJoin(route.Dest.URL, destName)
+		destURL := url.Join(route.Dest.URL, destName)
 		return NewWriter(route, func(writer *Writer) error {
 			if writer.Reader == nil {
 				return fmt.Errorf("writer reader was empty")

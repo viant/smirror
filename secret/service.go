@@ -17,7 +17,7 @@ import (
 )
 
 type Service interface {
-	Init(ctx context.Context, service afs.Service, resources [] *config.Resource) error
+	Init(ctx context.Context, service afs.Service, resources []*config.Resource) error
 
 	StorageOpts(ctx context.Context, esource *config.Resource) ([]storage.Option, error)
 }
@@ -47,20 +47,20 @@ func (s *service) Init(ctx context.Context, service afs.Service, resources []*co
 			continue
 		}
 		if resource.Credentials != nil {
-			data, err := kmsService.Decrypt(ctx, &resource.Credentials.Secret);
+			data, err := kmsService.Decrypt(ctx, &resource.Credentials.Secret)
 			if err != nil {
 				return err
 			}
 			resources[i].Credentials.Auth = decodeBase64IfNeeded(data)
 		}
 		if resource.CustomKey != nil {
-			data, err := kmsService.Decrypt(ctx, &resource.CustomKey.Secret);
+			data, err := kmsService.Decrypt(ctx, &resource.CustomKey.Secret)
 			if err != nil {
 				return err
 			}
 			data = decodeBase64IfNeeded(data)
 
-			if resources[i].CustomKey.AES256Key, err = option.NewAES256Key(data);err != nil {
+			if resources[i].CustomKey.AES256Key, err = option.NewAES256Key(data); err != nil {
 				return err
 			}
 		}

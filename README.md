@@ -12,6 +12,7 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
 - [Introduction](#introduction)
 - [Usage](#usage)
    * [GS to S3 Mirror](#gs-to-s3-mirror)
+   * [GS to Pubsub Mirro](#gs-to-pubsub)
    * [S3 to G3 Mirror](#s3-to-gs-mirror)
 - [End to end testing](#end-to-end-testing)
 - [Monitoring and limitation](#monitoring-and-limitation)
@@ -439,6 +440,48 @@ pipeline:
 - With **sam cli**
 -[Serverless-deploying](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-deploying.html)
 
+
+### GS To Pubsub
+
+To mirror data from google storage that match /data/ prefix and '.csv' suffix to pubsub 'myTopic' topic
+the following configuration can be used with Mirror cloud function
+
+[@gs://sourceBucket/config/config.json](usage/gs_to_pubsub/config.json)
+
+
+```json
+{
+  "Routes": [
+    {
+      "Prefix": "/data/",
+      "Suffix": ".csv",
+      "Dest": {
+        "Topic": "myTopic"
+      },
+      "Split": {
+        "MaxLines": 1000
+      },
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+          }
+        ]
+      },
+      "FolderDepth": 1
+    }
+  ]
+}
+```
+
+
+
 ## End to end testing
 
 
@@ -457,8 +500,6 @@ endly
 ```
 
 ## Monitoring and limitation
-
-
 
 
 ## Code Coverage

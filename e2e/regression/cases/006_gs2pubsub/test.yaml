@@ -1,3 +1,9 @@
+init:
+  part1: $Cat('${parent.path}/data/expect/events_00001.csv')
+  part2: $Cat('${parent.path}/data/expect/events_00002.csv')
+  events: $Cat('${parent.path}/data/expect/events.json')
+  exepct: $AsData($events)
+
 pipeline:
   trigger:
     action: storage:copy
@@ -17,8 +23,4 @@ pipeline:
       vendor: gcp
       credentials: $gcpCredentials
     count: 2
-    expect:
-      - Transformed:
-          message: "this is my 1st message"
-          projectID: $projectID
-          source: /proxySourceTopic/
+    expect: $exepct

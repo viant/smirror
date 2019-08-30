@@ -33,7 +33,6 @@ func Fn(ctx context.Context, event gs.Event) (err error) {
 }
 
 func fn(ctx context.Context, event gs.Event) (*Response, error) {
-	fmt.Printf("triggered by  %v\n", event.URL())
 	service, err := NewFromEnv(ctx, ConfigEnvKey)
 	if err != nil {
 		return nil, err

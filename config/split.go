@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"path"
 	"strings"
 )
 
@@ -22,17 +23,20 @@ func (s *Split) Name(router *Route, URL string, counter int32) string {
 		ext = string(name[extIndex+1:])
 		name = string(name[:extIndex])
 	}
+
+	parent, child := path.Split(name)
 	if s.Template != "" {
 		lastIndex := strings.LastIndex(s.Template, "%")
 		nameIndex := strings.Index(s.Template, "%v")
 		if nameIndex == lastIndex {
-			destName = fmt.Sprintf(s.Template, counter, name)
+			destName = fmt.Sprintf(s.Template, counter, child)
 		} else {
-			destName = fmt.Sprintf(s.Template, name, counter)
+			destName = fmt.Sprintf(s.Template, child, counter)
 		}
 	} else {
-		destName = fmt.Sprintf("%04d_%v", counter, name)
+		destName = fmt.Sprintf("%04d_%v", counter, child)
 	}
 	destName += "." + ext
-	return destName
+
+	return path.Join(parent, destName)
 }

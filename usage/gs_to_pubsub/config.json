@@ -1,0 +1,28 @@
+{
+  "Routes": [
+    {
+      "Prefix": "/data/p6",
+      "Suffix": ".csv",
+      "Dest": {
+        "Topic": "myTopic"
+      },
+      "Split": {
+        "MaxLines": 1000
+      },
+      "OnCompletion": {
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnError": [
+          {
+            "Action": "move",
+            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+          }
+        ]
+      },
+      "FolderDepth": 1
+    }
+  ]
+}

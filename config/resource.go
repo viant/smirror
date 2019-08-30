@@ -24,7 +24,7 @@ func (r *Resource) Init(projectID string) {
 		r.ProjectID = projectID
 	}
 	if r.Topic != "" {
-		if ! strings.Contains(r.Topic, "/") && r.ProjectID != "" {
+		if !strings.Contains(r.Topic, "/") && r.ProjectID != "" {
 			r.Topic = fmt.Sprintf("projects/%s/topics/%s", r.ProjectID, r.Topic)
 		}
 	}

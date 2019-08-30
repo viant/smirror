@@ -85,7 +85,6 @@ func TestRoute_HasMatch(t *testing.T) {
 
 }
 
-
 func TestRoute_Name(t *testing.T) {
 
 	var useCases = []struct {

@@ -10,10 +10,9 @@ import (
 	"time"
 )
 
-
 //Route represent matching resource route
 type Route struct {
-	Dest Resource
+	Dest   Resource
 	Source *Resource
 	matcher.Basic
 	Split        *Split
@@ -22,9 +21,6 @@ type Route struct {
 	//FolderDepth  - preserves specified folder depth in dest URL
 	FolderDepth int
 }
-
-
-
 
 //HasMatch returns true if URL matches prefix or suffix
 func (r *Route) HasMatch(URL string) bool {
@@ -65,4 +61,3 @@ func (r *Route) Name(URL string) string {
 	}
 	return path.Join(folderPath, name)
 }
-

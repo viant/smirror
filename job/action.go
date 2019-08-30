@@ -1,10 +1,10 @@
 package job
 
 import (
-	"fmt"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
-	"github.com/viant/toolbox"
+	"github.com/viant/afs/url"
+	"path"
 	"strings"
 )
 
@@ -21,10 +21,15 @@ type Action struct {
 	URL    string
 }
 
+func (a Action) DestURL(sourceURL string) string {
+	_, URLPath := url.Base(sourceURL, file.Scheme)
+	_, name := path.Split(URLPath)
+	return url.Join(a.URL, name)
+}
+
 //WriteError writes an error file if context has error
 func (a Action) WriteError(context *Context, service afs.Service) error {
-	_, name := toolbox.URLSplit(context.SourceURL)
-	moveURL := toolbox.URLPathJoin(a.URL, name) + "-error"
+	moveURL := a.DestURL(context.SourceURL) + "-error"
 	return service.Upload(context.Context, moveURL, file.DefaultFileOsMode, strings.NewReader(context.Error.Error()))
 }
 
@@ -35,11 +40,7 @@ func (a Action) Do(context *Context, service afs.Service) error {
 	case ActionDelete:
 		return service.Delete(context.Context, URL)
 	case ActionMove:
-		_, name := toolbox.URLSplit(context.SourceURL)
-		targetURL := toolbox.URLPathJoin(a.URL, name)
-
-		fmt.Printf("move: %v -> %v\n", URL, targetURL)
-
+		targetURL := a.DestURL(context.SourceURL)
 		return service.Move(context.Context, URL, targetURL)
 	}
 	return nil
