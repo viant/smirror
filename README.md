@@ -11,9 +11,9 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
 - [Motivation](#motivation)
 - [Introduction](#introduction)
 - [Usage](#usage)
-   * [GS to S3 Mirror](#gs-to-s3-mirror)
-   * [GS to Pubsub Mirro](#gs-to-pubsub)
-   * [S3 to G3 Mirror](#s3-to-gs-mirror)
+   * [GS to S3](#gs-to-s3)
+   * [GS to Pubsub](#gs-to-pubsub)
+   * [S3 to G3](#s3-to-gs)
 - [End to end testing](#end-to-end-testing)
 - [Monitoring and limitation](#monitoring-and-limitation)
 - [Code Coverage](#code-coverage)
@@ -39,7 +39,7 @@ This project provide serverless implementation for cloud storage mirror. All ext
 
 ## Usage
 
-### GS to S3 mirror
+### GS to S3
 
 To mirror data from google storage that match /data/ prefix and '.csv.gz' suffix to s3://destBucket/data
 preserving parent folder (folderDepth:1) the following configuration can be used with Mirror cloud function
@@ -248,7 +248,7 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \
     --runtime=go111 
 ```
 
-### S3 to GS mirror
+### S3 to GS
 
 [![Google storage to S3 mirror](images/s3to_gs_mirror.png)](images/s3to_gs_mirror.png)
 
