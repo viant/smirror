@@ -443,6 +443,9 @@ pipeline:
 
 ### GS To Pubsub
 
+[![Google storage to Pubsub](images/g3ToPubsub.png)](images/g3ToPubsub.png)
+
+
 To mirror data from google storage that match /data/ prefix and '.csv' suffix to pubsub 'myTopic' topic
 the following configuration can be used with Mirror cloud function
 
@@ -482,6 +485,7 @@ the following configuration can be used with Mirror cloud function
 
 
 
+
 ## End to end testing
 
 
@@ -498,6 +502,7 @@ cd smirror/e2e
 ### Update mirrors bucket for both S3, GS in e2e/run.yaml (gsBucket, s3Bucket)
 endly 
 ```
+
 
 ## Monitoring and limitation
 
