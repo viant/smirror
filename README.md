@@ -11,9 +11,9 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
 - [Motivation](#motivation)
 - [Introduction](#introduction)
 - [Usage](#usage)
-   * [GS to S3](#gs-to-s3)
-   * [GS to Pubsub](#gs-to-pubsub)
-   * [S3 to G3](#s3-to-gs)
+   * [Google Storage to S3](#google-storage-to-s3)
+   * [Google Storage to Pubsub](#google-storage-to-pubsub)
+   * [S3 to Google Storage](#s3-to-google-storage)
 - [End to end testing](#end-to-end-testing)
 - [Monitoring and limitation](#monitoring-and-limitation)
 - [Code Coverage](#code-coverage)
@@ -39,7 +39,7 @@ This project provide serverless implementation for cloud storage mirror. All ext
 
 ## Usage
 
-### GS to S3
+### Google Storage to S3
 
 To mirror data from google storage that match /data/ prefix and '.csv.gz' suffix to s3://destBucket/data
 preserving parent folder (folderDepth:1) the following configuration can be used with Mirror cloud function
@@ -248,7 +248,7 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \
     --runtime=go111 
 ```
 
-### S3 to GS
+### S3 to Google Storage
 
 [![Google storage to S3 mirror](images/s3to_gs_mirror.png)](images/s3to_gs_mirror.png)
 
@@ -319,8 +319,6 @@ preserving parent folder (folderDepth:1) the following configuration can be used
   ]
 }
 ```
-
-
 
 ###### Encrypting AWS credentials with GCP KMS 
 
@@ -441,7 +439,7 @@ pipeline:
 -[Serverless-deploying](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-deploying.html)
 
 
-### GS To Pubsub
+### Google Storage To Pubsub
 
 [![Google storage to Pubsub](images/g3ToPubsub.png)](images/g3ToPubsub.png)
 
@@ -499,7 +497,7 @@ the following configuration can be used with Mirror cloud function
 ```bash
 git clone https://github.com/viant/smirror.git
 cd smirror/e2e
-### Update mirrors bucket for both S3, GS in e2e/run.yaml (gsBucket, s3Bucket)
+### Update mirrors bucket for both S3, Google Storage in e2e/run.yaml (gsBucket, s3Bucket)
 endly 
 ```
 
