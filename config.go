@@ -47,6 +47,7 @@ func (c *Config) Init() error {
 	return nil
 }
 
+//UseMessageDest returns true if any routes uses message bus
 func (c *Config) UseMessageDest() bool {
 	for _, resource := range c.Routes {
 		if resource.Dest.Topic != "" {
