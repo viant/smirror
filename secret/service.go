@@ -16,16 +16,21 @@ import (
 	"smirror/secret/kms/gcp"
 )
 
+//Service represents kms service
 type Service interface {
+
+	//Init initialises resources
 	Init(ctx context.Context, service afs.Service, resources []*config.Resource) error
 
-	StorageOpts(ctx context.Context, esource *config.Resource) ([]storage.Option, error)
+	//StorageOpts returns storage option for supplied resource
+	StorageOpts(ctx context.Context, resource *config.Resource) ([]storage.Option, error)
 }
 
 type service struct {
 	sourceScheme string
 }
 
+//Kms returns kms service
 func (s service) Kms(service afs.Service) (kms.Service, error) {
 	switch s.sourceScheme {
 	case gs.Scheme:
@@ -36,6 +41,7 @@ func (s service) Kms(service afs.Service) (kms.Service, error) {
 	return nil, fmt.Errorf("unsupported scheme: %v", s.sourceScheme)
 }
 
+//Init initialises resources
 func (s *service) Init(ctx context.Context, service afs.Service, resources []*config.Resource) error {
 	kmsService, err := s.Kms(service)
 	if err != nil {
@@ -68,6 +74,7 @@ func (s *service) Init(ctx context.Context, service afs.Service, resources []*co
 	return nil
 }
 
+//StorageOpts returns storage option for supplied resource
 func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]storage.Option, error) {
 	var result = make([]storage.Option, 0)
 	if resource == nil {

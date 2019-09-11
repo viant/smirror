@@ -21,6 +21,7 @@ type Action struct {
 	URL    string
 }
 
+//DestURL returns destination URL
 func (a Action) DestURL(sourceURL string) string {
 	_, URLPath := url.Base(sourceURL, file.Scheme)
 	_, name := path.Split(URLPath)

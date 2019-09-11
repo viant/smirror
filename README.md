@@ -439,7 +439,7 @@ pipeline:
 -[Serverless-deploying](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-deploying.html)
 
 
-### Google Storage To Pubsub
+ ### Google Storage To Pubsub
 
 [![Google storage to Pubsub](images/g3ToPubsub.png)](images/g3ToPubsub.png)
 

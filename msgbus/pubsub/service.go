@@ -12,6 +12,7 @@ type service struct {
 	*pubsub.Service
 }
 
+//Publish publishes data to message bus
 func (s *service) Publish(ctx context.Context, topic string, data []byte, attributes map[string]interface{}) ([]string, error) {
 	request := &pubsub.PublishRequest{
 		Messages: []*pubsub.PubsubMessage{
@@ -36,6 +37,7 @@ func (s *service) Publish(ctx context.Context, topic string, data []byte, attrib
 	return response.MessageIds, nil
 }
 
+//New creates a service
 func New(ctx context.Context) (msgbus.Service, error) {
 	srv, err := pubsub.NewService(ctx)
 	if err != nil {
