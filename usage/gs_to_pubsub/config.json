@@ -9,19 +9,17 @@
       "Split": {
         "MaxLines": 1000
       },
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnError": [
-          {
-            "Action": "move",
-            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
-          }
-        ]
-      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+        }
+      ],
       "FolderDepth": 1
     }
   ]

@@ -2,14 +2,14 @@ package job
 
 import "github.com/viant/afs"
 
-//Completion represents a job completion
-type Completion struct {
+//Actions represents a job completion
+type Actions struct {
 	OnSuccess []*Action
 	OnFailure []*Action
 }
 
 //Run run completion
-func (c *Completion) Run(context *Context, service afs.Service) error {
+func (c *Actions) Run(context *Context, service afs.Service) error {
 	actions := c.OnSuccess
 	isError := context.Error != nil
 	if context.Error != nil {

@@ -64,7 +64,7 @@ preserving parent folder (folderDepth:1) the following configuration can be used
              "Action": "delete"
            }
          ],
-         "OnError": [
+         "OnFailure": [
            {
              "Action": "move",
              "URL": "gs://sourceBucket/data/errors/"
@@ -94,7 +94,7 @@ preserving parent folder (folderDepth:1) the following configuration can be used
              "Action": "delete"
            }
          ],
-         "OnError": [
+         "OnFailure": [
            {
              "Action": "move",
              "URL": "gs://sourceBucket/data/errors/"
@@ -276,7 +276,7 @@ preserving parent folder (folderDepth:1) the following configuration can be used
             "Action": "delete"
           }
         ],
-        "OnError": [
+        "OnFailure": [
           {
             "Action": "move",
             "URL": "s3://sourceBucket/data/errors/"
@@ -306,7 +306,7 @@ preserving parent folder (folderDepth:1) the following configuration can be used
             "Action": "delete"
           }
         ],
-        "OnError": [
+        "OnFailure": [
           {
             "Action": "move",
             "URL": "s3://sourceBucket/data/errors/"
@@ -462,19 +462,16 @@ the following configuration can be used with Mirror cloud function
       "Split": {
         "MaxLines": 1000
       },
-      "OnCompletion": {
         "OnSuccess": [
           {
             "Action": "delete"
           }
         ],
-        "OnError": [
+        "OnFailure": [
           {
             "Action": "move",
             "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
-          }
-        ]
-      },
+          }],
       "FolderDepth": 1
     }
   ]

@@ -280,7 +280,7 @@ line4`,
 						Dest: config.Resource{
 							URL: "mem://localhost/cloned/data",
 						},
-						OnCompletion: job.Completion{
+						Actions: job.Actions{
 							OnSuccess: []*job.Action{
 								{
 									Action: job.ActionDelete,
@@ -315,7 +315,7 @@ line4`,
 						Dest: config.Resource{
 							URL: "mem://localhost/cloned/data",
 						},
-						OnCompletion: job.Completion{
+						Actions: job.Actions{
 							OnSuccess: []*job.Action{
 								{
 									Action: job.ActionMove,

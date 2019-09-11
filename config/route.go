@@ -15,8 +15,8 @@ type Route struct {
 	Dest   Resource
 	Source *Resource
 	matcher.Basic
-	Split        *Split
-	OnCompletion job.Completion
+	Split *Split
+	job.Actions
 	*Compression
 	//FolderDepth  - preserves specified folder depth in dest URL
 	FolderDepth int

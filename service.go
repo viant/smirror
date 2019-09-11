@@ -56,7 +56,7 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 		err = s.mirrorAsset(ctx, route, request.URL, response)
 	}
 	jobContent := job.NewContext(ctx, err, request.URL)
-	if e := route.OnCompletion.Run(jobContent, s.Service); e != nil && err == nil {
+	if e := route.Actions.Run(jobContent, s.Service); e != nil && err == nil {
 		err = e
 	}
 	return err

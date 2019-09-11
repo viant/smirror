@@ -10,19 +10,17 @@
           "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
         }
       },
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnError": [
-          {
-            "Action": "move",
-            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
-          }
-        ]
-      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+        }
+      ],
       "FolderDepth": 1
     },
     {
@@ -36,19 +34,17 @@
         }
       },
       "Codec": "gzip",
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnError": [
-          {
-            "Action": "move",
-            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
-          }
-        ]
-      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+        }
+      ],
       "FolderDepth": 1
     },
     {
@@ -65,19 +61,17 @@
         "MaxLines": 10,
         "Template": "%s_%05d"
       },
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnError": [
-          {
-            "Action": "move",
-            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
-          }
-        ]
-      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+        }
+      ],
       "FolderDepth": 1
     },
     {
@@ -95,19 +89,17 @@
         "MaxLines": 10,
         "Template": "%s_%05d"
       },
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnError": [
-          {
-            "Action": "move",
-            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
-          }
-        ]
-      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+        }
+      ],
       "FolderDepth": 1
     },
     {
@@ -119,19 +111,17 @@
       "Split": {
         "MaxLines": 10
       },
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnError": [
-          {
-            "Action": "move",
-            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
-          }
-        ]
-      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+        }
+      ],
       "FolderDepth": 1
     }
   ]
