@@ -47,65 +47,61 @@ preserving parent folder (folderDepth:1) the following configuration can be used
 [@gs://sourceBucket/config/config.json](usage/gs_to_s3/config.json)
 ```json
 {
-   "Routes": [
-     {
-       "Prefix": "/data/",
-       "Suffix": ".csv.gz",
-       "Dest": {
-         "URL": "s3://destBucket/data",
-         "Credentials": {
-           "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
-           "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
-         }
-       },
-       "OnCompletion": {
-         "OnSuccess": [
-           {
-             "Action": "delete"
-           }
-         ],
-         "OnFailure": [
-           {
-             "Action": "move",
-             "URL": "gs://sourceBucket/data/errors/"
-           }
-         ]
-       },
-       "Codec": "gzip",
-       "FolderDepth": 1
-     },
-     {
-       "Filter": "^\/[a-z]+/data/\\d+/",
-       "Suffix": ".csv.gz",
-       "Dest": {
-         "URL": "s3://destBucket/data/chunks/",
-         "Credentials": {
-           "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
-           "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
-         }
-       },
-       "Split": {
-         "MaxLines": 10000,
-         "Template": "%s_%05d"
-       },
-       "OnCompletion": {
-         "OnSuccess": [
-           {
-             "Action": "delete"
-           }
-         ],
-         "OnFailure": [
-           {
-             "Action": "move",
-             "URL": "gs://sourceBucket/data/errors/"
-           }
-         ]
-       },
-       "Codec": "gzip",
-       "FolderDepth": 1
-     }
-   ]
- }
+  "Routes": [
+    {
+      "Prefix": "/data/",
+      "Suffix": ".csv.gz",
+      "Dest": {
+        "URL": "s3://destBucket/data",
+        "Credentials": {
+          "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+          "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+        }
+      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "gs://sourceBucket/data/errors/"
+        }
+      ],
+      "Codec": "gzip",
+      "FolderDepth": 1
+    },
+    {
+      "Filter": "^\/[a-z]+/data/\\d+/",
+      "Suffix": ".csv.gz",
+      "Dest": {
+        "URL": "s3://destBucket/data/chunks/",
+        "Credentials": {
+          "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+          "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+        }
+      },
+      "Split": {
+        "MaxLines": 10000,
+        "Template": "%s_%05d"
+      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "gs://sourceBucket/data/errors/"
+        }
+      ],
+      "Codec": "gzip",
+      "FolderDepth": 1
+    }
+  ]
+}
 ```
 
 ###### Encrypting AWS credentials with GCP KMS 
@@ -270,19 +266,17 @@ preserving parent folder (folderDepth:1) the following configuration can be used
           "Key": "smirror"
         }
       },
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnFailure": [
-          {
-            "Action": "move",
-            "URL": "s3://sourceBucket/data/errors/"
-          }
-        ]
-      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "s3://sourceBucket/data/errors/"
+        }
+      ],
       "Codec": "gzip",
       "FolderDepth": 1
     },
@@ -300,19 +294,17 @@ preserving parent folder (folderDepth:1) the following configuration can be used
         "MaxLines": 10000,
         "Template": "%s_%05d"
       },
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnFailure": [
-          {
-            "Action": "move",
-            "URL": "s3://sourceBucket/data/errors/"
-          }
-        ]
-      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "s3://sourceBucket/data/errors/"
+        }
+      ],
       "Codec": "gzip",
       "FolderDepth": 1
     }
@@ -454,7 +446,7 @@ the following configuration can be used with Mirror cloud function
 {
   "Routes": [
     {
-      "Prefix": "/data/",
+      "Prefix": "/data/p6",
       "Suffix": ".csv",
       "Dest": {
         "Topic": "myTopic"
@@ -462,16 +454,17 @@ the following configuration can be used with Mirror cloud function
       "Split": {
         "MaxLines": 1000
       },
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnFailure": [
-          {
-            "Action": "move",
-            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
-          }],
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "OnFailure": [
+        {
+          "Action": "move",
+          "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+        }
+      ],
       "FolderDepth": 1
     }
   ]
