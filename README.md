@@ -14,6 +14,7 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
    * [Google Storage to S3](#google-storage-to-s3)
    * [Google Storage to Pubsub](#google-storage-to-pubsub)
    * [S3 to Google Storage](#s3-to-google-storage)
+- [Deployment](#deployment)
 - [End to end testing](#end-to-end-testing)
 - [Monitoring and limitation](#monitoring-and-limitation)
 - [Code Coverage](#code-coverage)
@@ -244,6 +245,8 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \
     --runtime=go111 
 ```
 
+
+
 ### S3 to Google Storage
 
 [![Google storage to S3 mirror](images/s3to_gs_mirror.png)](images/s3to_gs_mirror.png)
@@ -344,12 +347,13 @@ pipeline:
 
 - With **aws cli**
 
+
 ```bash
 - aws kms create-key  
 - aws kms create-alias --alias-name=smirror --target-key-id=KEY_ID
 - aws ssm put-parameter \
     --name "smirror.gs" \
-    --value 'CONTENT OF GOOGLE SECRETE HERE' \
+    --value 'CONTENT OF GOOGLE SECRET HERE' \
     --type SecureString \
     --key-id alias/smirror
 
@@ -470,6 +474,9 @@ the following configuration can be used with Mirror cloud function
   ]
 }
 ```
+
+
+## Deployment
 
 
 

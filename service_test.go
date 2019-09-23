@@ -10,7 +10,6 @@ import (
 	"github.com/viant/afs/storage"
 	"github.com/viant/assertly"
 	"io"
-	"io/ioutil"
 	"smirror/config"
 	"smirror/job"
 	"strings"

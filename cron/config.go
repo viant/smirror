@@ -1,4 +1,4 @@
-package smirror
+package cron
 
 import (
 	"context"
@@ -11,44 +11,41 @@ import (
 	"github.com/viant/afsc/s3"
 	"github.com/viant/toolbox"
 	"os"
-	"smirror/config"
+	"smirror/cron/config"
+	"smirror/cron/trigger/mem"
 	"strings"
 )
 
-//ConfigEnvKey config eng key
-const ConfigEnvKey = "CONFIG"
-
-//Config represents routes
+//Config represents cron config
 type Config struct {
-	Routes config.Routes
-	RoutesBaseURL string
-	//SourceScheme, currently gs or s3
+	ProjectID string
+	MetaURL string
+	TimeWindow *config.TimeWindow
+	Resources []*config.Resource
+	ResourcesBaseURL string
 	SourceScheme string
-	ProjectID    string
-	Region       string
 }
 
-
-func (c *Config) loadRoutes(ctx context.Context) error {
-	if c.RoutesBaseURL == "" {
+func (c *Config) loadAllResources(ctx context.Context) error {
+	if c.ResourcesBaseURL == "" {
 		return nil
 	}
 	fs := afs.New()
 
 	suffixMatcher, _ := matcher.NewBasic("", ".json", "")
-	routesObject, err := fs.List(ctx, c.RoutesBaseURL, suffixMatcher)
+	routesObject, err := fs.List(ctx, c.ResourcesBaseURL, suffixMatcher)
 	if err != nil {
 		return err
 	}
 	for _, object := range routesObject {
-		if err = c.loadRoute(ctx, fs, object);err != nil {
+		if err = c.loadResources(ctx, fs, object);err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (c *Config) loadRoute(ctx context.Context, storage afs.Service, object storage.Object) error {
+func (c *Config) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
 	reader, err := storage.Download(ctx, object)
 	if err != nil {
 		return err
@@ -56,9 +53,9 @@ func (c *Config) loadRoute(ctx context.Context, storage afs.Service, object stor
 	defer func() {
 		_ = reader.Close()
 	}()
-	routes := config.Routes{}
-	if err = json.NewDecoder(reader).Decode(&routes);err == nil {
-		c.Routes = append(c.Routes, routes...)
+	resources := make([]*config.Resource, 0)
+	if err = json.NewDecoder(reader).Decode(&resources);err == nil {
+		c.Resources = append(c.Resources, resources...)
 	}
 	return err
 }
@@ -75,44 +72,23 @@ func (c *Config) Init(ctx context.Context) error {
 
 		} else if os.Getenv("AWS_LAMBDA_FUNCTION_NAME") != "" {
 			c.SourceScheme = s3.Scheme
+		} else {
+			c.SourceScheme = mem.Scheme
 		}
 	}
-	if len(c.Routes) == 0 {
-		c.Routes = make([]*config.Route, 0)
+	if len(c.Resources) == 0 {
+		c.Resources = make([]*config.Resource, 0)
 	}
-	if err := c.loadRoutes(ctx);err != nil {
+	if err := c.loadAllResources(ctx);err != nil {
 		return err
 	}
-	for i := range c.Routes {
-		c.Routes[i].Dest.Init(projectID)
+	for i := range c.Resources {
+		c.Resources[i].Init(projectID)
 	}
 	return nil
 }
 
-//UseMessageDest returns true if any routes uses message bus
-func (c *Config) UseMessageDest() bool {
-	for _, resource := range c.Routes {
-		if resource.Dest.Topic != "" {
-			return true
-		}
-	}
-	return false
-}
 
-//Resources returns
-func (c *Config) Resources() []*config.Resource {
-	var result = make([]*config.Resource, 0)
-
-	for _, resource := range c.Routes {
-		if resource.Source != nil {
-			result = append(result, resource.Source)
-		}
-		if resource.Dest.Credentials != nil || resource.Dest.CustomKey != nil {
-			result = append(result, &resource.Dest)
-		}
-	}
-	return result
-}
 
 //NewConfigFromEnv returns new config from env
 func NewConfigFromEnv(ctx context.Context, key string) (*Config, error) {

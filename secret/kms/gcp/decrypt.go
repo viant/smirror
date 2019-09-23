@@ -34,14 +34,17 @@ func (s *service) downloadBase64(ctx context.Context, URL string) (string, error
 //Decrypt decrypts plainText with supplied key
 func (s *service) Decrypt(ctx context.Context, secret *config.Secret) ([]byte, error) {
 	plainText, err := s.downloadBase64(ctx, secret.URL)
-	kms, err := cloudkms.NewService(ctx, option.WithScopes(cloudkms.CloudPlatformScope, cloudkms.CloudkmsScope))
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to create kms server for key %v", secret.Key))
+		return nil, err
 	}
-	service := cloudkms.NewProjectsLocationsKeyRingsCryptoKeysService(kms)
+	kmsService, err := cloudkms.NewService(ctx, option.WithScopes(cloudkms.CloudPlatformScope, cloudkms.CloudkmsScope))
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("failed to create kmsService server for key %v", secret.Key))
+	}
+	service := cloudkms.NewProjectsLocationsKeyRingsCryptoKeysService(kmsService)
 	response, err := service.Decrypt(secret.Key, &cloudkms.DecryptRequest{Ciphertext: plainText}).Context(ctx).Do()
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to encrypt with key %v", secret.Key))
+		return nil, errors.Wrap(err, fmt.Sprintf("failed to decrypt with key %v", secret.Key))
 	}
 	return []byte(response.Plaintext), nil
 }

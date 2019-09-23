@@ -1,0 +1,16 @@
+{
+  "MetaURL": "mem://localhost/ops/meta.json",
+  "TimeWindow": {
+    "DurationInSec": 720
+  },
+  "Resources": [
+    {
+      "URL": "s3://externalBucket/data/2019/",
+      "DestFunction": "myLambdaFun",
+      "CustomKey": {
+        "Parameter": "smirror.partnerX.customKey",
+        "Key": "smirror"
+      }
+    }
+  ]
+}

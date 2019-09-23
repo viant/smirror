@@ -8,9 +8,9 @@ import (
 //Represents a destination
 type Resource struct {
 	URL         string
+	Region      string
 	CustomKey   *CustomKey
 	Credentials *Credentials
-
 	Topic string
 	//Optional pubsub project ID, otherwise it uses default one.
 	ProjectID string

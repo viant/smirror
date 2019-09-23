@@ -41,16 +41,24 @@ func (s service) Kms(service afs.Service) (kms.Service, error) {
 	return nil, fmt.Errorf("unsupported scheme: %v", s.sourceScheme)
 }
 
+
+
 //Init initialises resources
-func (s *service) Init(ctx context.Context, service afs.Service, resources []*config.Resource) error {
-	kmsService, err := s.Kms(service)
-	if err != nil {
-		return err
-	}
+func (s *service) Init(ctx context.Context, service afs.Service, resources []*config.Resource) (err error) {
+	var kmsService kms.Service
 	for i := range resources {
 		resource := resources[i]
 		if resource == nil {
 			continue
+		}
+		if resource.Credentials == nil && resource.CustomKey == nil {
+			continue
+		}
+		if kmsService == nil {
+			kmsService, err = s.Kms(service)
+			if err != nil {
+				return err
+			}
 		}
 		if resource.Credentials != nil {
 			data, err := kmsService.Decrypt(ctx, &resource.Credentials.Secret)
@@ -65,7 +73,6 @@ func (s *service) Init(ctx context.Context, service afs.Service, resources []*co
 				return err
 			}
 			data = decodeBase64IfNeeded(data)
-
 			if resources[i].CustomKey.AES256Key, err = option.NewAES256Key(data); err != nil {
 				return err
 			}
@@ -101,6 +108,9 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 				return nil, err
 			}
 			result = append(result, auth)
+			if resource.Region != "" {
+				result = append(result, &s3.Region{Name: resource.Region})
+			}
 		default:
 			//do nothing init should take care of validating supported URL scheme
 		}
