@@ -1,0 +1,26 @@
+[
+  {
+    "Prefix": "/data/",
+    "Suffix": ".csv.gz",
+    "Dest": {
+      "URL": "s3://destBucket/data",
+      "Credentials": {
+        "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+        "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+      }
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "gs://myProject-smirro-ops/data/errors/"
+      }
+    ],
+    "Codec": "gzip",
+    "FolderDepth": 1
+  }
+]
