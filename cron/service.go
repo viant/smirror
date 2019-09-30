@@ -92,7 +92,6 @@ func (s *service) getResourceCandidates(ctx context.Context, resource *config.Re
 	return result, s.appendResources(ctx, resource.URL, &result, options)
 }
 
-
 func (s *service) appendResources(ctx context.Context, URL string, result *[]storage.Object, options []storage.Option) error {
 	objects, err := s.Service.List(ctx, URL, options...)
 	if err != nil {
@@ -103,7 +102,7 @@ func (s *service) appendResources(ctx context.Context, URL string, result *[]sto
 			continue
 		}
 		if objects[i].IsDir() {
-			if err = s.appendResources(ctx, objects[i].URL(), result, options);err != nil {
+			if err = s.appendResources(ctx, objects[i].URL(), result, options); err != nil {
 				return err
 			}
 			continue
@@ -113,9 +112,8 @@ func (s *service) appendResources(ctx context.Context, URL string, result *[]sto
 	return nil
 }
 
-
 func (s *service) addLastModifiedTimeMatcher(options []storage.Option) []storage.Option {
-	afterTime := time.Now().Add(-s.config.TimeWindow.Duration);
+	afterTime := time.Now().Add(-s.config.TimeWindow.Duration)
 	return append(options, matcher.NewModification(nil, &afterTime))
 }
 

@@ -17,7 +17,6 @@ import (
 	"time"
 )
 
-
 func TestService_Tick(t *testing.T) {
 
 	now := time.Now()
@@ -59,24 +58,24 @@ func TestService_Tick(t *testing.T) {
 	for _, useCase := range useCases {
 		resources := getTestObjects(useCase.input)
 		err := asset.Create(mem.Singleton(), useCase.baseURL, resources)
-		if ! assert.Nil(t, err, useCase.description) {
+		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 		_ = os.Setenv(useCase.configKey, useCase.configPayload)
 		useCase.config, err = NewConfigFromEnv(ctx, useCase.configKey)
-		if ! assert.Nil(t, err, useCase.description) {
+		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 		service, err := New(ctx, useCase.config, fs)
-		if ! assert.Nil(t, err, useCase.description) {
+		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 		err = service.Tick(ctx)
-		if ! assert.Nil(t, err, useCase.description) {
+		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 
-		if ! assert.Nil(t, err, useCase.description) {
+		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 		actual, err := loadMeta(ctx, fs, useCase.config.MetaURL)
@@ -88,17 +87,14 @@ func TestService_Tick(t *testing.T) {
 		assert.True(t, exists)
 		_ = fs.Delete(ctx, funcURL)
 
-
 		err = service.Tick(ctx)
-		if ! assert.Nil(t, err, useCase.description) {
+		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 
 		exists, _ = fs.Exists(ctx, funcURL)
 		//make sure that function is triggered only once
 		assert.False(t, exists, useCase.description)
-
-
 
 	}
 

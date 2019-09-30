@@ -27,4 +27,3 @@ func NewFromEnv(ctx context.Context, envKey string) (Service, error) {
 	singleton = service
 	return singleton, nil
 }
-

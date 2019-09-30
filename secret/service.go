@@ -41,8 +41,6 @@ func (s service) Kms(service afs.Service) (kms.Service, error) {
 	return nil, fmt.Errorf("unsupported scheme: %v", s.sourceScheme)
 }
 
-
-
 //Init initialises resources
 func (s *service) Init(ctx context.Context, service afs.Service, resources []*config.Resource) (err error) {
 	var kmsService kms.Service

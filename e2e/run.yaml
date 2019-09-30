@@ -1,6 +1,8 @@
 init:
   gsBucket: e2etst
   s3Bucket: e2etst
+  partnerXKey: this is secret :3rd party phrase
+  s3ExternalBucket: e2etstext
   gcpCredentials: gcp-e2e
   awsCredentials: aws-e2e
   gcpProject: viant-e2e

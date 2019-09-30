@@ -199,7 +199,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rou
 
 //New creates a new mirror service
 func New(ctx context.Context, config *Config) (Service, error) {
-	err := config.Init()
+	err := config.Init(ctx)
 	if err != nil {
 		return nil, err
 	}

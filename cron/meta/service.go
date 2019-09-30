@@ -28,7 +28,7 @@ type service struct {
 func (s *service) loadState(ctx context.Context) (*State, error) {
 	state := &State{}
 	has, _ := s.Exists(ctx, s.metaURL)
-	if ! has {
+	if !has {
 		return state, nil
 	}
 	reader, err := s.DownloadWithURL(ctx, s.metaURL)
@@ -56,8 +56,8 @@ func (s *service) PendingResources(ctx context.Context, candidates []storage.Obj
 	var result = make([]storage.Object, 0)
 	processed := state.ProcessMap()
 	for i, candidate := range candidates {
-		_, has := processed[candidate.URL()];
-		if ! has {
+		_, has := processed[candidate.URL()]
+		if !has {
 			result = append(result, candidates[i])
 		}
 	}

@@ -7,7 +7,3 @@ type Resource struct {
 	config.Resource
 	DestFunction string
 }
-
-
-
-

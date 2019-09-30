@@ -8,8 +8,18 @@ init:
   mirrorS3Config: $Cat(config/s3.json)
   mirrorS3ConfigJSON: $AsJSON($mirrorS3Config)
 
+  mirrorS3CronConfig: $Cat(config/s3Cron.json)
+  mirrorS3CronConfigJSON: $AsJSON($mirrorS3CronConfig)
+
 
 pipeline:
+
+  create3rdPartyBucket:
+    action: storage:create
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsBucket}/e2e-mirror/config/mirror.json
+
 
   uploadMirrorGSConfig:
     action: storage:upload
@@ -24,6 +34,15 @@ pipeline:
     dest:
       credentials: $awsCredentials
       URL: s3://${s3Bucket}/e2e-mirror/config/mirror.json
+
+
+  uploadMirrorS3CronConfig:
+    action: storage:upload
+    sourceKey: mirrorS3CronConfigJSON
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3Bucket}/e2e-mirror/config/cronmirror.json
+
 
   setupMessageBus:
     action: msg:setupResource
@@ -41,7 +60,7 @@ pipeline:
           topic:
             URL: /projects/${gcp.projectID}/topics/smirrorTopic
 
-  s3Secret:
+  secureWithGCP:
     deployGCPKey:
       action: gcp/kms:deployKey
       credentials: $gcpCredentials
@@ -64,7 +83,9 @@ pipeline:
         credentials: ${gcpCredentials}
       logging: false
 
-  gsSecret:
+
+  secureWithAWS:
+
     deployS3Key:
      credentials: $awsCredentials
      action: aws/kms:setupKey
@@ -78,6 +99,13 @@ pipeline:
      keyId: alias/dstransfer
      value: $gcpSecrets.Data
 
+    deployCustomerKey:
+      action: aws/ssm:setParameter
+      name: smirror.partnerXKey
+      '@description': PartnerX custom encryption key
+      type: SecureString
+      keyId: alias/smirror
+      value: $partnerXKey
 
 
   info:

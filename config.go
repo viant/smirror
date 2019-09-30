@@ -20,7 +20,7 @@ const ConfigEnvKey = "CONFIG"
 
 //Config represents routes
 type Config struct {
-	Routes config.Routes
+	Routes        config.Routes
 	RoutesBaseURL string
 	//SourceScheme, currently gs or s3
 	SourceScheme string
@@ -28,20 +28,19 @@ type Config struct {
 	Region       string
 }
 
-
 func (c *Config) loadRoutes(ctx context.Context) error {
 	if c.RoutesBaseURL == "" {
 		return nil
 	}
 	fs := afs.New()
 
-	suffixMatcher, _ := matcher.NewBasic("", ".json", "")
+	suffixMatcher, _ := matcher.NewBasic("", ".json", "", nil)
 	routesObject, err := fs.List(ctx, c.RoutesBaseURL, suffixMatcher)
 	if err != nil {
 		return err
 	}
 	for _, object := range routesObject {
-		if err = c.loadRoute(ctx, fs, object);err != nil {
+		if err = c.loadRoute(ctx, fs, object); err != nil {
 			return err
 		}
 	}
@@ -57,7 +56,7 @@ func (c *Config) loadRoute(ctx context.Context, storage afs.Service, object stor
 		_ = reader.Close()
 	}()
 	routes := config.Routes{}
-	if err = json.NewDecoder(reader).Decode(&routes);err == nil {
+	if err = json.NewDecoder(reader).Decode(&routes); err == nil {
 		c.Routes = append(c.Routes, routes...)
 	}
 	return err
@@ -80,7 +79,7 @@ func (c *Config) Init(ctx context.Context) error {
 	if len(c.Routes) == 0 {
 		c.Routes = make([]*config.Route, 0)
 	}
-	if err := c.loadRoutes(ctx);err != nil {
+	if err := c.loadRoutes(ctx); err != nil {
 		return err
 	}
 	for i := range c.Routes {

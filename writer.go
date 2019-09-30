@@ -3,7 +3,6 @@ package smirror
 import (
 	"bytes"
 	"compress/gzip"
-	"github.com/docker/docker/pkg/ioutils"
 	"io"
 	"smirror/config"
 )
@@ -25,7 +24,7 @@ type Writer struct {
 func NewWriter(route *config.Route, listener OnClose) io.WriteCloser {
 	buffer := new(bytes.Buffer)
 	result := &Writer{
-		WriteCloser: ioutils.NopWriteCloser(buffer),
+		WriteCloser: WriteNopCloser(buffer),
 		buffer:      buffer,
 		listener:    listener,
 	}
@@ -50,4 +49,16 @@ func (w *Writer) Close() error {
 	}
 	w.Reader = w.buffer
 	return w.listener(w)
+}
+
+type writeNopCloser struct {
+	io.Writer
+}
+
+func (writeNopCloser) Close() error { return nil }
+
+// WriteNopCloser returns a WriteCloser with a no-op Close method wrapping
+// the provided Writer w.
+func WriteNopCloser(w io.Writer) io.WriteCloser {
+	return writeNopCloser{w}
 }

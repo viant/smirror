@@ -1,0 +1,16 @@
+{
+  "MetaURL": "s3://${s3Bucket}/ops/meta.json",
+  "TimeWindow": {
+    "DurationInSec": 720
+  },
+  "Resources": [
+    {
+      "URL": "s3://${s3ExternalBucket}/data/partnerX/2019",
+      "DestFunction": "SMirror",
+      "CustomKey": {
+        "Parameter": "smirror.partnerXKey",
+        "Key": "alias/smirror"
+      }
+    }
+  ]
+}

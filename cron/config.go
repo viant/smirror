@@ -18,12 +18,12 @@ import (
 
 //Config represents cron config
 type Config struct {
-	ProjectID string
-	MetaURL string
-	TimeWindow *config.TimeWindow
-	Resources []*config.Resource
+	ProjectID        string
+	MetaURL          string
+	TimeWindow       *config.TimeWindow
+	Resources        []*config.Resource
 	ResourcesBaseURL string
-	SourceScheme string
+	SourceScheme     string
 }
 
 func (c *Config) loadAllResources(ctx context.Context) error {
@@ -32,13 +32,13 @@ func (c *Config) loadAllResources(ctx context.Context) error {
 	}
 	fs := afs.New()
 
-	suffixMatcher, _ := matcher.NewBasic("", ".json", "")
+	suffixMatcher, _ := matcher.NewBasic("", ".json", "", nil)
 	routesObject, err := fs.List(ctx, c.ResourcesBaseURL, suffixMatcher)
 	if err != nil {
 		return err
 	}
 	for _, object := range routesObject {
-		if err = c.loadResources(ctx, fs, object);err != nil {
+		if err = c.loadResources(ctx, fs, object); err != nil {
 			return err
 		}
 	}
@@ -54,7 +54,7 @@ func (c *Config) loadResources(ctx context.Context, storage afs.Service, object 
 		_ = reader.Close()
 	}()
 	resources := make([]*config.Resource, 0)
-	if err = json.NewDecoder(reader).Decode(&resources);err == nil {
+	if err = json.NewDecoder(reader).Decode(&resources); err == nil {
 		c.Resources = append(c.Resources, resources...)
 	}
 	return err
@@ -79,7 +79,7 @@ func (c *Config) Init(ctx context.Context) error {
 	if len(c.Resources) == 0 {
 		c.Resources = make([]*config.Resource, 0)
 	}
-	if err := c.loadAllResources(ctx);err != nil {
+	if err := c.loadAllResources(ctx); err != nil {
 		return err
 	}
 	for i := range c.Resources {
@@ -87,8 +87,6 @@ func (c *Config) Init(ctx context.Context) error {
 	}
 	return nil
 }
-
-
 
 //NewConfigFromEnv returns new config from env
 func NewConfigFromEnv(ctx context.Context, key string) (*Config, error) {

@@ -10,10 +10,8 @@ type State struct {
 	Processed []*Processed
 }
 
-
-
 //Add adds storage object to processed resources
-func (s *State) Add(objects ... storage.Object) {
+func (s *State) Add(objects ...storage.Object) {
 	if len(s.Processed) == 0 {
 		s.Processed = make([]*Processed, 0)
 	}
@@ -22,9 +20,8 @@ func (s *State) Add(objects ... storage.Object) {
 	}
 }
 
-
 //Prune removes any resourced older than supplied max age
-func (s *State) Prune(now time.Time, maxAge time.Duration)  {
+func (s *State) Prune(now time.Time, maxAge time.Duration) {
 	if maxAge <= 0 {
 		return
 	}

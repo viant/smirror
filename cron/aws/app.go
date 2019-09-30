@@ -14,7 +14,7 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			debug.PrintStack()
-			fmt.Println("Recovered in f", r)
+			fmt.Println("recovered in f", r)
 		}
 	}()
 	lambda.Start(handleRequest)
@@ -34,4 +34,3 @@ func handleRequest(ctx context.Context) error {
 	}
 	return nil
 }
-

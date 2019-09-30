@@ -22,6 +22,23 @@
         }
       ],
       "FolderDepth": 1
+    },
+    {
+      "Prefix": "data/partnerX/",
+      "Suffix": ".csv",
+      "Dest": {
+        "URL": "gs://${s3Bucket}/data",
+        "CustomKey": {
+          "Parameter": "smirror.partnerXKey",
+          "Key": "alias/smirror"
+        }
+      },
+      "OnSuccess": [
+        {
+          "Action": "delete"
+        }
+      ],
+      "FolderDepth": 2
     }
   ]
 }

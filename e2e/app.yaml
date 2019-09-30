@@ -1,7 +1,9 @@
 init:
   fnAppPath: $Pwd(..)
-  codeZip: $Pwd(../aws/smirror.zip)
-  functionName: E2etstMirror
+  mirrorAppZip: $Pwd(../aws/smirror.zip)
+  mirrorCronZip: $Pwd(../cron/aws/smirrorcron.zip)
+  functionName: smirror
+  cronFunctionName: cronsmirror
   privilegePolicy: privilege-policy.json
 
 pipeline:
@@ -21,8 +23,12 @@ pipeline:
         - cd aws
         - go build -o smirror
         - zip -j smirror.zip smirror
+        - cd ../cron/aws
+        - go build -o smirrorcron
+        - zip -j smirrorcron.zip smirrorcron
 
     deployCloudFunction:
+      when: false
       action: gcp/cloudfunctions:deploy
       credentials: $gcpCredentials
       '@name': $functionName
@@ -52,7 +58,7 @@ pipeline:
           LOGGING: 'true'
           CONFIG: s3://${s3Bucket}/e2e-mirror/config/mirror.json
       code:
-        zipfile: $LoadBinary(${codeZip})
+        zipfile: $LoadBinary(${mirrorAppZip})
       rolename: lambda-${functionName}-executor
       define:
         - policyname: kms-${functionName}-role
@@ -72,3 +78,26 @@ pipeline:
           filter:
             prefix:
               - data
+
+  
+    deployCronLambad:
+      action: aws/lambda:deploy
+      credentials: $awsCredentials
+      functionname: $cronFunctionName
+      runtime:  go1.x
+      handler: smirror
+      timeout: 360
+      environment:
+        variables:
+          LOGGING: 'true'
+          CONFIG: s3://${s3Bucket}/e2e-mirror/config/cronmirror.json
+      code:
+        zipfile: $LoadBinary(${mirrorCronZip})
+      schedule:
+        expression: rate(1 minute)
+      rolename: lambda-${cronFunctionName}-executor
+      define:
+        - policyname: kms-${cronFunctionName}-role
+          policydocument: $Cat('${privilegePolicy}')
+      attach:
+        - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole

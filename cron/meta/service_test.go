@@ -12,7 +12,6 @@ import (
 
 func TestService_PendingResources(t *testing.T) {
 
-
 	now := time.Now()
 	var useCases = []struct {
 		description    string
@@ -22,41 +21,40 @@ func TestService_PendingResources(t *testing.T) {
 		expect         []string
 	}{
 		{
-			description:"no pending resources",
-			processedSoFar:map[string]time.Time{
-				"f1":now.Add(-15 *time.Second),
-				"f2":now.Add(-12 *time.Second),
-				"f3":now.Add(-10 *time.Second),
+			description: "no pending resources",
+			processedSoFar: map[string]time.Time{
+				"f1": now.Add(-15 * time.Second),
+				"f2": now.Add(-12 * time.Second),
+				"f3": now.Add(-10 * time.Second),
 			},
-			candidates:map[string]time.Time{
-				"f2":now.Add(-12 *time.Second),
-				"f3":now.Add(-10 *time.Second),
+			candidates: map[string]time.Time{
+				"f2": now.Add(-12 * time.Second),
+				"f3": now.Add(-10 * time.Second),
 			},
 		},
 		{
-			description:"all pending resources",
-			processedSoFar:map[string]time.Time{
-				"f1":now.Add(-15 *time.Second),
+			description: "all pending resources",
+			processedSoFar: map[string]time.Time{
+				"f1": now.Add(-15 * time.Second),
 			},
-			candidates:map[string]time.Time{
-				"f2":now.Add(-12 *time.Second),
-				"f3":now.Add(-10 *time.Second),
+			candidates: map[string]time.Time{
+				"f2": now.Add(-12 * time.Second),
+				"f3": now.Add(-10 * time.Second),
 			},
-			expect:[]string{"f2", "f3"},
+			expect: []string{"f2", "f3"},
 		},
 		{
-			description:"partial pending resources",
-			processedSoFar:map[string]time.Time{
-				"f1":now.Add(-15 *time.Second),
+			description: "partial pending resources",
+			processedSoFar: map[string]time.Time{
+				"f1": now.Add(-15 * time.Second),
 			},
-			candidates:map[string]time.Time{
-				"f1":now.Add(-15 *time.Second),
-				"f2":now.Add(-12 *time.Second),
-				"f3":now.Add(-10 *time.Second),
+			candidates: map[string]time.Time{
+				"f1": now.Add(-15 * time.Second),
+				"f2": now.Add(-12 * time.Second),
+				"f3": now.Add(-10 * time.Second),
 			},
-			expect:[]string{"f2", "f3"},
+			expect: []string{"f2", "f3"},
 		},
-
 	}
 
 	ctx := context.Background()
