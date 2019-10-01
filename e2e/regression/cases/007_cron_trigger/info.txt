@@ -1,0 +1,1 @@
+crone s3://${s3TriggerBucket}/data/p7/events.csv to gs

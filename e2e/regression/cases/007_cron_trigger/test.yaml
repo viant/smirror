@@ -12,17 +12,20 @@ pipeline:
 
   trigger:
     action: storage:copy
-    sleepTimeMs: 20000
+    sleepTimeMs: 70000
     source:
       URL: ${parent.path}/data/prepare/events.csv
     dest:
       credentials: $awsCredentials
-      URL: s3://${s3TriggerBucket}/data/p5/events.csv
+      customKey:
+        Key: $partnerXKey
+      URL: s3://${s3ExternalBucket}/data/p7/events.csv
+
 
   validate:
     action: storage:download
     source:
       credentials: $gcpCredentials
-      URL: gs://${gsDestBucket}/data/p5/events.csv
+      URL: gs://${gsDestBucket}/data/p7/events.csv
     destKey: events
     expect: $Cat('${parent.path}/data/expect/events.csv')

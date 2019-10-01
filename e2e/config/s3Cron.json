@@ -5,8 +5,8 @@
   },
   "Resources": [
     {
-      "URL": "s3://${s3ExternalBucket}/data/partnerX/2019",
-      "DestFunction": "SMirror",
+      "URL": "s3://${s3ExternalBucket}/data/p7",
+      "DestFunction": "StorageMirror",
       "CustomKey": {
         "Parameter": "smirror.partnerXKey",
         "Key": "alias/smirror"

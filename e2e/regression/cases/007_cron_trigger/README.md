@@ -4,22 +4,47 @@ Mirror suffixed *.csv data from gs://${gsTriggerBucket}/data/p1 to s3://${s3Trig
 
 #### Input:
 
+
+**StorageMirrorCron**
+
 Configuration:
 
-* Global Config: [@config,json](../../../config/gs.json)
+* Global Config: [@config,json](../../../config/s3Cron.json)
+
 * Route:
 
-[@routes,json](routes.json)
+[@route,json](routes.json)
+
+
+
+
+**StorageMirror**
+
+Configuration:
+
+* Global Config: [@config,json](../../../config/s3.json)
+
+* Route:
+
+[@route,json](routes.json)
 ```json
 [
   {
-    "Prefix": "/data/p6",
+    "Prefix": "/data/p7",
     "Suffix": ".csv",
-    "Dest": {
-      "Topic": "smirrorTopic"
+    "Source": {
+
+      "CustomKey": {
+        "Parameter": "smirror.partnerXKey",
+        "Key": "alias/smirror"
+      }
     },
-    "Split": {
-      "MaxLines": 10
+    "Dest": {
+      "URL": "gs://${gsDestBucket}/data",
+      "Credentials": {
+        "Parameter": "smirror.gs",
+        "Key": "alias/smirror"
+      }
     },
     "OnSuccess": [
       {
@@ -29,11 +54,12 @@ Configuration:
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
+        "URL": "s3:///${s3OpsBucket}/e2e-mirror/errors/"
       }
     ],
     "FolderDepth": 1
   }
+
 ]
 ```
 

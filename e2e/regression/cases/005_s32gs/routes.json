@@ -1,0 +1,24 @@
+[
+  {
+    "Prefix": "/data/p6",
+    "Suffix": ".csv",
+    "Dest": {
+      "Topic": "smirrorTopic"
+    },
+    "Split": {
+      "MaxLines": 10
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
+      }
+    ],
+    "FolderDepth": 1
+  }
+]

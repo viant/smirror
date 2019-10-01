@@ -1,6 +1,6 @@
 init:
   appPath: $Pwd(../..)
-  gsTriggerBucket: e2etst
+  gsTriggerBucket: ${s3TriggerBucket}
   codeZip: ${appPath}/aws/smirror.zip
   functionName: E2etstMirror
   privilegePolicy: privilege-policy.json
@@ -33,7 +33,7 @@ pipeline:
     environment:
       variables:
         LOGGING: 'true'
-        CONFIG: s3://${s3TriggerBucket}/e2e-mirror/config/mirror.json
+        CONFIG: s3://${s3ConfigBucket}/e2e-mirror/config/mirror.json
     code:
       zipfile: $LoadBinary(${codeZip})
     rolename: lambda-${functionName}-executor

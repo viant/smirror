@@ -16,7 +16,7 @@ Configuration:
        "Dest": {
            "URL": "s3://${s3TriggerBucket}/data",
            "Credentials": {
-              "URL": "gs://${gsTriggerBucket}/e2e-mirror/secret/s3-mirror.json.enc",
+              "URL": "gs://${gsConifgBucket}/Secrets/s3-mirror.json.enc",
               "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
            }
        },

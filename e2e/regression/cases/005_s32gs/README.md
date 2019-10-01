@@ -1,40 +1,43 @@
 #### Scenario:
 
-Mirror suffixed *.csv data from gs://${gsTriggerBucket}/data/p1 to s3://${s3TriggerBucket}/data
+Mirror suffixed *.csv data from s3://${s3TriggerBucket}/data/p5 to gs://${gsDestBucket}/data
 
 #### Input:
 
 Configuration:
 
+* Global Config: [@config,json](../../../config/s3.json)
+
 * Route:
 
-[@config,json](../../../config/s3.json)
+[@routes,json](routes.json)
 ```json
-     {
-         "Prefix": "/data/p5",
-         "Suffix": ".csv",
-         "Dest": {
-           "URL": "gs://${s3TriggerBucket}/data",
-           "Credentials": {
-             "Parameter": "smirror.gs",
-             "Key": "alias/smirror"
-           }
-         },
-         "OnCompletion": {
-           "OnSuccess": [
-             {
-               "Action": "delete"
-             }
-           ],
-           "OnError": [
-             {
-               "Action": "move",
-               "URL": "s3:///${gsTriggerBucket}/e2e-mirror/errors/"
-             }
-           ]
-         },
-         "FolderDepth": 1
+ [
+   {
+     "Prefix": "/data/p5",
+     "Suffix": ".csv",
+     "Dest": {
+       "URL": "gs://${gsDestBucket}/data",
+       "Credentials": {
+         "Parameter": "smirror.gs",
+         "Key": "alias/smirror"
        }
+     },
+     "OnSuccess": [
+       {
+         "Action": "delete"
+       }
+     ],
+     "OnFailure": [
+       {
+         "Action": "move",
+         "URL": "s3:///${s3OpsBucket}/e2e-mirror/errors/"
+       }
+     ],
+     "FolderDepth": 1
+   }
+ 
+ ]
 ```
 
 * Trigger:

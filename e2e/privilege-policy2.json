@@ -21,12 +21,26 @@
     },
     {
       "Effect": "Allow",
+      "Sid": "Stmt1482841232304002",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+        "arn:aws:lambda:${aws.region}:${aws.accountID}:function:*"
+      ]
+    },
+    {
+      "Effect": "Allow",
       "Action": [
         "s3:*"
       ],
       "Resource": [
         "arn:aws:s3:::${s3ExternalBucket}",
         "arn:aws:s3:::${s3ExternalBucket}/*",
+        "arn:aws:s3:::${s3ConifgBucket}",
+        "arn:aws:s3:::${s3ConifgBucket}/*",
+        "arn:aws:s3:::${s3OpsBucket}",
+        "arn:aws:s3:::${s3OpsBucket}/*",
         "arn:aws:s3:::${s3TriggerBucket}",
         "arn:aws:s3:::${s3TriggerBucket}/*"
       ]

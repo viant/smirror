@@ -26,7 +26,7 @@ pipeline:
       udf: UnzipText
       source:
         credentials: $awsCredentials
-        URL: s3://${gsTriggerBucket}/data/p4/events_00001.csv.gz
+        URL: s3://${s3DestBucket}/data/p4/events_00001.csv.gz
       destKey: events
       expect: $Cat('${parent.path}/data/expect/events_00001.csv')
     chunk2:
@@ -34,6 +34,6 @@ pipeline:
       udf: UnzipText
       source:
         credentials: $awsCredentials
-        URL: s3://${gsTriggerBucket}/data/p4/events_00002.csv.gz
+        URL: s3://${s3DestBucket}/data/p4/events_00002.csv.gz
       destKey: events
       expect: $Cat('${parent.path}/data/expect/events_00002.csv')

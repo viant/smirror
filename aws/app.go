@@ -40,8 +40,11 @@ func handleRequest(ctx context.Context, s3Event events.S3Event) error {
 			fmt.Printf("triggered by  %v\n", URL)
 		}
 		response := service.Mirror(ctx, smirror.NewRequest(URL))
-		if data, err := json.Marshal(response); err == nil {
-			fmt.Print(string(data))
+
+		if smirror.IsFnLoggingEnabled(smirror.LoggingEnvKey) {
+			if data, err := json.Marshal(response); err == nil {
+				fmt.Printf("%s\n", string(data))
+			}
 		}
 
 	}

@@ -1,19 +1,16 @@
 pipeline:
-
   init:
     action: storage:remove
     credentials: $awsCredentials
     assets:
       - URL: gs:///${gsTriggerBucket}/e2e-mirror/
 
-
   test:
     tag: $pathMatch
     description: '@info'
     subPath: 'cases/${index}_*'
-    range: 1..004
+    range: 1..007
     template:
-
       setVars:
         action: nop
         comments: use case init

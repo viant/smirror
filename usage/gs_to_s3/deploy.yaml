@@ -1,6 +1,6 @@
 init:
   appPath: $Pwd(../..)
-  gsTriggerBucket: e2etst
+  gsTriggerBucket: ${s3TriggerBucket}
 
 pipeline:
 

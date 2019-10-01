@@ -1,5 +1,5 @@
 init:
-  gsTriggerBucket: e2etst
+  gsTriggerBucket: ${s3TriggerBucket}
 pipeline:
   secure:
     deployKey:

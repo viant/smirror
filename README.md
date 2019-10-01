@@ -121,7 +121,7 @@ endly encryt
 [@encrypt.yaml](usage/gs_to_s3/encrypt.yaml)
 ```yaml
 init:
-  gsTriggerBucket: e2etst
+  gsTriggerBucket: ${s3TriggerBucket}
 pipeline:
   secure:
     deployKey:
@@ -197,7 +197,7 @@ endly deploy
 ```yaml
 init:
   appPath: $Pwd(../..)
-  gsTriggerBucket: e2etst
+  gsTriggerBucket: ${s3TriggerBucket}
 
 pipeline:
 
@@ -237,7 +237,7 @@ export GO111MODULE=on
 go mod vendor
 
 gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \ 
-    --trigger-resource e2etst 
+    --trigger-resource ${s3TriggerBucket} 
     --trigger-event google.storage.object.finalize \
     --set-env-vars=LOGGING=true,CONFIG=gs://gsTriggerBucket/mirror/config/gs.json \
     --memory=512M \
@@ -372,7 +372,7 @@ endly deploy
 ```yaml
 init:
   appPath: $Pwd(../..)
-  gsTriggerBucket: e2etst
+  gsTriggerBucket: ${s3TriggerBucket}
   codeZip: ${appPath}/aws/smirror.zip
   functionName: E2etstMirror
   privilegePolicy: privilege-policy.json

@@ -14,6 +14,7 @@ import (
 type Route struct {
 	Dest   Resource
 	Source *Resource
+	Replace map[string]string
 	matcher.Basic
 	Split *Split
 	job.Actions

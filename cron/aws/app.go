@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/lambda"
 	"log"
-	"runtime/debug"
 	"smirror"
 	"smirror/cron"
 )
@@ -13,7 +12,6 @@ import (
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
-			debug.PrintStack()
 			fmt.Println("recovered in f", r)
 		}
 	}()

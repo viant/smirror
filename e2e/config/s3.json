@@ -1,44 +1,4 @@
 {
-  "Routes": [
-    {
-      "Prefix": "/data/p5",
-      "Suffix": ".csv",
-      "Dest": {
-        "URL": "gs://${s3TriggerBucket}/data",
-        "Credentials": {
-          "Parameter": "smirror.gs",
-          "Key": "alias/smirror"
-        }
-      },
-      "OnSuccess": [
-        {
-          "Action": "delete"
-        }
-      ],
-      "OnFailure": [
-        {
-          "Action": "move",
-          "URL": "s3:///${gsTriggerBucket}/e2e-mirror/errors/"
-        }
-      ],
-      "FolderDepth": 1
-    },
-    {
-      "Prefix": "data/partnerX/",
-      "Suffix": ".csv",
-      "Dest": {
-        "URL": "gs://${s3TriggerBucket}/data",
-        "CustomKey": {
-          "Parameter": "smirror.partnerXKey",
-          "Key": "alias/smirror"
-        }
-      },
-      "OnSuccess": [
-        {
-          "Action": "delete"
-        }
-      ],
-      "FolderDepth": 2
-    }
-  ]
+  "RoutesBaseURL": "s3://${s3ConifgBucket}/StorageMirror/dataflow/",
+  "RoutesCheckFrequencyMs": 100
 }
