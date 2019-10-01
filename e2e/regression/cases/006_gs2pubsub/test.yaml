@@ -13,7 +13,7 @@ pipeline:
       URL: ${parent.path}/routes.json
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsConifgBucket}/StorageMirror/processes/case_${parent.index}.json
+      URL: gs://${gsConifgBucket}/StorageMirror/dataflow/case_${parent.index}.json
 
   trigger:
     action: storage:copy
