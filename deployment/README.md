@@ -20,7 +20,7 @@ This bucket stores all configuration files:
     /
     | - config
     |      |- smirror.json
-    |      |- routes
+    |      |- processes
     |      |     | - process1_routes.json
     |      |     | - processN_routes.json        
         
