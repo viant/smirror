@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-//Fn cloud function entry point
-func Fn(ctx context.Context, event gs.Event) (err error) {
+//StorageMirror cloud function entry point
+func StorageMirror(ctx context.Context, event gs.Event) (err error) {
 	start := time.Now()
 	defer func() {
 		if r := recover(); r != nil {
@@ -19,7 +19,7 @@ func Fn(ctx context.Context, event gs.Event) (err error) {
 			err = fmt.Errorf("%v", r)
 		}
 	}()
-	response, err := fn(ctx, event)
+	response, err := storageMirror(ctx, event)
 	elapsed := time.Since(start)
 	if err != nil {
 		err = errors.Wrap(err, "failed to mirror "+event.URL())
@@ -32,7 +32,7 @@ func Fn(ctx context.Context, event gs.Event) (err error) {
 	return err
 }
 
-func fn(ctx context.Context, event gs.Event) (*Response, error) {
+func storageMirror(ctx context.Context, event gs.Event) (*Response, error) {
 	service, err := NewFromEnv(ctx, ConfigEnvKey)
 	if err != nil {
 		return nil, err

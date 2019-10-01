@@ -1,0 +1,30 @@
+[
+  {
+    "Prefix": "/data/p4",
+    "Suffix": ".csv",
+    "Dest": {
+      "URL": "s3://${s3DestBucket}/data",
+      "Credentials": {
+        "URL": "gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc",
+        "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
+      }
+    },
+    "Codec": "gzip",
+    "Split": {
+      "MaxLines": 10,
+      "Template": "%s_%05d"
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
+      }
+    ],
+    "FolderDepth": 1
+  }
+]

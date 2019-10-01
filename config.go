@@ -12,7 +12,9 @@ import (
 	"github.com/viant/toolbox"
 	"os"
 	"smirror/config"
+	"smirror/route"
 	"strings"
+	"time"
 )
 
 //ConfigEnvKey config eng key
@@ -20,25 +22,30 @@ const ConfigEnvKey = "CONFIG"
 
 //Config represents routes
 type Config struct {
-	Routes        config.Routes
-	RoutesBaseURL string
+	initRoutes             config.Routes
+	Routes                 config.Routes
+	RoutesBaseURL          string
+	RoutesCheckFrequencyMs int
+	*route.Meta
 	//SourceScheme, currently gs or s3
 	SourceScheme string
 	ProjectID    string
 	Region       string
 }
 
-func (c *Config) loadRoutes(ctx context.Context) error {
+func (c *Config) loadRoutes(ctx context.Context, fs afs.Service) error {
 	if c.RoutesBaseURL == "" {
 		return nil
 	}
-	fs := afs.New()
-
 	suffixMatcher, _ := matcher.NewBasic("", ".json", "", nil)
-	routesObject, err := fs.List(ctx, c.RoutesBaseURL, suffixMatcher)
+	routesObject, err := fs.List(ctx, c.RoutesBaseURL, suffixMatcher.Match)
 	if err != nil {
 		return err
 	}
+	if len(c.initRoutes) == 0 {
+		c.initRoutes = make(config.Routes, 0)
+	}
+	c.Routes  = c.initRoutes
 	for _, object := range routesObject {
 		if err = c.loadRoute(ctx, fs, object); err != nil {
 			return err
@@ -55,6 +62,7 @@ func (c *Config) loadRoute(ctx context.Context, storage afs.Service, object stor
 	defer func() {
 		_ = reader.Close()
 	}()
+
 	routes := config.Routes{}
 	if err = json.NewDecoder(reader).Decode(&routes); err == nil {
 		c.Routes = append(c.Routes, routes...)
@@ -63,7 +71,23 @@ func (c *Config) loadRoute(ctx context.Context, storage afs.Service, object stor
 }
 
 //Init initialises routes
-func (c *Config) Init(ctx context.Context) error {
+func (c *Config) Init(ctx context.Context, fs afs.Service) error {
+	projectID := c.initSourceScheme()
+	c.Meta = route.New(c.RoutesBaseURL, time.Duration(c.RoutesCheckFrequencyMs)*time.Millisecond)
+	if len(c.Routes) == 0 {
+		c.Routes = make([]*config.Route, 0)
+	}
+	if err := c.loadRoutes(ctx, fs); err != nil {
+		return err
+	}
+	for i := range c.Routes {
+		c.Routes[i].Dest.Init(projectID)
+	}
+	return nil
+}
+
+
+func (c *Config) initSourceScheme() string {
 	var projectID string
 	if c.SourceScheme == "" {
 		if projectID = os.Getenv("GCLOUD_PROJECT"); projectID != "" {
@@ -76,17 +100,10 @@ func (c *Config) Init(ctx context.Context) error {
 			c.SourceScheme = s3.Scheme
 		}
 	}
-	if len(c.Routes) == 0 {
-		c.Routes = make([]*config.Route, 0)
-	}
-	if err := c.loadRoutes(ctx); err != nil {
-		return err
-	}
-	for i := range c.Routes {
-		c.Routes[i].Dest.Init(projectID)
-	}
-	return nil
+	return projectID
 }
+
+
 
 //UseMessageDest returns true if any routes uses message bus
 func (c *Config) UseMessageDest() bool {
@@ -99,10 +116,10 @@ func (c *Config) UseMessageDest() bool {
 }
 
 //Resources returns
-func (c *Config) Resources() []*config.Resource {
+func (c *Config) Resources(ctx context.Context, fs afs.Service) ([]*config.Resource, error) {
 	var result = make([]*config.Resource, 0)
-
-	for _, resource := range c.Routes {
+	for i := range c.Routes {
+		resource := c.Routes[i]
 		if resource.Source != nil {
 			result = append(result, resource.Source)
 		}
@@ -110,7 +127,7 @@ func (c *Config) Resources() []*config.Resource {
 			result = append(result, &resource.Dest)
 		}
 	}
-	return result
+	return result, nil
 }
 
 //NewConfigFromEnv returns new config from env
@@ -126,8 +143,10 @@ func NewConfigFromEnv(ctx context.Context, key string) (*Config, error) {
 func NewConfigFromJSON(ctx context.Context, payload string) (*Config, error) {
 	cfg := &Config{}
 	err := json.NewDecoder(strings.NewReader(payload)).Decode(cfg)
+
 	if err == nil {
-		err = cfg.Init(ctx)
+		cfg.initRoutes = cfg.Routes
+		err = cfg.Init(ctx, afs.New())
 	}
 	return cfg, err
 }
@@ -144,5 +163,6 @@ func NewConfigFromURL(ctx context.Context, URL string) (*Config, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to decode: %v ", URL)
 	}
-	return cfg, cfg.Init(ctx)
+	cfg.initRoutes = cfg.Routes
+	return cfg, cfg.Init(ctx, afs.New())
 }

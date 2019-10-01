@@ -27,6 +27,7 @@ type Service interface {
 }
 
 type service struct {
+	mux *sync.Mutex
 	config *Config
 	afs.Service
 	secret secret.Service
@@ -45,6 +46,16 @@ func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 }
 
 func (s *service) mirror(ctx context.Context, request *Request, response *Response) (err error) {
+	hasChanges, err := s.config.Meta.HasChanged(ctx, s.Service)
+	if err != nil {
+		return err
+	}
+	if hasChanges {
+		if err = s.Init(ctx);err != nil {
+			return err
+		}
+	}
+
 	route := s.config.Routes.HasMatch(request.URL)
 	if route == nil {
 		response.Status = StatusNoMatch
@@ -176,6 +187,31 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *Resp
 	return nil
 }
 
+//Init initialises this service
+func (s *service) Init(ctx context.Context) error {
+	if err := s.config.loadRoutes(ctx, s.Service);err != nil {
+		return err
+	}
+	resources, err := s.config.Resources(ctx, s.Service)
+	if err != nil {
+		return  err
+	}
+	if len(resources) > 0 {
+		if err = s.secret.Init(ctx, s.Service, resources);err != nil {
+			return errors.Wrap(err, "failed to init resource secrets")
+		}
+	}
+	if s.config.UseMessageDest() && s.msgbus == nil {
+		if s.config.SourceScheme == gs.Scheme {
+			if s.msgbus, err = pubsub.New(ctx); err != nil {
+				return errors.Wrapf(err, "unable to create publisher for %v", s.config.SourceScheme)
+			}
+		}
+	}
+	return nil
+}
+
+
 func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Route, counter *int32, waitGroup *sync.WaitGroup, response *Response) func() io.WriteCloser {
 	return func() io.WriteCloser {
 		splitCount := atomic.AddInt32(counter, 1)
@@ -199,24 +235,15 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rou
 
 //New creates a new mirror service
 func New(ctx context.Context, config *Config) (Service, error) {
-	err := config.Init(ctx)
+	err := config.Init(ctx, afs.New())
 	if err != nil {
 		return nil, err
 	}
+	fs := afs.New()
 	result := &service{config: config,
-		Service: afs.New(),
+		Service: fs,
+		mux: &sync.Mutex{},
 		secret:  secret.New(config.SourceScheme),
 	}
-	if resources := config.Resources(); len(resources) > 0 {
-		err = result.secret.Init(ctx, result.Service, resources)
-	}
-
-	if config.UseMessageDest() {
-		if config.SourceScheme == gs.Scheme {
-			if result.msgbus, err = pubsub.New(ctx); err != nil {
-				return nil, errors.Wrapf(err, "unable to create publisher for %v", config.SourceScheme)
-			}
-		}
-	}
-	return result, err
+	return result, result.Init(ctx)
 }

@@ -1,0 +1,54 @@
+
+pipeline:
+  secureWithinGCP:
+
+    deployGCPKey:
+      action: gcp/kms:deployKey
+      credentials: $gcpCredentials
+      ring: gs_mirror_ring
+      key: gs_mirror_key
+      purpose: ENCRYPT_DECRYPT
+      logging: false
+      bindings:
+        - role: roles/cloudkms.cryptoKeyEncrypterDecrypter
+          members:
+            - serviceAccount:${gcp.serviceAccount}
+
+    encryptS3Credentials:
+      action: gcp/kms:encrypt
+      ring: gs_mirror_ring
+      key: gs_mirror_key
+      plainData: $AsJSON($s3Secrets)
+      dest:
+        URL: gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc
+        credentials: ${gcpCredentials}
+      logging: false
+
+
+  secureWithinAWS:
+
+    deployS3Key:
+      credentials: $awsCredentials
+      action: aws/kms:setupKey
+      aliasName: alias/smirror
+
+    deployGSSecret:
+      action: aws/ssm:setParameter
+      name: smirror.gs
+      '@description': Google Storage credentials
+      type: SecureString
+      keyId: alias/dstransfer
+      value: $gcpSecrets.Data
+
+    deployCustomerKey:
+      action: aws/ssm:setParameter
+      name: smirror.partnerXKey
+      '@description': PartnerX custom encryption key
+      type: SecureString
+      keyId: alias/smirror
+      value: $partnerXKey
+
+
+  info:
+    action: print
+    message: 'encrypted s3 credentials: ${encryptS3Credentials.CipherBase64Text}'

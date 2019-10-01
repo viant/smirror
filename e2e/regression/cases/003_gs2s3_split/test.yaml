@@ -1,5 +1,15 @@
 pipeline:
 
+  setupRoute:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/routes.json
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsConifgBucket}/StorageMirror/processes/case_${parent.index}.json
+
+
   trigger:
     action: storage:copy
     sleepTimeMs: 20000
@@ -14,13 +24,13 @@ pipeline:
       action: storage:download
       source:
         credentials: $awsCredentials
-        URL: s3://${gsBucket}/data/p3/events_00001.csv
+        URL: s3://${s3DestBucket}/data/p3/events_00001.csv
       destKey: events
       expect: $Cat('${parent.path}/data/expect/events_00001.csv')
     chunk2:
       action: storage:download
       source:
         credentials: $awsCredentials
-        URL: s3://${gsBucket}/data/p3/events_00002.csv
+        URL: s3://${s3DestBucket}/data/p3/events_00002.csv
       destKey: events
       expect: $Cat('${parent.path}/data/expect/events_00002.csv')

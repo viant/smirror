@@ -1,4 +1,14 @@
 pipeline:
+
+  setupRoute:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/routes.json
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsConifgBucket}/StorageMirror/processes/case_${parent.index}.json
+
   trigger:
     action: storage:copy
     sleepTimeMs: 20000
@@ -12,6 +22,6 @@ pipeline:
     action: storage:download
     source:
       credentials: $awsCredentials
-      URL: s3://${gsBucket}/data/p1/events.csv
+      URL: s3://${s3DestBucket}/data/p1/events.csv
     destKey: events
     expect: $Cat('${parent.path}/data/expect/events.csv')

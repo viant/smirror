@@ -58,14 +58,17 @@ func (s *service) Init(ctx context.Context, service afs.Service, resources []*co
 				return err
 			}
 		}
-		if resource.Credentials != nil {
+
+
+		if resource.Credentials != nil && resources[i].Credentials.Auth == nil {
 			data, err := kmsService.Decrypt(ctx, &resource.Credentials.Secret)
 			if err != nil {
 				return err
 			}
 			resources[i].Credentials.Auth = decodeBase64IfNeeded(data)
 		}
-		if resource.CustomKey != nil {
+
+		if resource.CustomKey != nil && resources[i].CustomKey.AES256Key == nil {
 			data, err := kmsService.Decrypt(ctx, &resource.CustomKey.Secret)
 			if err != nil {
 				return err

@@ -1,0 +1,16 @@
+pipeline:
+  deployPubsubTopic:
+    action: msg:setupResource
+    resources:
+      - URL: smirrorTopic
+        type: topic
+        vendor: gcp
+        credentials: $gcpCredentials
+
+      - URL: smirrorSubscription
+        type: subscription
+        vendor: gcp
+        credentials: $gcpCredentials
+        config:
+          topic:
+            URL: /projects/${gcp.projectID}/topics/smirrorTopic

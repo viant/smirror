@@ -1,0 +1,30 @@
+pipeline:
+
+  cleanUp:
+    googleStorage:
+      action: storage:remove
+      assets:
+        - URL:  gs://${gsConifgBucket}/StorageMirror
+          credentials: $gcpCredentials
+
+
+  deployGoogleStorageMirroConifg:
+    action: storage:upload
+    sourceKey: mirrorGSConfigJSON
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsConifgBucket}/StorageMirror/config.json
+
+  deployS3MirrorConfig:
+    action: storage:upload
+    sourceKey: mirrorS3ConfigJSON
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3Bucket}/e2e-mirror/config/mirror.json
+
+  deployS3MirrorCronConfig:
+    action: storage:upload
+    sourceKey: mirrorS3CronConfigJSON
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3Bucket}/e2e-mirror/config/cron.json

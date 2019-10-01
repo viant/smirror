@@ -1,4 +1,5 @@
 {
+  "RoutesCheckFrequencyMs": 60000,
   "Routes": [
     {
       "Prefix": "/data/",

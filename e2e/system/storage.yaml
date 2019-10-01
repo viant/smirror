@@ -1,0 +1,78 @@
+pipeline:
+
+
+  cleanup:
+  googleStorage:
+    action: storage:remove
+    assets:
+      - URL:  gs://${gsDestBucket}/
+        credentials: $gcpCredentials
+      - URL:  gs://${s3DestBucket}/
+        credentials: $awsCredentials
+
+  create3rdParty:
+    action: storage:create
+    isDir: true
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3ExternalBucket}/
+
+  createOnS3:
+    config:
+      action: storage:create
+      isDir: true
+      dest:
+        credentials: $awsCredentials
+        URL: s3://${s3ConifgBucket}/
+
+    ops:
+      action: storage:create
+      isDir: true
+      dest:
+        credentials: $awsCredentials
+        URL: s3://${s3Bucket}/
+
+    data:
+      action: storage:create
+      isDir: true
+      dest:
+        credentials: $awsCredentials
+        URL: s3://${s3OpsBucket}/
+    dest:
+      action: storage:create
+      isDir: true
+      dest:
+        credentials: $awsCredentials
+        URL: s3://${s3DestBucket}/
+
+
+  createOnGoogleStorage:
+    config:
+      action: storage:create
+      isDir: true
+      dest:
+        credentials: $gcpCredentials
+        URL: s3://${s3ConifgBucket}/
+
+
+    ops:
+      action: storage:create
+      isDir: true
+      dest:
+        credentials: $gcpCredentials
+        URL: gs://${gsOpsBucket}/
+
+    data:
+      action: storage:create
+      isDir: true
+      dest:
+        credentials: $gcpCredentials
+        URL: gs://${gsBucket}/
+
+    dest:
+      action: storage:create
+      isDir: true
+      dest:
+        credentials: $awsCredentials
+        URL: s3://${gsDestBucket}/
+

@@ -22,5 +22,6 @@
       ],
       "FolderDepth": 1
     }
-  ]
+  ],
+  "RoutesCheckFrequencyMs": 60000
 }

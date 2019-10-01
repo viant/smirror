@@ -9,7 +9,7 @@
       "Resource": "*"
     },
     {
-      "Sid": "Stmt1482841904000",
+      "Sid": "Stmt1482841904001",
       "Effect": "Allow",
       "Action": [
         "ssm:GetParameters",
@@ -25,7 +25,6 @@
         "s3:*"
       ],
       "Resource": [
-        "arn:aws:s3:::*",
         "arn:aws:s3:::${s3ExternalBucket}",
         "arn:aws:s3:::${s3ExternalBucket}/*",
         "arn:aws:s3:::${s3Bucket}",
@@ -33,7 +32,7 @@
       ]
     },
     {
-      "Sid": "Stmt1482841948000",
+      "Sid": "Stmt14828419480001",
       "Effect": "Allow",
       "Action": [
         "kms:Decrypt"

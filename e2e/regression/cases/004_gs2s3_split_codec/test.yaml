@@ -1,5 +1,16 @@
 pipeline:
 
+  setupRoute:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/routes.json
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsConifgBucket}/StorageMirror/processes/case_${parent.index}.json
+
+
+
   trigger:
     action: storage:copy
     sleepTimeMs: 20000

@@ -2,4 +2,6 @@
 - E2E test with custom key encyption
 - Scheduled pull
 - Cross data format transcoder/spliter i.e CSV to Avro
+- Add merger
+
 

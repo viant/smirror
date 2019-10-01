@@ -29,11 +29,11 @@ func (r *Route) HasMatch(URL string) bool {
 	return r.Match(parent, file.NewInfo(name, 0, 0644, time.Now(), false))
 }
 
+
 //Name return route dest asset name
 func (r *Route) Name(URL string) string {
 	_, location := url.Base(URL, file.Scheme)
 	parent, name := path.Split(location)
-
 	ext := path.Ext(name)
 	if r.Compression != nil {
 		switch r.Compression.Codec {
