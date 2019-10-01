@@ -1,5 +1,5 @@
 {
-  "MetaURL": "s3://${s3Bucket}/ops/meta.json",
+  "MetaURL": "s3://${s3TriggerBucket}/ops/meta.json",
   "TimeWindow": {
     "DurationInSec": 720
   },

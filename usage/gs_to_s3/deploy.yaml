@@ -1,6 +1,6 @@
 init:
   appPath: $Pwd(../..)
-  gsBucket: e2etst
+  gsTriggerBucket: e2etst
 
 pipeline:
 
@@ -21,10 +21,10 @@ pipeline:
     runtime: go111
     eventTrigger:
       eventType: google.storage.object.finalize
-      resource: projects/_/buckets/${gsBucket}
+      resource: projects/_/buckets/${gsTriggerBucket}
     environmentVariables:
       LOGGING: 'true'
-      CONFIG: gs://gsBucket/mirror/config/gs.json
+      CONFIG: gs://gsTriggerBucket/mirror/config/gs.json
     source:
       URL: ${appPath}/
     sleepTimeMs: 5000

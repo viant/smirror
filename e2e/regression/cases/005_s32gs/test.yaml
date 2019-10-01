@@ -6,12 +6,12 @@ pipeline:
       URL: ${parent.path}/data/prepare/events.csv
     dest:
       credentials: $awsCredentials
-      URL: s3://${gsBucket}/data/p5/events.csv
+      URL: s3://${gsTriggerBucket}/data/p5/events.csv
 
   validate:
     action: storage:download
     source:
       credentials: $gcpCredentials
-      URL: gs://${gsBucket}/data/p5/events.csv
+      URL: gs://${gsTriggerBucket}/data/p5/events.csv
     destKey: events
     expect: $Cat('${parent.path}/data/expect/events.csv')

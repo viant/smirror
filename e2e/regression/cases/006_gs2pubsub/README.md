@@ -1,6 +1,6 @@
 #### Scenario:
 
-Mirror suffixed *.csv data from gs://${gsBucket}/data/p1 to smirrorTopic topic, where each message is max 10 lines.
+Mirror suffixed *.csv data from gs://${gsTriggerBucket}/data/p1 to smirrorTopic topic, where each message is max 10 lines.
 
 #### Input:
 
@@ -28,7 +28,7 @@ Configuration:
         "OnError": [
           {
             "Action": "move",
-            "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+            "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
           }
         ]
       },
@@ -40,15 +40,15 @@ Configuration:
 * Trigger:
 
 * event Type: google.storage.object.finalize
-* resource: projects/_/buckets/${gsBucket}
+* resource: projects/_/buckets/${gsTriggerBucket}
 * entryPoint: Fn
 * environmentVariables:
   - LOGGING: 'true'
-  - CONFIG: gs://${gsBucket}/e2e-mirror/config/mirror.json
+  - CONFIG: gs://${gsTriggerBucket}/e2e-mirror/config/mirror.json
  
 Data:
-- gs://${gsBucket}/data/p1/events.csv
+- gs://${gsTriggerBucket}/data/p1/events.csv
 
 Output:
-- s3://${gsBucket}/data/p1/events.csv
+- s3://${gsTriggerBucket}/data/p1/events.csv
 

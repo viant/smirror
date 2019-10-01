@@ -1,6 +1,6 @@
 #### Scenario:
 
-Mirror suffixed *.csv data from gs://${gsBucket}/data/p1 to s3://${s3Bucket}/data
+Mirror suffixed *.csv data from gs://${gsTriggerBucket}/data/p1 to s3://${s3TriggerBucket}/data
 
 #### Input:
 
@@ -14,7 +14,7 @@ Configuration:
          "Prefix": "/data/p5",
          "Suffix": ".csv",
          "Dest": {
-           "URL": "gs://${s3Bucket}/data",
+           "URL": "gs://${s3TriggerBucket}/data",
            "Credentials": {
              "Parameter": "smirror.gs",
              "Key": "alias/smirror"
@@ -29,7 +29,7 @@ Configuration:
            "OnError": [
              {
                "Action": "move",
-               "URL": "s3:///${gsBucket}/e2e-mirror/errors/"
+               "URL": "s3:///${gsTriggerBucket}/e2e-mirror/errors/"
              }
            ]
          },
@@ -40,17 +40,17 @@ Configuration:
 * Trigger:
 
 * event Type: google.storage.object.finalize
-* resource: projects/_/buckets/${gsBucket}
+* resource: projects/_/buckets/${gsTriggerBucket}
 * entryPoint: Fn
 * environmentVariables:
   - LOGGING: 'true'
-  - CONFIG: gs://${gsBucket}/e2e-mirror/config/mirror.json
+  - CONFIG: gs://${gsTriggerBucket}/e2e-mirror/config/mirror.json
  
 
 
 Data:
-- gs://${gsBucket}/data/p1/events.csv
+- gs://${gsTriggerBucket}/data/p1/events.csv
 
 
 Output:
-- s3://${gsBucket}/data/p1/events.csv
+- s3://${gsTriggerBucket}/data/p1/events.csv

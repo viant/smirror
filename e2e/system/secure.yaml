@@ -1,5 +1,7 @@
 
 pipeline:
+
+
   secureWithinGCP:
 
     deployGCPKey:
@@ -20,7 +22,7 @@ pipeline:
       key: gs_mirror_key
       plainData: $AsJSON($s3Secrets)
       dest:
-        URL: gs://${gsBucket}/e2e-mirror/secret/s3-mirror.json.enc
+        URL: gs://${gsTriggerBucket}/e2e-mirror/secret/s3-mirror.json.enc
         credentials: ${gcpCredentials}
       logging: false
 

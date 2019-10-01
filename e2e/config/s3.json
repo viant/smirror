@@ -4,7 +4,7 @@
       "Prefix": "/data/p5",
       "Suffix": ".csv",
       "Dest": {
-        "URL": "gs://${s3Bucket}/data",
+        "URL": "gs://${s3TriggerBucket}/data",
         "Credentials": {
           "Parameter": "smirror.gs",
           "Key": "alias/smirror"
@@ -18,7 +18,7 @@
       "OnFailure": [
         {
           "Action": "move",
-          "URL": "s3:///${gsBucket}/e2e-mirror/errors/"
+          "URL": "s3:///${gsTriggerBucket}/e2e-mirror/errors/"
         }
       ],
       "FolderDepth": 1
@@ -27,7 +27,7 @@
       "Prefix": "data/partnerX/",
       "Suffix": ".csv",
       "Dest": {
-        "URL": "gs://${s3Bucket}/data",
+        "URL": "gs://${s3TriggerBucket}/data",
         "CustomKey": {
           "Parameter": "smirror.partnerXKey",
           "Key": "alias/smirror"

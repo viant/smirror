@@ -22,7 +22,7 @@ pipeline:
       URL: ${parent.path}/data/prepare/events.csv
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsBucket}/data/p6/events.csv
+      URL: gs://${gsTriggerBucket}/data/p6/events.csv
 
   validate:
     action: msg:pull

@@ -16,7 +16,7 @@
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+        "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
       }
     ],
     "FolderDepth": 1

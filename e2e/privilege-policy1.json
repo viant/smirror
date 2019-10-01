@@ -27,8 +27,8 @@
       "Resource": [
         "arn:aws:s3:::${s3ExternalBucket}",
         "arn:aws:s3:::${s3ExternalBucket}/*",
-        "arn:aws:s3:::${s3Bucket}",
-        "arn:aws:s3:::${s3Bucket}/*"
+        "arn:aws:s3:::${s3TriggerBucket}",
+        "arn:aws:s3:::${s3TriggerBucket}/*"
       ]
     },
     {

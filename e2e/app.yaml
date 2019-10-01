@@ -36,7 +36,7 @@ pipeline:
     availableMemoryMB: 256
     eventTrigger:
       eventType: google.storage.object.finalize
-      resource: projects/_/buckets/${gsBucket}
+      resource: projects/_/buckets/${gsTriggerBucket}
     environmentVariables:
       LOGGING: 'true'
       CONFIG: gs://${gsConifgBucket}/StorageMirror/config.json
@@ -54,7 +54,7 @@ pipeline:
     environment:
       variables:
         LOGGING: 'true'
-        CONFIG: s3://${s3Bucket}/e2e-mirror/config/mirror.json
+        CONFIG: s3://${s3TriggerBucket}/e2e-mirror/config/mirror.json
     code:
       zipfile: $LoadBinary(${mirrorAppZip})
     rolename: lambda-${functionName}-executor
@@ -67,7 +67,7 @@ pipeline:
   setTrigger:
     action: aws/s3:setupBucketNotification
     sleepTimeMs: 20000
-    bucket: ${s3Bucket}
+    bucket: ${s3TriggerBucket}
     lambdaFunctionConfigurations:
       - functionName: $functionName
         id: ObjectCreatedEvents
@@ -88,7 +88,7 @@ pipeline:
     environment:
       variables:
         LOGGING: 'true'
-        CONFIG: s3://${s3Bucket}/e2e-mirror/config/cron.json
+        CONFIG: s3://${s3TriggerBucket}/e2e-mirror/config/cron.json
     code:
       zipfile: $LoadBinary(${mirrorCronZip})
     schedule:

@@ -121,7 +121,7 @@ endly encryt
 [@encrypt.yaml](usage/gs_to_s3/encrypt.yaml)
 ```yaml
 init:
-  gsBucket: e2etst
+  gsTriggerBucket: e2etst
 pipeline:
   secure:
     deployKey:
@@ -149,7 +149,7 @@ pipeline:
         URL: s3-cred.json
       dest:
         credentials: gcp-e2e
-        URL: gs://$gsBucket/mirror/config/s3-cred.json.enc
+        URL: gs://$gsTriggerBucket/mirror/config/s3-cred.json.enc
     info:
       action: print
       message: ${encrypt.CipherBase64Text}
@@ -197,7 +197,7 @@ endly deploy
 ```yaml
 init:
   appPath: $Pwd(../..)
-  gsBucket: e2etst
+  gsTriggerBucket: e2etst
 
 pipeline:
 
@@ -219,10 +219,10 @@ pipeline:
     availableMemoryMb: 512
     eventTrigger:
       eventType: google.storage.object.finalize
-      resource: projects/_/buckets/${gsBucket}
+      resource: projects/_/buckets/${gsTriggerBucket}
     environmentVariables:
       LOGGING: 'true'
-      CONFIG: gs://gsBucket/mirror/config/gs.json
+      CONFIG: gs://gsTriggerBucket/mirror/config/gs.json
     source:
       URL: ${appPath}/
     sleepTimeMs: 5000
@@ -239,7 +239,7 @@ go mod vendor
 gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \ 
     --trigger-resource e2etst 
     --trigger-event google.storage.object.finalize \
-    --set-env-vars=LOGGING=true,CONFIG=gs://gsBucket/mirror/config/gs.json \
+    --set-env-vars=LOGGING=true,CONFIG=gs://gsTriggerBucket/mirror/config/gs.json \
     --memory=512M \
     --timeout=500s \
     --runtime=go111 
@@ -372,7 +372,7 @@ endly deploy
 ```yaml
 init:
   appPath: $Pwd(../..)
-  gsBucket: e2etst
+  gsTriggerBucket: e2etst
   codeZip: ${appPath}/aws/smirror.zip
   functionName: E2etstMirror
   privilegePolicy: privilege-policy.json
@@ -405,7 +405,7 @@ pipeline:
     environment:
       variables:
         LOGGING: 'true'
-        CONFIG: s3://${s3Bucket}/e2e-mirror/config/mirror.json
+        CONFIG: s3://${s3TriggerBucket}/e2e-mirror/config/mirror.json
     code:
       zipfile: $LoadBinary(${codeZip})
     rolename: lambda-${functionName}-executor
@@ -417,7 +417,7 @@ pipeline:
   setTrigger:
       action: aws/s3:setupBucketNotification
       sleepTimeMs: 20000
-      bucket: ${s3Bucket}
+      bucket: ${s3TriggerBucket}
       lambdaFunctionConfigurations:
         - functionName: $functionName
           id: ObjectCreatedEvents
@@ -466,7 +466,7 @@ the following configuration can be used with Mirror cloud function
       "OnFailure": [
         {
           "Action": "move",
-          "URL": "gs:///${gsBucket}/e2e-mirror/errors/"
+          "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
         }
       ],
       "FolderDepth": 1
@@ -494,7 +494,7 @@ the following configuration can be used with Mirror cloud function
 ```bash
 git clone https://github.com/viant/smirror.git
 cd smirror/e2e
-### Update mirrors bucket for both S3, Google Storage in e2e/run.yaml (gsBucket, s3Bucket)
+### Update mirrors bucket for both S3, Google Storage in e2e/run.yaml (gsTriggerBucket, s3TriggerBucket)
 endly 
 ```
 

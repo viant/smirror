@@ -26,6 +26,7 @@ pipeline:
     action: run
     request: '@system/resource'
 
+
   deploySecured:
     action: run
     request: '@system/secure'

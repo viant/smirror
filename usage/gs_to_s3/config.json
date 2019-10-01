@@ -1,6 +1,6 @@
 {
   "RoutesCheckFrequencyMs": 60000,
-  "RoutesBaseURL": "gs://${gsBucket}/mirror/config/routes/",
+  "RoutesBaseURL": "gs://${gsTriggerBucket}/mirror/config/routes/",
   "Routes": [
     {
       "Prefix": "/data/",

@@ -16,7 +16,7 @@ pipeline:
       URL: ${parent.path}/data/prepare/events.csv.gz
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsBucket}/data/p2/events.csv.gz
+      URL: gs://${gsTriggerBucket}/data/p2/events.csv.gz
 
   validate:
     action: storage:download

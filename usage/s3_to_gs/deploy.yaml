@@ -1,6 +1,6 @@
 init:
   appPath: $Pwd(../..)
-  gsBucket: e2etst
+  gsTriggerBucket: e2etst
   codeZip: ${appPath}/aws/smirror.zip
   functionName: E2etstMirror
   privilegePolicy: privilege-policy.json
@@ -33,7 +33,7 @@ pipeline:
     environment:
       variables:
         LOGGING: 'true'
-        CONFIG: s3://${s3Bucket}/e2e-mirror/config/mirror.json
+        CONFIG: s3://${s3TriggerBucket}/e2e-mirror/config/mirror.json
     code:
       zipfile: $LoadBinary(${codeZip})
     rolename: lambda-${functionName}-executor
@@ -46,7 +46,7 @@ pipeline:
   setTrigger:
     action: aws/s3:setupBucketNotification
     sleepTimeMs: 20000
-    bucket: ${s3Bucket}
+    bucket: ${s3TriggerBucket}
     lambdaFunctionConfigurations:
       - functionName: $functionName
         id: ObjectCreatedEvents

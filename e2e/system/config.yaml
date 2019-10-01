@@ -20,11 +20,11 @@ pipeline:
     sourceKey: mirrorS3ConfigJSON
     dest:
       credentials: $awsCredentials
-      URL: s3://${s3Bucket}/e2e-mirror/config/mirror.json
+      URL: s3://${s3TriggerBucket}/e2e-mirror/config/mirror.json
 
   deployS3MirrorCronConfig:
     action: storage:upload
     sourceKey: mirrorS3CronConfigJSON
     dest:
       credentials: $awsCredentials
-      URL: s3://${s3Bucket}/e2e-mirror/config/cron.json
+      URL: s3://${s3TriggerBucket}/e2e-mirror/config/cron.json

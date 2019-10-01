@@ -2,17 +2,20 @@ init:
 
   gsConifgBucket: viant-e2e-config
 
-  gsBucket: viant-e2e-storagemirror-inbound
+  gsTriggerBucket: viant-e2e-storagemirror-inbound
   gsOpsBucket: viant-e2e-ops
   gsDestBucket: viant-e2e-storagemirror-outbound
 
-  s3Bucket: ms-e2e-storagemirror-inbound
-  s3OpsBucket: ms-e2e-ops
-  s3ConifgBucket: ms-e2e-config
-  s3DestBucket: ms-e2e-storagemirror-outbound
-  s3ExternalBucket: ms-e2e-storagemirro-ext
 
+  s3ConifgBucket: ms-e2e-config
+  s3TriggerBucket: ms-e2e-storagemirror-inbound
+  s3OpsBucket: ms-e2e-ops
+  s3DestBucket: ms-e2e-storagemirror-outbound
+
+
+  s3ExternalBucket: ms-e2e-storagemirro-ext
   partnerXKey: this is secret :3rd party phrase
+
   gcpCredentials: gcp-e2e
   awsCredentials: aws-e2e
   gcpProject: viant-e2e

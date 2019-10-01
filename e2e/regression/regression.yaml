@@ -4,7 +4,7 @@ pipeline:
     action: storage:remove
     credentials: $awsCredentials
     assets:
-      - URL: gs:///${gsBucket}/e2e-mirror/
+      - URL: gs:///${gsTriggerBucket}/e2e-mirror/
 
 
   test:

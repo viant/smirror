@@ -30,7 +30,7 @@ pipeline:
       isDir: true
       dest:
         credentials: $awsCredentials
-        URL: s3://${s3Bucket}/
+        URL: s3://${s3TriggerBucket}/
 
     data:
       action: storage:create
@@ -67,7 +67,7 @@ pipeline:
       isDir: true
       dest:
         credentials: $gcpCredentials
-        URL: gs://${gsBucket}/
+        URL: gs://${gsTriggerBucket}/
 
     dest:
       action: storage:create

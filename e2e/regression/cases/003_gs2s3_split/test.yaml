@@ -17,7 +17,7 @@ pipeline:
       URL: ${parent.path}/data/prepare/events.csv
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsBucket}/data/p3/events.csv
+      URL: gs://${gsTriggerBucket}/data/p3/events.csv
 
   validate:
     chunk1:
