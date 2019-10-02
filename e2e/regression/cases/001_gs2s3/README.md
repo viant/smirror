@@ -10,7 +10,7 @@ Configuration:
 
 * Route:
 
-[@routes,json](routes.json)
+[@routes,json](rule.json)
 ```json
 [
   {
@@ -34,7 +34,7 @@ Configuration:
         "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
       }
     ],
-    "FolderDepth": 1
+    "PreserveDepth": 1
   }
 ]
 ```

@@ -34,7 +34,7 @@ Configuration:
            }
          ]
        },
-       "FolderDepth": 1
+       "PreserveDepth": 1
      }
 ```
 

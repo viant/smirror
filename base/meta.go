@@ -1,4 +1,4 @@
-package route
+package base
 
 import (
 	"context"
@@ -31,10 +31,10 @@ func (m *Meta) hasChanges(routes []storage.Object) bool {
 	}
 	for _, route := range routes {
 		modTime, ok := m.routes[route.URL()]
-		if ! ok {
+		if !ok {
 			return true
 		}
-		if ! modTime.Equal(route.ModTime()) {
+		if !modTime.Equal(route.ModTime()) {
 			return true
 		}
 	}
@@ -47,7 +47,7 @@ func (m *Meta) HasChanged(ctx context.Context, fs afs.Service) (bool, error) {
 	if m.baseURL == "" {
 		return false, nil
 	}
-	if ! m.isCheckDue(time.Now()) {
+	if !m.isCheckDue(time.Now()) {
 		return false, nil
 	}
 
@@ -71,7 +71,7 @@ func (m *Meta) HasChanged(ctx context.Context, fs afs.Service) (bool, error) {
 	return true, nil
 }
 
-func New(baeURL string, checkFrequency time.Duration) *Meta {
+func NewMeta(baeURL string, checkFrequency time.Duration) *Meta {
 	if checkFrequency == 0 {
 		checkFrequency = time.Minute
 	}

@@ -1,6 +1,7 @@
 init:
   appPath: $Pwd(../..)
-  gsTriggerBucket: ${s3TriggerBucket}
+  gsTriggerBucket: myTriggerBucket
+  gsConfigBucket: myConfigBucket
 
 pipeline:
 
@@ -16,15 +17,15 @@ pipeline:
   deploy:
     action: gcp/cloudfunctions:deploy
     credentials: gcp-e2e
-    '@name': MyGsBucketToS3Mirror
-    entryPoint: Fn
+    '@name': StorageMirror
+    entryPoint: StorageMirror
     runtime: go111
     eventTrigger:
       eventType: google.storage.object.finalize
       resource: projects/_/buckets/${gsTriggerBucket}
     environmentVariables:
       LOGGING: 'true'
-      CONFIG: gs://gsTriggerBucket/mirror/config/gs.json
+      CONFIG: gs://gsConfigBucket/StorageMirror/config.json
     source:
       URL: ${appPath}/
     sleepTimeMs: 5000

@@ -37,7 +37,7 @@ func TestSplit_Name(t *testing.T) {
 		{
 			description: "suffix template with 2 depth",
 			route: &Route{
-				FolderDepth: 2,
+				PreserveDepth: 2,
 			},
 			counter: 32,
 			split: &Split{

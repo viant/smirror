@@ -1,8 +1,6 @@
 pipeline:
 
-
   cleanup:
-  googleStorage:
     action: storage:remove
     assets:
       - URL:  gs://${gsDestBucket}/

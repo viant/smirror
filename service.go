@@ -8,8 +8,10 @@ import (
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
 	"github.com/viant/afsc/gs"
+	"github.com/viant/toolbox"
 	"io"
 	"io/ioutil"
+	"smirror/base"
 	"smirror/config"
 	"smirror/job"
 	"smirror/msgbus"
@@ -27,9 +29,9 @@ type Service interface {
 }
 
 type service struct {
-	mux *sync.Mutex
+	mux    *sync.Mutex
 	config *Config
-	afs.Service
+	fs     afs.Service
 	secret secret.Service
 	msgbus msgbus.Service
 }
@@ -46,20 +48,24 @@ func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 }
 
 func (s *service) mirror(ctx context.Context, request *Request, response *Response) (err error) {
-	hasChanges, err := s.config.Meta.HasChanged(ctx, s.Service)
+
+	changed, err := s.config.Mirrors.ReloadIfNeeded(ctx, s.fs)
+	if changed && err == nil {
+		err = s.UpdateResources(ctx)
+	}
 	if err != nil {
 		return err
 	}
-	if hasChanges {
-		if err = s.Init(ctx);err != nil {
-			return err
-		}
-	}
+	route := s.config.Mirrors.HasMatch(request.URL)
 
-	route := s.config.Routes.HasMatch(request.URL)
 	if route == nil {
 		response.Status = StatusNoMatch
 		return nil
+	}
+	if base.IsLoggingEnabled() {
+		fmt.Printf("matched: ")
+		toolbox.Dump(route)
+		fmt.Printf("\n")
 	}
 	if route.Split != nil {
 		err = s.mirrorChunkedAsset(ctx, route, request, response)
@@ -67,21 +73,22 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 		err = s.mirrorAsset(ctx, route, request.URL, response)
 	}
 	jobContent := job.NewContext(ctx, err, request.URL)
-	if e := route.Actions.Run(jobContent, s.Service); e != nil && err == nil {
+	if e := route.Actions.Run(jobContent, s.fs); e != nil && err == nil {
 		err = e
 	}
 	return err
 }
 
 func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL string, response *Response) error {
-	options, err := s.secret.StorageOpts(ctx, route.Source)
+	options, err := s.secret.StorageOpts(ctx, &route.Source)
 	if err != nil {
 		return err
 	}
-	reader, err := s.Service.DownloadWithURL(ctx, URL, options...)
+	reader, err := s.fs.DownloadWithURL(ctx, URL, options...)
 	if err != nil {
 		return err
 	}
+
 
 	sourceCompression := config.NewCompressionForURL(URL)
 	destCompression := route.Compression
@@ -113,11 +120,11 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 }
 
 func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, request *Request, response *Response) error {
-	options, err := s.secret.StorageOpts(ctx, route.Source)
+	options, err := s.secret.StorageOpts(ctx, &route.Source)
 	if err != nil {
 		return err
 	}
-	reader, err := s.Service.DownloadWithURL(ctx, request.URL, options...)
+	reader, err := s.fs.DownloadWithURL(ctx, request.URL, options...)
 	if err == nil {
 		reader, err = NewReader(reader, config.NewCompressionForURL(request.URL))
 		if err != nil {
@@ -180,7 +187,7 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *Resp
 	if err != nil {
 		return err
 	}
-	if err = s.Service.Upload(ctx, transfer.Dest.URL, file.DefaultFileOsMode, reader, options...); err != nil {
+	if err = s.fs.Upload(ctx, transfer.Dest.URL, file.DefaultFileOsMode, reader, options...); err != nil {
 		return err
 	}
 	response.AddURL(transfer.Dest.URL)
@@ -189,15 +196,20 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *Resp
 
 //Init initialises this service
 func (s *service) Init(ctx context.Context) error {
-	if err := s.config.loadRoutes(ctx, s.Service);err != nil {
+	err := s.config.Init(ctx, s.fs)
+	if err != nil {
 		return err
 	}
-	resources, err := s.config.Resources(ctx, s.Service)
+	return s.UpdateResources(ctx)
+}
+
+func (s *service) UpdateResources(ctx context.Context) error {
+	resources, err := s.config.Resources(ctx, s.fs)
 	if err != nil {
-		return  err
+		return err
 	}
 	if len(resources) > 0 {
-		if err = s.secret.Init(ctx, s.Service, resources);err != nil {
+		if err = s.secret.Init(ctx, s.fs, resources); err != nil {
 			return errors.Wrap(err, "failed to init resource secrets")
 		}
 	}
@@ -210,7 +222,6 @@ func (s *service) Init(ctx context.Context) error {
 	}
 	return nil
 }
-
 
 func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Route, counter *int32, waitGroup *sync.WaitGroup, response *Response) func() io.WriteCloser {
 	return func() io.WriteCloser {
@@ -241,9 +252,9 @@ func New(ctx context.Context, config *Config) (Service, error) {
 	}
 	fs := afs.New()
 	result := &service{config: config,
-		Service: fs,
-		mux: &sync.Mutex{},
-		secret:  secret.New(config.SourceScheme),
+		fs:     fs,
+		mux:    &sync.Mutex{},
+		secret: secret.New(config.SourceScheme),
 	}
 	return result, result.Init(ctx)
 }

@@ -26,56 +26,56 @@ pipeline:
       - go build -o smirrorcron
       - zip -j smirrorcron.zip smirrorcron
 
-#  deployCloudFunction:
-#    action: gcp/cloudfunctions:deploy
-#    credentials: $gcpCredentials
-#    '@name': $functionName
-#    entryPoint: StorageMirror
-#    serviceAccount: ${gcp.serviceAccount}
-#    runtime: go111
-#    availableMemoryMB: 256
-#    eventTrigger:
-#      eventType: google.storage.object.finalize
-#      resource: projects/_/buckets/${gsTriggerBucket}
-#    environmentVariables:
-#      LOGGING: 'true'
-#      CONFIG: gs://${gsConifgBucket}/StorageMirror/config.json
-#    source:
-#      URL: ${fnAppPath}/
-#    sleepTimeMs: 5000
+  deployCludFunction:
+    action: gcp/cloudfunctions:deploy
+    credentials: $gcpCredentials
+    '@name': $functionName
+    entryPoint: StorageMirror
+    serviceAccount: ${gcp.serviceAccount}
+    runtime: go111
+    availableMemoryMB: 256
+    eventTrigger:
+      eventType: google.storage.object.finalize
+      resource: projects/_/buckets/${gsTriggerBucket}
+    environmentVariables:
+      LOGGING: 'true'
+      CONFIG: gs://${gsConifgBucket}/StorageMirror/config.json
+    source:
+      URL: ${fnAppPath}/
+    sleepTimeMs: 5000
 
-#  deployLambda:
-#    action: aws/lambda:deploy
-#    credentials: $awsCredentials
-#    functionname: $functionName
-#    runtime:  go1.x
-#    handler: smirror
-#    timeout: 360
-#    environment:
-#      variables:
-#        LOGGING: 'true'
-#        CONFIG: s3://${s3ConifgBucket}/StorageMirror/config.json
-#    code:
-#      zipfile: $LoadBinary(${mirrorAppZip})
-#    rolename: lambda-${functionName}-executor
-#    define:
-#      - policyname: kms-${functionName}-role
-#        policydocument: $Cat('${privilegePolicy1}')
-#    attach:
-#      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-#
-#  setTrigger:
-#    action: aws/s3:setupBucketNotification
-#    sleepTimeMs: 20000
-#    bucket: ${s3TriggerBucket}
-#    lambdaFunctionConfigurations:
-#      - functionName: $functionName
-#        id: ObjectCreatedEvents
-#        events:
-#          - s3:ObjectCreated:*
-#        filter:
-#          prefix:
-#            - data
+  deployLambda:
+    action: aws/lambda:deploy
+    credentials: $awsCredentials
+    functionname: $functionName
+    runtime:  go1.x
+    handler: smirror
+    timeout: 360
+    environment:
+      variables:
+        LOGGING: 'true'
+        CONFIG: s3://${s3ConifgBucket}/StorageMirror/config.json
+    code:
+      zipfile: $LoadBinary(${mirrorAppZip})
+    rolename: lambda-${functionName}-executor
+    define:
+      - policyname: kms-${functionName}-role
+        policydocument: $Cat('${privilegePolicy1}')
+    attach:
+      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  setTrigger:
+    action: aws/s3:setupBucketNotification
+    sleepTimeMs: 20000
+    bucket: ${s3TriggerBucket}
+    lambdaFunctionConfigurations:
+      - functionName: $functionName
+        id: ObjectCreatedEvents
+        events:
+          - s3:ObjectCreated:*
+        filter:
+          prefix:
+            - data
 
 
   deployCronLambad:

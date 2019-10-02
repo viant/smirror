@@ -1,7 +1,9 @@
 [
   {
-    "Prefix": "/data/p1",
-    "Suffix": ".csv",
+    "Source": {
+      "Prefix": "/data/p1",
+      "Suffix": ".csv"
+    },
     "Dest": {
       "URL": "s3://${s3DestBucket}/data",
       "Credentials": {
@@ -20,6 +22,6 @@
         "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
       }
     ],
-    "FolderDepth": 1
+    "PreserveDepth": 1
   }
 ]

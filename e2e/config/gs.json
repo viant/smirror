@@ -1,4 +1,6 @@
 {
-  "RoutesBaseURL": "gs://${gsConifgBucket}/StorageMirror/dataflow/",
-  "RoutesCheckFrequencyMs": 100
+  "Mirrors": {
+    "BaseURL": "gs://${gsConifgBucket}/StorageMirror/dataflow/",
+    "CheckInMs": 100
+  }
 }

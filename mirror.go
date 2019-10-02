@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
+	"smirror/base"
 	"smirror/gs"
 	"time"
 )
@@ -24,7 +25,7 @@ func StorageMirror(ctx context.Context, event gs.Event) (err error) {
 		return err
 	}
 
-	if IsFnLoggingEnabled(LoggingEnvKey) {
+	if base.IsLoggingEnabled() {
 		fmt.Printf("mirrored %v: %v in %v", response.Status, event.URL(), elapsed)
 	}
 	return err
@@ -35,11 +36,11 @@ func storageMirror(ctx context.Context, event gs.Event) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	if IsFnLoggingEnabled(LoggingEnvKey) {
+	if base.IsLoggingEnabled() {
 		fmt.Printf("uses service %T(%p), err: %v\n", service, service, err)
 	}
 	response := service.Mirror(ctx, NewRequest(event.URL()))
-	if IsFnLoggingEnabled(LoggingEnvKey) {
+	if base.IsLoggingEnabled() {
 		if data, err := json.Marshal(response); err == nil {
 			fmt.Printf("%v\n", string(data))
 		}

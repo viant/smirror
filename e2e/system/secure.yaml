@@ -32,7 +32,7 @@ pipeline:
     deployS3Key:
       credentials: $awsCredentials
       action: aws/kms:setupKey
-      aliasName: alias/smirror
+      aliasName: alias/storagemirror
 
     deployGSSecret:
       action: aws/ssm:setParameter
@@ -47,7 +47,7 @@ pipeline:
       name: smirror.partnerXKey
       '@description': PartnerX custom encryption key
       type: SecureString
-      keyId: alias/smirror
+      keyId: alias/storagemirror
       value: $partnerXKey
 
 

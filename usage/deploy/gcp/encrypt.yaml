@@ -1,5 +1,6 @@
 init:
-  gsTriggerBucket: ${s3TriggerBucket}
+  gsConfigBucket: ${gsConfigBucket}
+  
 pipeline:
   secure:
     deployKey:
@@ -27,7 +28,7 @@ pipeline:
         URL: s3-cred.json
       dest:
         credentials: gcp-e2e
-        URL: gs://$gsTriggerBucket/mirror/config/s3-cred.json.enc
+        URL: gs://$gsConfigBucket/StorageMirror/secrets/s3-cred.json.enc
     info:
       action: print
       message: ${encrypt.CipherBase64Text}

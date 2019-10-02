@@ -4,7 +4,7 @@ pipeline:
     action: storage:copy
     expand: true
     source:
-      URL: ${parent.path}/routes.json
+      URL: ${parent.path}/rule.json
     dest:
       credentials: $gcpCredentials
       URL: gs://${gsConifgBucket}/StorageMirror/dataflow/case_${parent.index}.json

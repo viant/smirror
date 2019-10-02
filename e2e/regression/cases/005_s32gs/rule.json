@@ -1,13 +1,8 @@
 [
   {
-    "Prefix": "/data/p7",
-    "Suffix": ".csv",
     "Source": {
-
-      "CustomKey": {
-        "Parameter": "smirror.partnerXKey",
-        "Key": "alias/smirror"
-      }
+      "Prefix": "/data/p5",
+      "Suffix": ".csv"
     },
     "Dest": {
       "URL": "gs://${gsDestBucket}/data",
@@ -27,7 +22,6 @@
         "URL": "s3:///${s3OpsBucket}/e2e-mirror/errors/"
       }
     ],
-    "FolderDepth": 1
+    "PreserveDepth": 1
   }
-
 ]

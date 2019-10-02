@@ -17,8 +17,10 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "prefix match",
 			Route: Route{
-				Basic: matcher.Basic{
-					Prefix: "/folder/",
+				Source: Resource{
+					Basic: matcher.Basic{
+						Prefix: "/folder/",
+					},
 				},
 			},
 			URL:    "ssh:///folder/abc.xom",
@@ -27,8 +29,10 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "prefix no match",
 			Route: Route{
-				Basic: matcher.Basic{
-					Prefix: "folder/",
+				Source: Resource{
+					Basic: matcher.Basic{
+						Prefix: "folder/",
+					},
 				},
 			},
 			URL:    "ssh:///f/abc.xom",
@@ -37,8 +41,10 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "suffix match",
 			Route: Route{
-				Basic: matcher.Basic{
-					Suffix: ".csv",
+				Source: Resource{
+					Basic: matcher.Basic{
+						Suffix: ".csv",
+					},
 				},
 			},
 			URL:    "ssh:///folder/abc.csv",
@@ -47,8 +53,10 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "suffix no match",
 			Route: Route{
-				Basic: matcher.Basic{
-					Suffix: ".tsv",
+				Source: Resource{
+					Basic: matcher.Basic{
+						Suffix: ".tsv",
+					},
 				},
 			},
 			URL:    "ssh:///f/abc.ts",
@@ -57,9 +65,11 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "filter no match",
 			Route: Route{
-				Basic: matcher.Basic{
-					Suffix: ".tsv",
-					Filter: `^[a-z]*/data/\\d+/`,
+				Source: Resource{
+					Basic: matcher.Basic{
+						Suffix: ".tsv",
+						Filter: `^[a-z]*/data/\\d+/`,
+					},
 				},
 			},
 			URL:    "ssh://host/123/abc.tsv",
@@ -68,9 +78,11 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "filter match",
 			Route: Route{
-				Basic: matcher.Basic{
-					Suffix: ".tsv",
-					Filter: `^\/[a-z]+/data/\d+/`,
+				Source: Resource{
+					Basic: matcher.Basic{
+						Suffix: ".tsv",
+						Filter: `^\/[a-z]+/data/\d+/`,
+					},
 				},
 			},
 			URL:    "ssh://host/aa/data/002/abc.tsv",
@@ -101,7 +113,7 @@ func TestRoute_Name(t *testing.T) {
 		{
 			description: "folder depth = 1",
 			Route: Route{
-				FolderDepth: 1,
+				PreserveDepth: 1,
 			},
 			URL:    "s3://myducket/folder/sub/asset1.txt",
 			expect: "sub/asset1.txt",
@@ -109,7 +121,7 @@ func TestRoute_Name(t *testing.T) {
 		{
 			description: "folder depth = 2",
 			Route: Route{
-				FolderDepth: 2,
+				PreserveDepth: 2,
 			},
 			URL:    "s3://myducket/folder/sub/asset1.txt",
 			expect: "folder/sub/asset1.txt",
@@ -117,7 +129,7 @@ func TestRoute_Name(t *testing.T) {
 		{
 			description: "folder depth exceeded path",
 			Route: Route{
-				FolderDepth: 4,
+				PreserveDepth: 4,
 			},
 			URL:    "s3://myducket/folder/sub/asset1.txt",
 			expect: "folder/sub/asset1.txt",

@@ -10,7 +10,7 @@ Configuration:
 
 * Route:
 
-[@routes,json](routes.json)
+[@routes,json](rule.json)
 ```json
  [
    {
@@ -20,7 +20,7 @@ Configuration:
        "URL": "gs://${gsDestBucket}/data",
        "Credentials": {
          "Parameter": "smirror.gs",
-         "Key": "alias/smirror"
+         "Key": "alias/storagemirror"
        }
      },
      "OnSuccess": [
@@ -34,7 +34,7 @@ Configuration:
          "URL": "s3:///${s3OpsBucket}/e2e-mirror/errors/"
        }
      ],
-     "FolderDepth": 1
+     "PreserveDepth": 1
    }
  
  ]

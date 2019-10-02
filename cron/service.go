@@ -6,7 +6,8 @@ import (
 	"github.com/viant/afs"
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/storage"
-
+	"github.com/viant/afs/url"
+	"smirror/base"
 	cfg "smirror/config"
 	"smirror/cron/config"
 	"smirror/cron/trigger"
@@ -26,8 +27,8 @@ type Service interface {
 }
 
 type service struct {
-	config *Config
-	afs.Service
+	config      *Config
+	fs          afs.Service
 	dest        trigger.Service
 	secret      secret.Service
 	metaService meta.Service
@@ -35,7 +36,14 @@ type service struct {
 
 //Tick run cron service
 func (s *service) Tick(ctx context.Context) error {
-	for _, resource := range s.config.Resources {
+	changed, err := s.config.Resources.ReloadIfNeeded(ctx, s.fs)
+	if changed && err == nil {
+		err = s.UpdateSecrets(ctx)
+	}
+	if err != nil {
+		return err
+	}
+	for _, resource := range s.config.Resources.Rules {
 		if err := s.processResource(ctx, resource); err != nil {
 			return err
 		}
@@ -49,8 +57,11 @@ func (s *service) processResource(ctx context.Context, resource *config.Resource
 		return err
 	}
 	pendings, err := s.metaService.PendingResources(ctx, objects)
-	if err != nil {
+	if err != nil || len(pendings)  ==  0{
 		return err
+	}
+	if base.IsLoggingEnabled() {
+		fmt.Printf(`{"matched"": %v}\n"`, pendings)
 	}
 	if err = s.notifyAll(ctx, resource, pendings); err != nil {
 		return err
@@ -93,7 +104,7 @@ func (s *service) getResourceCandidates(ctx context.Context, resource *config.Re
 }
 
 func (s *service) appendResources(ctx context.Context, URL string, result *[]storage.Object, options []storage.Option) error {
-	objects, err := s.Service.List(ctx, URL, options...)
+	objects, err := s.fs.List(ctx, URL, options...)
 	if err != nil {
 		return err
 	}
@@ -119,6 +130,9 @@ func (s *service) addLastModifiedTimeMatcher(options []storage.Option) []storage
 
 func (s *service) Init(ctx context.Context, fs afs.Service) error {
 	var err error
+	if s.config.SourceScheme == "" {
+		s.config.SourceScheme = url.Scheme(s.config.MetaURL, "")
+	}
 	switch s.config.SourceScheme {
 	case s3.Scheme:
 		s.dest, err = lambda.New()
@@ -127,27 +141,36 @@ func (s *service) Init(ctx context.Context, fs afs.Service) error {
 	default:
 		err = fmt.Errorf("unsupported source scheme: %v", s.config.SourceScheme)
 	}
-
-	resources := make([]*cfg.Resource, len(s.config.Resources))
-	for i := range s.config.Resources {
-		resources[i] = &s.config.Resources[i].Resource
+	if err != nil {
+		return err
 	}
-	if err == nil && s.secret != nil {
-		err = s.secret.Init(ctx, s.Service, resources)
+	if err = s.config.Init(ctx, fs); err == nil {
+		err = s.UpdateSecrets(ctx)
 	}
 	return err
 }
 
+func (s *service) UpdateSecrets(ctx context.Context) error {
+	if s.secret == nil {
+		return nil
+	}
+	resources := make([]*cfg.Resource, len(s.config.Resources.Rules))
+	for i := range s.config.Resources.Rules {
+		resources[i] = &s.config.Resources.Rules[i].Resource
+	}
+	return s.secret.Init(ctx, s.fs, resources)
+}
+
 //New returns new cron service
 func New(ctx context.Context, config *Config, fs afs.Service) (Service, error) {
-	err := config.Init(ctx)
+	err := config.Init(ctx, fs)
 	if err != nil {
 		return nil, err
 	}
 	meteService := meta.New(config.MetaURL, config.TimeWindow.Duration*2, fs)
 	result := &service{
 		config:      config,
-		Service:     fs,
+		fs:          fs,
 		secret:      secret.New(config.SourceScheme),
 		metaService: meteService,
 	}

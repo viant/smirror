@@ -16,44 +16,55 @@ func TestRoutes_HasMatch(t *testing.T) {
 		{
 			description: "suffix match",
 			Routes: Routes{
-				&Route{
-					Basic: matcher.Basic{
-						Suffix: ".tsv",
+				Rules: []*Route{
+					&Route{
+						Source: Resource{
+							Basic: matcher.Basic{
+								Suffix: ".tsv",
+							},
+						},
+						Dest: Resource{
+							URL: "dst://abc",
+						},
 					},
-					Dest: Resource{
-						URL: "dst://abc",
-					},
-				},
-				&Route{
-					Basic: matcher.Basic{
-						Suffix: ".csv",
-					},
-					Dest: Resource{
-						URL: "dst://xyz",
+					&Route{
+						Source: Resource{
+							Basic: matcher.Basic{
+								Suffix: ".csv",
+							},
+						},
+						Dest: Resource{
+							URL: "dst://xyz",
+						},
 					},
 				},
 			},
-
 			URL:       "ssh://zz/folder/a.csv",
 			expectURL: "dst://xyz",
 		},
 		{
 			description: "prefix np match",
 			Routes: Routes{
-				&Route{
-					Basic: matcher.Basic{
-						Prefix: "/s",
+				Rules:[]*Route{
+					&Route{
+						Source: Resource{
+							Basic: matcher.Basic{
+								Prefix: "/s",
+							},
+						},
+						Dest: Resource{
+							URL: "dst://abc",
+						},
 					},
-					Dest: Resource{
-						URL: "dst://abc",
-					},
-				},
-				&Route{
-					Basic: matcher.Basic{
-						Prefix: "/g",
-					},
-					Dest: Resource{
-						URL: "dst://xyz",
+					&Route{
+						Source: Resource{
+							Basic: matcher.Basic{
+								Prefix: "/g",
+							},
+						},
+						Dest: Resource{
+							URL: "dst://xyz",
+						},
 					},
 				},
 			},

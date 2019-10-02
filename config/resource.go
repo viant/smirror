@@ -2,11 +2,13 @@ package config
 
 import (
 	"fmt"
+	"github.com/viant/afs/matcher"
 	"strings"
 )
 
 //Represents a destination
 type Resource struct {
+	matcher.Basic
 	URL         string
 	Region      string
 	CustomKey   *CustomKey

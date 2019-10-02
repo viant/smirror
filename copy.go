@@ -5,29 +5,52 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"smirror/config"
+	"strings"
 )
 
 //Transfer represents a data transfer
 type Transfer struct {
+	Replace map[string]string
 	Resource *config.Resource
 	Reader   io.Reader
 	Dest     *Datafile
 }
 
 //GetReader returns a reader
-func (c *Transfer) GetReader() (io.Reader, error) {
-	if c.Reader == nil {
+func (t *Transfer) GetReader() (io.Reader, error) {
+	if t.Reader == nil {
 		return nil, fmt.Errorf("transfer reader was empty")
 	}
-	if c.Dest.Compression == nil {
-		return c.Reader, nil
+	reader, err := t.getReader()
+	if err != nil || len(t.Replace) == 0 {
+		return reader, err
 	}
-	if c.Dest.Codec == config.GZipCodec {
+	data, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+	textData := string(data)
+	for k, v := range t.Replace {
+		count := strings.Count(textData, k)
+		if count == 0 {
+			continue
+		}
+		textData = strings.Replace(textData, k, v, count)
+	}
+	return strings.NewReader(textData), nil
+}
 
+
+func (t *Transfer)  getReader() (io.Reader, error) {
+	if t.Dest.Compression == nil {
+		return t.Reader, nil
+	}
+	if t.Dest.Codec == config.GZipCodec {
 		buffer := new(bytes.Buffer)
 		gzipWriter := gzip.NewWriter(buffer)
-		_, err := io.Copy(gzipWriter, c.Reader)
+		_, err := io.Copy(gzipWriter, t.Reader)
 		if err == nil {
 			if err = gzipWriter.Flush(); err == nil {
 				err = gzipWriter.Close()
@@ -35,5 +58,5 @@ func (c *Transfer) GetReader() (io.Reader, error) {
 		}
 		return buffer, err
 	}
-	return nil, fmt.Errorf("unsupported compression: %v", c.Dest.Compression.Codec)
+	return nil, fmt.Errorf("unsupported compression: %v", t.Dest.Compression.Codec)
 }

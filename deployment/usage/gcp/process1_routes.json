@@ -21,6 +21,6 @@
       }
     ],
     "Codec": "gzip",
-    "FolderDepth": 1
+    "PreserveDepth": 1
   }
 ]

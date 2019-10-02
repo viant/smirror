@@ -1,0 +1,32 @@
+[
+  {
+    "Source": {
+      "Prefix": "/data/p7",
+      "Suffix": ".csv",
+      "CustomKey": {
+        "Parameter": "smirror.partnerXKey",
+        "Key": "alias/storagemirror"
+      }
+    },
+    "Dest": {
+      "URL": "gs://${gsDestBucket}/data",
+      "Credentials": {
+        "Parameter": "smirror.gs",
+        "Key": "alias/storagemirror"
+      }
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "s3:///${s3OpsBucket}/e2e-mirror/errors/"
+      }
+    ],
+    "PreserveDepth": 1
+  }
+
+]

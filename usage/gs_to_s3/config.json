@@ -1,58 +1,63 @@
 {
-  "RoutesCheckFrequencyMs": 60000,
-  "RoutesBaseURL": "gs://${gsTriggerBucket}/mirror/config/routes/",
-  "Routes": [
-    {
-      "Prefix": "/data/",
-      "Suffix": ".csv.gz",
-      "Dest": {
-        "URL": "s3://destBucket/data",
-        "Credentials": {
-          "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
-          "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
-        }
+  "Mirrors": {
+    "BaseURL": "gs://${gsConfigBucket}/StorageMirror/dataflow/",
+    "Rules": [
+      {
+        "Source": {
+          "Prefix": "/data/",
+          "Suffix": ".csv.gz"
+        },
+        "Dest": {
+          "URL": "s3://destBucket/data",
+          "Credentials": {
+            "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+            "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+          }
+        },
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnFailure": [
+          {
+            "Action": "move",
+            "URL": "gs://sourceBucket/data/errors/"
+          }
+        ],
+        "Codec": "gzip",
+        "PreserveDepth": 1
       },
-      "OnSuccess": [
-        {
-          "Action": "delete"
-        }
-      ],
-      "OnFailure": [
-        {
-          "Action": "move",
-          "URL": "gs://sourceBucket/data/errors/"
-        }
-      ],
-      "Codec": "gzip",
-      "FolderDepth": 1
-    },
-    {
-      "Filter": "^\/[a-z]+/data/\\d+/",
-      "Suffix": ".csv.gz",
-      "Dest": {
-        "URL": "s3://destBucket/data/chunks/",
-        "Credentials": {
-          "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
-          "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
-        }
-      },
-      "Split": {
-        "MaxLines": 10000,
-        "Template": "%s_%05d"
-      },
-      "OnSuccess": [
-        {
-          "Action": "delete"
-        }
-      ],
-      "OnFailure": [
-        {
-          "Action": "move",
-          "URL": "gs://sourceBucket/data/errors/"
-        }
-      ],
-      "Codec": "gzip",
-      "FolderDepth": 1
-    }
-  ]
+      {
+        "Source": {
+          "Filter": "^\/[a-z]+/data/\\d+/",
+          "Suffix": ".csv.gz"
+        },
+        "Dest": {
+          "URL": "s3://destBucket/data/chunks/",
+          "Credentials": {
+            "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+            "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+          }
+        },
+        "Split": {
+          "MaxLines": 10000,
+          "Template": "%s_%05d"
+        },
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnFailure": [
+          {
+            "Action": "move",
+            "URL": "gs://sourceBucket/data/errors/"
+          }
+        ],
+        "Codec": "gzip",
+        "PreserveDepth": 1
+      }
+    ]
+  }
 }

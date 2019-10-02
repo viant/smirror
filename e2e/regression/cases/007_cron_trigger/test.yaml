@@ -1,13 +1,22 @@
 pipeline:
 
-  setupRoute:
+  setupMirrorRule:
     action: storage:copy
     expand: true
     source:
-      URL: ${parent.path}/routes.json
+      URL: ${parent.path}/rule.json
     dest:
       credentials: $awsCredentials
       URL: s3://${s3ConifgBucket}/StorageMirror/dataflow/case_${parent.index}.json
+
+  setupCronRule:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/cron.json
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3ConifgBucket}/StorageMirrorCron/dataflow/case_${parent.index}.json
 
 
   trigger:

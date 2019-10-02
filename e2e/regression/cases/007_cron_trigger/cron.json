@@ -1,0 +1,10 @@
+[
+  {
+    "URL": "s3://${s3ExternalBucket}/data/p7",
+    "DestFunction": "StorageMirror",
+    "CustomKey": {
+      "Parameter": "smirror.partnerXKey",
+      "Key": "alias/storagemirror"
+    }
+  }
+]

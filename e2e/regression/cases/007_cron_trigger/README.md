@@ -13,7 +13,7 @@ Configuration:
 
 * Route:
 
-[@route,json](routes.json)
+[@route,json](rule.json)
 
 
 
@@ -26,7 +26,7 @@ Configuration:
 
 * Route:
 
-[@route,json](routes.json)
+[@route,json](rule.json)
 ```json
 [
   {
@@ -36,14 +36,14 @@ Configuration:
 
       "CustomKey": {
         "Parameter": "smirror.partnerXKey",
-        "Key": "alias/smirror"
+        "Key": "alias/storagemirror"
       }
     },
     "Dest": {
       "URL": "gs://${gsDestBucket}/data",
       "Credentials": {
         "Parameter": "smirror.gs",
-        "Key": "alias/smirror"
+        "Key": "alias/storagemirror"
       }
     },
     "OnSuccess": [
@@ -57,7 +57,7 @@ Configuration:
         "URL": "s3:///${s3OpsBucket}/e2e-mirror/errors/"
       }
     ],
-    "FolderDepth": 1
+    "PreserveDepth": 1
   }
 
 ]

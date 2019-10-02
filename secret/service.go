@@ -59,7 +59,6 @@ func (s *service) Init(ctx context.Context, service afs.Service, resources []*co
 			}
 		}
 
-
 		if resource.Credentials != nil && resources[i].Credentials.Auth == nil {
 			data, err := kmsService.Decrypt(ctx, &resource.Credentials.Secret)
 			if err != nil {

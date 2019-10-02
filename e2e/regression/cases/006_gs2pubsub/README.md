@@ -9,7 +9,7 @@ Configuration:
 * Global Config: [@config,json](../../../config/gs.json)
 * Route:
 
-[@routes,json](routes.json)
+[@routes,json](rule.json)
 ```json
 [
   {
@@ -32,7 +32,7 @@ Configuration:
         "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
       }
     ],
-    "FolderDepth": 1
+    "PreserveDepth": 1
   }
 ]
 ```

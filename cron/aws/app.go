@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"log"
 	"smirror"
+	"smirror/base"
 	"smirror/cron"
 )
 
@@ -23,7 +24,7 @@ func handleRequest(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if smirror.IsFnLoggingEnabled(smirror.LoggingEnvKey) {
+	if base.IsLoggingEnabled() {
 		fmt.Printf("uses service %T(%p), err: %v\n", service, service, err)
 	}
 	err = service.Tick(ctx)

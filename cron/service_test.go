@@ -37,12 +37,14 @@ func TestService_Tick(t *testing.T) {
   "TimeWindow": {
     "DurationInSec": 5
   },
-  "Resources": [
-    {
-      "URL": "mem://localhost/case001/",
-      "DestFunction": "func1"
-    }
-  ]
+  "Resources": {	
+	  "Rules": [
+		{
+		  "URL": "mem://localhost/case001/",
+		  "DestFunction": "func1"
+		}
+	  ]
+  }
 }
 `,
 			configKey: "CONFIG",
@@ -81,7 +83,7 @@ func TestService_Tick(t *testing.T) {
 		actual, err := loadMeta(ctx, fs, useCase.config.MetaURL)
 		assertly.AssertValues(t, useCase.expect, actual, useCase.description)
 
-		funcURL := fmt.Sprintf("mem://localhost/%v", useCase.config.Resources[0].DestFunction)
+		funcURL := fmt.Sprintf("mem://localhost/%v", useCase.config.Resources.Rules[0].DestFunction)
 
 		exists, _ := fs.Exists(ctx, funcURL)
 		assert.True(t, exists)

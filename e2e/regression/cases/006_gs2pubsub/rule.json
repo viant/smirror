@@ -1,7 +1,9 @@
 [
   {
-    "Prefix": "/data/p6",
-    "Suffix": ".csv",
+    "Source": {
+      "Prefix": "/data/p6",
+      "Suffix": ".csv"
+    },
     "Dest": {
       "Topic": "smirrorTopic"
     },
@@ -19,6 +21,6 @@
         "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
       }
     ],
-    "FolderDepth": 1
+    "PreserveDepth": 1
   }
 ]

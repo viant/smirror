@@ -1,16 +1,10 @@
 {
-  "MetaURL": "s3://${s3TriggerBucket}/ops/meta.json",
+  "MetaURL": "s3://${s3OpsBucket}/StorageMirrorCron/meta.json",
   "TimeWindow": {
     "DurationInSec": 720
   },
-  "Resources": [
-    {
-      "URL": "s3://${s3ExternalBucket}/data/p7",
-      "DestFunction": "StorageMirror",
-      "CustomKey": {
-        "Parameter": "smirror.partnerXKey",
-        "Key": "alias/smirror"
-      }
-    }
-  ]
+  "Resources": {
+    "CheckInMs": 100,
+    "BaseURL": "s3://${s3ConifgBucket}/StorageMirrorCron/dataflow/"
+  }
 }

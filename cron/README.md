@@ -13,21 +13,24 @@ no direct cloud event integration.
   "TimeWindow": {
     "DurationInSec": 720
   },
-  "Resources": [
-    {
-      "URL": "s3://externalBucket/data/2019/",
-      "DestFunction": "myLambdaFun",
-      "CustomKey": {
-        "Parameter": "smirror.partnerX.customKey",
-        "Key": "smirror"
+  "Resources": {
+    "BaseURL": "s3://myopsBucket/smirror/cron/rules",
+    "Rules": [
+      {
+        "URL": "s3://externalBucket/data/2019/",
+        "DestFunction": "myLambdaFunction",
+        "CustomKey": {
+          "Parameter": "smirror.partnerX.customKey",
+          "Key": "smirror"
+        }
       }
-    }
-  ]
+    ]
+  }
 }
 ```
 
 - **MetaURL** stores all process files. In example above all files with modified time within 2 * 720 sec
-- **Resources** list of resources with source base URL and DestFunction function
+- **Resources** baseURL for resource rules or list of resources rules with source base URL and DestFunction function
 - **CustomKey** kms key name and ssm parameters storing [AES256Key](../config/key.go) encrypted value.
 - **Credentials**  kms key name and ssm parameters storing encrypted credentials
 

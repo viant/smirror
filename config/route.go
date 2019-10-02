@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/viant/afs/file"
-	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/url"
 	"path"
 	"smirror/job"
@@ -10,26 +9,25 @@ import (
 	"time"
 )
 
-//Route represent matching resource route
+//Route represent matching resource route rule
 type Route struct {
-	Dest   Resource
-	Source *Resource
+	Dest    Resource
+	Source  Resource
 	Replace map[string]string
-	matcher.Basic
+
 	Split *Split
 	job.Actions
 	*Compression
-	//FolderDepth  - preserves specified folder depth in dest URL
-	FolderDepth int
+	//PreserveDepth  - preserves specified folder depth in dest URL
+	PreserveDepth int
 }
 
 //HasMatch returns true if URL matches prefix or suffix
 func (r *Route) HasMatch(URL string) bool {
 	location := url.Path(URL)
 	parent, name := path.Split(location)
-	return r.Match(parent, file.NewInfo(name, 0, 0644, time.Now(), false))
+	return r.Source.Match(parent, file.NewInfo(name, 0, 0644, time.Now(), false))
 }
-
 
 //Name return route dest asset name
 func (r *Route) Name(URL string) string {
@@ -49,14 +47,14 @@ func (r *Route) Name(URL string) string {
 		}
 	}
 
-	if r.FolderDepth == 0 {
+	if r.PreserveDepth == 0 {
 		return name
 	}
 
 	folderPath := strings.Trim(parent, "/")
 	fragments := strings.Split(folderPath, "/")
-	if r.FolderDepth < len(fragments) {
-		folderPath = strings.Join(fragments[len(fragments)-r.FolderDepth:], "/")
+	if r.PreserveDepth < len(fragments) {
+		folderPath = strings.Join(fragments[len(fragments)-r.PreserveDepth:], "/")
 	} else if strings.HasPrefix(folderPath, "/") {
 		folderPath = string(folderPath[1:])
 	}

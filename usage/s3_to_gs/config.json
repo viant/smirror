@@ -1,57 +1,63 @@
 {
-  "RoutesCheckFrequencyMs": 60000,
-  "Routes": [
-    {
-      "Prefix": "/data/",
-      "Suffix": ".csv.gz",
-      "Dest": {
-        "URL": "gs://destBucket/data",
-        "Credentials": {
-          "Parameter": "smirror.gs",
-          "Key": "smirror"
-        }
+  "Mirrors": {
+    "BaseURL": "gs://${gsConfigBucket}/StorageMirror/dataflow/",
+    "Rules": [
+      {
+        "Source": {
+          "Prefix": "/data/",
+          "Suffix": ".csv.gz"
+        },
+        "Dest": {
+          "URL": "gs://destBucket/data",
+          "Credentials": {
+            "Parameter": "smirror.gs",
+            "Key": "smirror"
+          }
+        },
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnFailure": [
+          {
+            "Action": "move",
+            "URL": "s3://sourceBucket/data/errors/"
+          }
+        ],
+        "Codec": "gzip",
+        "PreserveDepth": 1
       },
-      "OnSuccess": [
-        {
-          "Action": "delete"
-        }
-      ],
-      "OnFailure": [
-        {
-          "Action": "move",
-          "URL": "s3://sourceBucket/data/errors/"
-        }
-      ],
-      "Codec": "gzip",
-      "FolderDepth": 1
-    },
-    {
-      "Prefix": "/large/data/",
-      "Suffix": ".csv.gz",
-      "Dest": {
-        "URL": "gs://destBucket/data/chunks/",
-        "Credentials": {
-          "Parameter": "smirror.gs",
-          "Key": "smirror"
-        }
-      },
-      "Split": {
-        "MaxLines": 10000,
-        "Template": "%s_%05d"
-      },
-      "OnSuccess": [
-        {
-          "Action": "delete"
-        }
-      ],
-      "OnFailure": [
-        {
-          "Action": "move",
-          "URL": "s3://sourceBucket/data/errors/"
-        }
-      ],
-      "Codec": "gzip",
-      "FolderDepth": 1
-    }
-  ]
+      {
+        "Source": {
+          "Prefix": "/large/data/",
+          "Suffix": ".csv.gz"
+        },
+        "Dest": {
+          "URL": "gs://destBucket/data/chunks/",
+          "Credentials": {
+            "Parameter": "smirror.gs",
+            "Key": "smirror"
+          }
+        },
+        "Split": {
+          "MaxLines": 10000,
+          "Template": "%s_%05d"
+        },
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnFailure": [
+          {
+            "Action": "move",
+            "URL": "s3://sourceBucket/data/errors/"
+          }
+        ],
+        "Codec": "gzip",
+        "PreserveDepth": 1
+      }
+    ]
+  }
 }

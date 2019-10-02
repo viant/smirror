@@ -1,7 +1,9 @@
 [
   {
-    "Prefix": "/data/p2",
-    "Suffix": ".csv.gz",
+    "Source": {
+      "Prefix": "/data/p4",
+      "Suffix": ".csv"
+    },
     "Dest": {
       "URL": "s3://${s3DestBucket}/data",
       "Credentials": {
@@ -10,6 +12,10 @@
       }
     },
     "Codec": "gzip",
+    "Split": {
+      "MaxLines": 10,
+      "Template": "%s_%05d"
+    },
     "OnSuccess": [
       {
         "Action": "delete"
@@ -21,6 +27,6 @@
         "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
       }
     ],
-    "FolderDepth": 1
+    "PreserveDepth": 1
   }
 ]

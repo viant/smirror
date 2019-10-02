@@ -46,16 +46,20 @@ line8,
 line9
 `,
 			config: &Config{
-				Routes: config.Routes{
-					&config.Route{
-						Basic: matcher.Basic{
-							Suffix: ".txt",
-						},
-						Dest: config.Resource{
-							URL: "mem://localhost/data",
-						},
-						Compression: &config.Compression{
-							Codec: config.GZipCodec,
+				Mirrors: config.Routes{
+					Rules: []*config.Route{
+						{
+							Source: config.Resource{
+								Basic: matcher.Basic{
+									Suffix: ".txt",
+								},
+							},
+							Dest: config.Resource{
+								URL: "mem://localhost/data",
+							},
+							Compression: &config.Compression{
+								Codec: config.GZipCodec,
+							},
 						},
 					},
 				},
@@ -80,14 +84,18 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Routes: config.Routes{
-					&config.Route{
-						Basic: matcher.Basic{
-							Suffix: ".txt",
-							Prefix: "/folder/",
-						},
-						Dest: config.Resource{
-							URL: "mem://localhost/cloned/data",
+				Mirrors: config.Routes{
+					Rules: []*config.Route{
+						{
+							Source: config.Resource{
+								Basic: matcher.Basic{
+									Suffix: ".txt",
+									Prefix: "/folder/",
+								},
+							},
+							Dest: config.Resource{
+								URL: "mem://localhost/cloned/data",
+							},
 						},
 					},
 				},
@@ -109,14 +117,18 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Routes: config.Routes{
-					&config.Route{
-						FolderDepth: 2,
-						Basic: matcher.Basic{
-							Suffix: ".txt",
-						},
-						Dest: config.Resource{
-							URL: "mem://localhost/cloned/data",
+				Mirrors: config.Routes{
+					Rules: []*config.Route{
+						{
+							PreserveDepth: 2,
+							Source: config.Resource{
+								Basic: matcher.Basic{
+									Suffix: ".txt",
+								},
+							},
+							Dest: config.Resource{
+								URL: "mem://localhost/cloned/data",
+							},
 						},
 					},
 				},
@@ -139,17 +151,21 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Routes: config.Routes{
-					&config.Route{
-						Basic: matcher.Basic{
-							Suffix: ".txt",
-						},
-						Dest: config.Resource{
-							URL: "mem://localhost/cloned/data",
-						},
-						Split: &config.Split{
-							MaxLines: 3,
-							Template: "%v_%05d",
+				Mirrors: config.Routes{
+					Rules: []*config.Route{
+						{
+							Source: config.Resource{
+								Basic: matcher.Basic{
+									Suffix: ".txt",
+								},
+							},
+							Dest: config.Resource{
+								URL: "mem://localhost/cloned/data",
+							},
+							Split: &config.Split{
+								MaxLines: 3,
+								Template: "%v_%05d",
+							},
 						},
 					},
 				},
@@ -184,20 +200,24 @@ line10,
 line11
 `,
 			config: &Config{
-				Routes: config.Routes{
-					&config.Route{
-						Basic: matcher.Basic{
-							Suffix: ".txt",
-						},
-						Dest: config.Resource{
-							URL: "mem://localhost/data",
-						},
-						Split: &config.Split{
-							MaxLines: 10,
-							Template: "%v_%05d",
-						},
-						Compression: &config.Compression{
-							Codec: config.GZipCodec,
+				Mirrors: config.Routes{
+					Rules: []*config.Route{
+						{
+							Source: config.Resource{
+								Basic: matcher.Basic{
+									Suffix: ".txt",
+								},
+							},
+							Dest: config.Resource{
+								URL: "mem://localhost/data",
+							},
+							Split: &config.Split{
+								MaxLines: 10,
+								Template: "%v_%05d",
+							},
+							Compression: &config.Compression{
+								Codec: config.GZipCodec,
+							},
 						},
 					},
 				},
@@ -232,20 +252,24 @@ line10,
 line11
 `,
 			config: &Config{
-				Routes: config.Routes{
-					&config.Route{
-						Basic: matcher.Basic{
-							Suffix: ".txt.gz",
-						},
-						Dest: config.Resource{
-							URL: "mem://localhost/data",
-						},
-						Split: &config.Split{
-							MaxLines: 10,
-							Template: "%v_%05d",
-						},
-						Compression: &config.Compression{
-							Codec: config.GZipCodec,
+				Mirrors: config.Routes{
+					Rules: []*config.Route{
+						{
+							Source: config.Resource{
+								Basic: matcher.Basic{
+									Suffix: ".txt.gz",
+								},
+							},
+							Dest: config.Resource{
+								URL: "mem://localhost/data",
+							},
+							Split: &config.Split{
+								MaxLines: 10,
+								Template: "%v_%05d",
+							},
+							Compression: &config.Compression{
+								Codec: config.GZipCodec,
+							},
 						},
 					},
 				},
@@ -272,18 +296,22 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Routes: config.Routes{
-					&config.Route{
-						Basic: matcher.Basic{
-							Suffix: ".txt",
-						},
-						Dest: config.Resource{
-							URL: "mem://localhost/cloned/data",
-						},
-						Actions: job.Actions{
-							OnSuccess: []*job.Action{
-								{
-									Action: job.ActionDelete,
+				Mirrors: config.Routes{
+					Rules: []*config.Route{
+						{
+							Source: config.Resource{
+								Basic: matcher.Basic{
+									Suffix: ".txt",
+								},
+							},
+							Dest: config.Resource{
+								URL: "mem://localhost/cloned/data",
+							},
+							Actions: job.Actions{
+								OnSuccess: []*job.Action{
+									{
+										Action: job.ActionDelete,
+									},
 								},
 							},
 						},
@@ -307,19 +335,23 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Routes: config.Routes{
-					&config.Route{
-						Basic: matcher.Basic{
-							Suffix: ".txt",
-						},
-						Dest: config.Resource{
-							URL: "mem://localhost/cloned/data",
-						},
-						Actions: job.Actions{
-							OnSuccess: []*job.Action{
-								{
-									Action: job.ActionMove,
-									URL:    "mem://localhost/processed",
+				Mirrors: config.Routes{
+					Rules: []*config.Route{
+						{
+							Source: config.Resource{
+								Basic: matcher.Basic{
+									Suffix: ".txt",
+								},
+							},
+							Dest: config.Resource{
+								URL: "mem://localhost/cloned/data",
+							},
+							Actions: job.Actions{
+								OnSuccess: []*job.Action{
+									{
+										Action: job.ActionMove,
+										URL:    "mem://localhost/processed",
+									},
 								},
 							},
 						},

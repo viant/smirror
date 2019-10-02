@@ -2,6 +2,7 @@ package cron
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
@@ -21,7 +22,8 @@ func NewFromEnv(ctx context.Context, envKey string) (Service, error) {
 	}
 	service, err := New(ctx, config, afs.New())
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to create service from config %v", config))
+		JSON, _ := json.Marshal(config)
+		return nil, errors.Wrap(err, fmt.Sprintf("failed to create service from config %s", JSON))
 	}
 	singletonEnvKey = envKey
 	singleton = service

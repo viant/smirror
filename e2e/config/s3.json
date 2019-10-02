@@ -1,4 +1,6 @@
 {
-  "RoutesBaseURL": "s3://${s3ConifgBucket}/StorageMirror/dataflow/",
-  "RoutesCheckFrequencyMs": 100
+  "Mirrors": {
+    "BaseURL": "s3://${s3ConifgBucket}/StorageMirror/dataflow/",
+    "CheckInMs": 100
+  }
 }

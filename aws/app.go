@@ -10,6 +10,7 @@ import (
 	_ "github.com/viant/afsc/s3"
 	"runtime/debug"
 	"smirror"
+	"smirror/base"
 )
 
 func main() {
@@ -30,18 +31,17 @@ func handleRequest(ctx context.Context, s3Event events.S3Event) error {
 	if err != nil {
 		return err
 	}
-	if smirror.IsFnLoggingEnabled(smirror.LoggingEnvKey) {
+	if base.IsLoggingEnabled() {
 		fmt.Printf("uses service %T(%p), err: %v\n", service, service, err)
 	}
 
 	for _, resource := range s3Event.Records {
 		URL := resourceURL(resource)
-		if smirror.IsFnLoggingEnabled(smirror.LoggingEnvKey) {
+		if base.IsLoggingEnabled() {
 			fmt.Printf("triggered by  %v\n", URL)
 		}
 		response := service.Mirror(ctx, smirror.NewRequest(URL))
-
-		if smirror.IsFnLoggingEnabled(smirror.LoggingEnvKey) {
+		if base.IsLoggingEnabled() {
 			if data, err := json.Marshal(response); err == nil {
 				fmt.Printf("%s\n", string(data))
 			}

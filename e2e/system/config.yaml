@@ -4,8 +4,8 @@ pipeline:
     googleStorage:
       action: storage:remove
       assets:
-#        - URL:  gs://${gsConifgBucket}/StorageMirror
-#          credentials: $gcpCredentials
+        - URL:  gs://${gsConifgBucket}/StorageMirror
+          credentials: $gcpCredentials
         - URL:  gs://${s3ConifgBucket}/StorageMirror
           credentials: $awsCredentials
 

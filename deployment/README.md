@@ -33,8 +33,9 @@ Where:
 
 ```json
 {
-  "RoutesCheckFrequencyMs": 60000,
-  "RoutesBaseURL": "gs://${gcp.projectID}-smirror/config/routes/"
+
+  "CheckInMs": 60000,
+  "BaseURL": "gs://${gcp.projectID}-smirror/config/routes/"
 }
 ```
 
@@ -44,8 +45,10 @@ and routes files store JSON array with process routes.
 ```json
 [
   {
-    "Prefix": "/data/",
-    "Suffix": ".csv.gz",
+    "Source": { 
+      "Prefix": "/data/",
+      "Suffix": ".csv.gz"
+    },
     "Dest": {
       "URL": "s3://destBucket/data",
       "Credentials": {
@@ -65,7 +68,7 @@ and routes files store JSON array with process routes.
       }
     ],
     "Codec": "gzip",
-    "FolderDepth": 1
+    "PreserveDepth": 1
   }
 ]
 ```

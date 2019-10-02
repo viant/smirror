@@ -1,27 +1,30 @@
 {
-  "Routes": [
-    {
-      "Prefix": "/data/p6",
-      "Suffix": ".csv",
-      "Dest": {
-        "Topic": "myTopic"
-      },
-      "Split": {
-        "MaxLines": 1000
-      },
-      "OnSuccess": [
-        {
-          "Action": "delete"
-        }
-      ],
-      "OnFailure": [
-        {
-          "Action": "move",
-          "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
-        }
-      ],
-      "FolderDepth": 1
-    }
-  ],
-  "RoutesCheckFrequencyMs": 60000
+  "Mirrors": {
+    "Rules": [
+      {
+        "Source": {
+          "Prefix": "/data/p6",
+          "Suffix": ".csv"
+        },
+        "Dest": {
+          "Topic": "myTopic"
+        },
+        "Split": {
+          "MaxLines": 1000
+        },
+        "OnSuccess": [
+          {
+            "Action": "delete"
+          }
+        ],
+        "OnFailure": [
+          {
+            "Action": "move",
+            "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
+          }
+        ],
+        "PreserveDepth": 1
+      }
+    ]
+  }
 }
