@@ -8,7 +8,7 @@ import (
 	akms "github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/pkg/errors"
-	"smirror/config"
+	"smirror/auth"
 	"smirror/secret/kms"
 	"strings"
 )
@@ -18,7 +18,7 @@ type service struct {
 	*akms.KMS
 }
 
-func (s *service) Decrypt(ctx context.Context, secret *config.Secret) ([]byte, error) {
+func (s *service) Decrypt(ctx context.Context, secret *auth.Secret) ([]byte, error) {
 	if secret.Parameter == "" {
 		return nil, errors.New("parameter was empty")
 	}

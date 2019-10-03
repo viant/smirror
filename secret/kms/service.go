@@ -2,9 +2,9 @@ package kms
 
 import (
 	"context"
-	"smirror/config"
+	"smirror/auth"
 )
 
 type Service interface {
-	Decrypt(ctx context.Context, secret *config.Secret) ([]byte, error)
+	Decrypt(ctx context.Context, secret *auth.Secret) ([]byte, error)
 }

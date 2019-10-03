@@ -1,11 +1,11 @@
 package smirror
 
 import (
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"smirror/config"
 	"strings"
 )
@@ -13,6 +13,7 @@ import (
 //Transfer represents a data transfer
 type Transfer struct {
 	Replace  []*config.Replace
+	Size     int
 	Resource *config.Resource
 	Reader   io.Reader
 	Dest     *Datafile
@@ -32,22 +33,27 @@ func (t *Transfer) GetReader() (io.Reader, error) {
 }
 
 func (t *Transfer) replaceData() error {
-	data, err := ioutil.ReadAll(t.Reader)
-	if err != nil {
-		return err
+	var lines = make([]string, 0)
+	scanner := bufio.NewScanner(t.Reader)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		lines = append(lines, t.replace(scanner.Text()))
 	}
-	textData := string(data)
+	t.Reader = strings.NewReader(strings.Join(lines, "\n"))
+	return nil
+}
+
+func (t *Transfer) replace(line string) string {
 	for _, replace := range t.Replace {
-		from:= replace.From
+		from := replace.From
 		to := replace.To
-		count := strings.Count(textData, from)
+		count := strings.Count(line, from)
 		if count == 0 {
 			continue
 		}
-		textData = strings.Replace(textData, from, to, count)
+		line = strings.Replace(line, from, to, count)
 	}
-	t.Reader = strings.NewReader(textData)
-	return nil
+	return line
 }
 
 func (t *Transfer) getReader() (io.Reader, error) {

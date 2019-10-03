@@ -1,4 +1,4 @@
-package config
+package auth
 
 //Secret represents a secret config
 type Secret struct {

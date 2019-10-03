@@ -4,6 +4,7 @@ import (
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
+	"smirror/auth"
 	"strings"
 )
 
@@ -18,6 +19,8 @@ const (
 type Action struct {
 	Action string //empty Delete,Move
 	URL    string
+	Message interface{}
+	Credentials *auth.Credentials
 }
 
 //DestURL returns destination URL

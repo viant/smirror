@@ -9,7 +9,7 @@ import (
 	"google.golang.org/api/cloudkms/v1"
 	"google.golang.org/api/option"
 	"io/ioutil"
-	"smirror/config"
+	"smirror/auth"
 	"smirror/secret/kms"
 )
 
@@ -32,7 +32,7 @@ func (s *service) downloadBase64(ctx context.Context, URL string) (string, error
 }
 
 //Decrypt decrypts plainText with supplied key
-func (s *service) Decrypt(ctx context.Context, secret *config.Secret) ([]byte, error) {
+func (s *service) Decrypt(ctx context.Context, secret *auth.Secret) ([]byte, error) {
 	plainText, err := s.downloadBase64(ctx, secret.URL)
 	if err != nil {
 		return nil, err

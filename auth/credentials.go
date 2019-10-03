@@ -1,4 +1,4 @@
-package config
+package auth
 
 //Credentials represents credentials
 type Credentials struct {
