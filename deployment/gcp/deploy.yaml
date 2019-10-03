@@ -7,22 +7,28 @@ init:
   projectID: $gcp.ProjectID
   serviceAccount: $gcp.ClientEmail
 
+
+
   gsConfigBucket: viant_dataflow_config
   gsTriggerBucket: viant_dataflow_trigger
   gsOpsBucket: viant_dataflow_operation
   gsDestBucket: viant_dataflow_mirrored
-
+  
+  configLocation: config/config.json
+  configText: $Cat('$configLocation')
 
 
 pipeline:
 
-  setup:
+  info:
+    action: print
     init:
-      mirrorGSConfig: $Cat(config/config.json)
-      mirrorGSConfigJSON: $AsJSON($mirrorGSConfig)
+      configJSON: $AsJSON($configText)
+    message: $configJSON
 
+  setup:
     action: storage:upload
-    sourceKey: mirrorGSConfigJSON
+    sourceKey: configJSON
     expand: true
     dest:
       credentials: $gcpCredentials
@@ -45,6 +51,7 @@ pipeline:
         - cd ${appPath}
         - unset GOPATH
         - export GO111MODULE=on
+        - rm -rf vendor
         - go mod vendor
 
     upload:

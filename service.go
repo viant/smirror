@@ -43,6 +43,7 @@ func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 		response.Status = StatusError
 		response.Error = err.Error()
 	}
+	response.TotalRules = len(s.config.Mirrors.Rules)
 	response.TimeTakenMs = int(time.Now().Sub(response.startTime) / time.Millisecond)
 	return response
 }
