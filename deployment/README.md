@@ -13,16 +13,17 @@ The following google storage layout is used:
 
 This bucket stores all configuration files:
 
-**${gcp.projectID}-smirror:**
 
+
+**${configBucket}:**
 
 ```bash
     /
-    | - config
-    |      |- smirror.json
-    |      |- processes
-    |      |     | - process1_routes.json
-    |      |     | - processN_routes.json        
+    | - StorageMirror
+    |      |- config.json
+    |      |- dataflow
+    |      |     | - route_rule1.json
+    |      |     | - route_ruleN.json        
         
 ```            
 
@@ -35,13 +36,13 @@ Where:
 {
 
   "CheckInMs": 60000,
-  "BaseURL": "gs://${gcp.projectID}-smirror/config/routes/"
+  "BaseURL": "gs://${configBucket}/StorageMirror/dataflow/"
 }
 ```
 
 and routes files store JSON array with process routes.
 
-[@process1_routes.json](usage/gcp/process1_routes.json)
+[@route_rule1.json](usage/gcp/route_rule1.json)
 ```json
 [
   {
@@ -78,22 +79,21 @@ and routes files store JSON array with process routes.
 
 This bucket stores all processed, error files. 
 
-**${gcp.projectID}-smirror-ops:**
+**XXXXX-ops:**
 
 
-##### Inbound mirror bucket 
+##### Trigger bucket (inbound) 
 
-This bucket stores all data that needs to be ingested to Big Query, 
+This bucket stores all data that needs to be mirror 
 
-**${gcp.projectID}-smirror-inbound**
-
-
-# Deployment
-
-You can deploy the described infrastructure with SMirror cloud function with [endly](https://github.com/viant/endly/) automation runner.
+**storagemirror-inbound**
 
 
-TODO add endly workflow
-```bash
+##### Mirrored bucket (outbound) 
 
-```
+This bucket stores all data that was mirrored from other cloud storage 
+
+**storagemirror-outbound**
+
+
+
