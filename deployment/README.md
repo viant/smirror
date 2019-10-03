@@ -8,14 +8,17 @@ SMirror lambda and cloud functions per bucket.
 
 The following google storage layout is used:
 
+- [Configuration Bucket](#configuration-bucket)
+- [Operational bucket](#operational-bucket)
+- [Trigger bucket](#trigger-bucket-inbound)
+- [Mirrored bucket](#mirrored-bucket-outbound)
 
-##### Storage Mirror bucket
+
+##### Configuration Bucket
 
 This bucket stores all configuration files:
 
-
-
-**${configBucket}:**
+**${prefix}-config:**
 
 ```bash
     /
@@ -26,7 +29,6 @@ This bucket stores all configuration files:
     |      |     | - route_ruleN.json        
         
 ```            
-
 
 Where:
 
@@ -79,21 +81,42 @@ and routes files store JSON array with process routes.
 
 This bucket stores all processed, error files. 
 
-**XXXXX-ops:**
+**${prefix}-ops:**
+
+```bash
+    /
+    | - StorageMirror
+    |      |- errors
+    |      |- processed
+        
+```            
+
 
 
 ##### Trigger bucket (inbound) 
 
 This bucket stores all data that needs to be mirror 
 
-**storagemirror-inbound**
+**${prefix}-storagemirror-inbound**
+
+```bash
+    /
+    | - data
+    |      |- idfa
+                |- dataXXX.csv.gz 
+```    
+
 
 
 ##### Mirrored bucket (outbound) 
 
 This bucket stores all data that was mirrored from other cloud storage 
 
-**storagemirror-outbound**
+**${prefix}-storagemirror-inbound**
 
-
-
+```bash
+    /
+    | - data
+    |      |- idfa
+                |- dataXXX.csv.gz 
+```    
