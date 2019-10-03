@@ -47,7 +47,7 @@ Configuration:
 * entryPoint: StorageMirror
 * environmentVariables:
   - LOGGING: 'true'
-  - CONFIG: gs://${gsConifgBucket}/StorageMirror/config.json
+  - CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
  
 
 

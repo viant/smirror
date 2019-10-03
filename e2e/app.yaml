@@ -39,7 +39,7 @@ pipeline:
       resource: projects/_/buckets/${gsTriggerBucket}
     environmentVariables:
       LOGGING: 'true'
-      CONFIG: gs://${gsConifgBucket}/StorageMirror/config.json
+      CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
     source:
       URL: ${fnAppPath}/
     sleepTimeMs: 5000
@@ -54,7 +54,7 @@ pipeline:
     environment:
       variables:
         LOGGING: 'true'
-        CONFIG: s3://${s3ConifgBucket}/StorageMirror/config.json
+        CONFIG: s3://${s3ConfigBucket}/StorageMirror/config.json
     code:
       zipfile: $LoadBinary(${mirrorAppZip})
     rolename: lambda-${functionName}-executor
@@ -88,7 +88,7 @@ pipeline:
     environment:
       variables:
         LOGGING: 'true'
-        CONFIG: s3://${s3ConifgBucket}/StorageMirrorCron/config.json
+        CONFIG: s3://${s3ConfigBucket}/StorageMirrorCron/config.json
     code:
       zipfile: $LoadBinary(${mirrorCronZip})
     schedule:

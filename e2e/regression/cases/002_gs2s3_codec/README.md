@@ -16,7 +16,7 @@ Mirror compressed data from gs://${gsTriggerBucket}/data/p2 and suffixed *.csv.g
        "Dest": {
            "URL": "s3://${s3TriggerBucket}/data",
            "Credentials": {
-              "URL": "gs://${gsConifgBucket}/Secrets/s3-mirror.json.enc",
+              "URL": "gs://${gsConfigBucket}/Secrets/s3-mirror.json.enc",
               "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
            }
        },
@@ -44,7 +44,7 @@ Mirror compressed data from gs://${gsTriggerBucket}/data/p2 and suffixed *.csv.g
     * entryPoint: StorageMirror
     * environmentVariables:
       - LOGGING: 'true'
-      - CONFIG: gs://${gsConifgBucket}/StorageMirror/config.json
+      - CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
  
 
 

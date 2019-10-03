@@ -7,7 +7,7 @@ pipeline:
       URL: ${parent.path}/rule.json
     dest:
       credentials: $awsCredentials
-      URL: s3://${s3ConifgBucket}/StorageMirror/dataflow/case_${parent.index}.json
+      URL: s3://${s3ConfigBucket}/StorageMirror/dataflow/case_${parent.index}.json
 
 
   trigger:

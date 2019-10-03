@@ -1,12 +1,12 @@
 init:
 
-  gsConifgBucket: viant-e2e-config
+  gsConfigBucket: viant-e2e-config
   gsTriggerBucket: viant-e2e-storagemirror-inbound
   gsOpsBucket: viant-e2e-ops
   gsDestBucket: viant-e2e-storagemirror-outbound
 
 
-  s3ConifgBucket: ms-e2e-config
+  s3ConfigBucket: ms-e2e-config
   s3TriggerBucket: ms-e2e-storagemirror-inbound
   s3OpsBucket: ms-e2e-ops
   s3DestBucket: ms-e2e-storagemirror-outbound

@@ -4,9 +4,9 @@ pipeline:
     googleStorage:
       action: storage:remove
       assets:
-        - URL:  gs://${gsConifgBucket}/StorageMirror
+        - URL:  gs://${gsConfigBucket}/StorageMirror
           credentials: $gcpCredentials
-        - URL:  gs://${s3ConifgBucket}/StorageMirror
+        - URL:  gs://${s3ConfigBucket}/StorageMirror
           credentials: $awsCredentials
 
 
@@ -15,18 +15,18 @@ pipeline:
     sourceKey: mirrorGSConfigJSON
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsConifgBucket}/StorageMirror/config.json
+      URL: gs://${gsConfigBucket}/StorageMirror/config.json
 
   deployS3MirrorConfig:
     action: storage:upload
     sourceKey: mirrorS3ConfigJSON
     dest:
       credentials: $awsCredentials
-      URL: s3://${s3ConifgBucket}/StorageMirror/config.json
+      URL: s3://${s3ConfigBucket}/StorageMirror/config.json
 
   deployS3MirrorCronConfig:
     action: storage:upload
     sourceKey: mirrorS3CronConfigJSON
     dest:
       credentials: $awsCredentials
-      URL: s3://${s3ConifgBucket}/StorageMirrorCron/config.json
+      URL: s3://${s3ConfigBucket}/StorageMirrorCron/config.json

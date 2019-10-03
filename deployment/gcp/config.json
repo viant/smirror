@@ -1,6 +1,6 @@
 {
   "Mirrors": {
     "BaseURL": "gs://${gsConfigBucket}/StorageMirror/dataflow",
-    "CheckInMs": 100
+    "CheckInMs": 60000
   }
 }

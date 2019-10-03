@@ -25,7 +25,7 @@ pipeline:
       isDir: true
       dest:
         credentials: $awsCredentials
-        URL: s3://${s3ConifgBucket}/
+        URL: s3://${s3ConfigBucket}/
 
     ops:
       action: storage:create
@@ -54,7 +54,7 @@ pipeline:
       isDir: true
       dest:
         credentials: $gcpCredentials
-        URL: s3://${s3ConifgBucket}/
+        URL: s3://${s3ConfigBucket}/
 
 
     ops:

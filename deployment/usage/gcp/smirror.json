@@ -1,4 +1,0 @@
-{
-  "RoutesCheckFrequencyMs": 60000,
-  "RoutesBaseURL": "gs://${gcp.projectID}-smirror/config/routes/"
-}

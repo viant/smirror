@@ -4,6 +4,7 @@
 The following document describes global shared storage mirror deployments for various data transfer processes, with one
 SMirror lambda and cloud functions per bucket.
 
+
 ### Google Storage layout:
 
 The following google storage layout is used:
@@ -18,7 +19,7 @@ The following google storage layout is used:
 
 This bucket stores all configuration files:
 
-**${prefix}-config:**
+**${gsConfigBucket}:**
 
 ```bash
     /
@@ -30,9 +31,11 @@ This bucket stores all configuration files:
         
 ```            
 
+Name candidates: ${prefix}-config
+
 Where:
 
-[@smirror.json](usage/gcp/smirror.json)
+[@smirror.json](usage/gcp/config.json)
 
 ```json
 {
@@ -81,7 +84,7 @@ and routes files store JSON array with process routes.
 
 This bucket stores all processed, error files. 
 
-**${prefix}-ops:**
+**${gsOpsBucket}:**
 
 ```bash
     /
@@ -91,13 +94,16 @@ This bucket stores all processed, error files.
         
 ```            
 
+Name candidates: ${prefix}-ops
 
 
 ##### Trigger bucket (inbound) 
 
 This bucket stores all data that needs to be mirror 
 
-**${prefix}-storagemirror-inbound**
+**${gsDestBucket}**
+
+
 
 ```bash
     /
@@ -106,13 +112,15 @@ This bucket stores all data that needs to be mirror
                 |- dataXXX.csv.gz 
 ```    
 
+Name candidates: ${prefix}-storagemirror-inbound
 
 
 ##### Mirrored bucket (outbound) 
 
 This bucket stores all data that was mirrored from other cloud storage 
 
-**${prefix}-storagemirror-inbound**
+**${gsDestBucket}**
+
 
 ```bash
     /
@@ -120,3 +128,5 @@ This bucket stores all data that was mirrored from other cloud storage
     |      |- idfa
                 |- dataXXX.csv.gz 
 ```    
+
+Name candidates: ${prefix}-storagemirror-outbound

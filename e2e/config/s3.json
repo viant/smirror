@@ -1,6 +1,6 @@
 {
   "Mirrors": {
-    "BaseURL": "s3://${s3ConifgBucket}/StorageMirror/dataflow",
+    "BaseURL": "s3://${s3ConfigBucket}/StorageMirror/dataflow",
     "CheckInMs": 100
   }
 }
