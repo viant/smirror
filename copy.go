@@ -12,7 +12,7 @@ import (
 
 //Transfer represents a data transfer
 type Transfer struct {
-	Replace  map[string]string
+	Replace  []*config.Replace
 	Resource *config.Resource
 	Reader   io.Reader
 	Dest     *Datafile
@@ -37,12 +37,14 @@ func (t *Transfer) replaceData() error {
 		return err
 	}
 	textData := string(data)
-	for k, v := range t.Replace {
-		count := strings.Count(textData, k)
+	for _, replace := range t.Replace {
+		from:= replace.From
+		to := replace.To
+		count := strings.Count(textData, from)
 		if count == 0 {
 			continue
 		}
-		textData = strings.Replace(textData, k, v, count)
+		textData = strings.Replace(textData, from, to, count)
 	}
 	t.Reader = strings.NewReader(textData)
 	return nil

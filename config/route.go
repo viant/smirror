@@ -14,7 +14,7 @@ import (
 type Route struct {
 	Dest    *Resource
 	Source  *Resource
-	Replace map[string]string `json:",omitempty"`
+	Replace []*Replace `json:",omitempty"`
 
 	Split *Split `json:",omitempty"`
 	job.Actions

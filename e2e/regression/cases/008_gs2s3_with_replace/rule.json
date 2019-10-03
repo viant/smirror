@@ -4,9 +4,12 @@
       "Prefix": "/data/p8",
       "Suffix": ".csv.gz"
     },
-    "Replace": {
-        "10": "33333333"
-    },
+    "Replace": [
+      {
+        "From": "10",
+        "To": "33333333"
+      }
+    ],
     "Dest": {
       "URL": "s3://${s3DestBucket}/data",
       "Credentials": {

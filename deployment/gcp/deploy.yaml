@@ -28,6 +28,8 @@ pipeline:
 
   setup:
     action: storage:upload
+    init:
+      configJSON: $AsJSON($configText)
     sourceKey: configJSON
     expand: true
     dest:
