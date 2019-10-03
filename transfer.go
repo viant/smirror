@@ -33,13 +33,29 @@ func (t *Transfer) GetReader() (io.Reader, error) {
 }
 
 func (t *Transfer) replaceData() error {
-	var lines = make([]string, 0)
+	buf := new(bytes.Buffer)
+	pairs := make([]string, 0)
+	for _, replace := range t.Replace {
+		pairs = append(pairs, replace.From)
+		pairs = append(pairs, replace.To)
+	}
+	replacer := strings.NewReplacer(pairs...)
 	scanner := bufio.NewScanner(t.Reader)
 	scanner.Split(bufio.ScanLines)
+	i := 0
 	for scanner.Scan() {
-		lines = append(lines, t.replace(scanner.Text()))
+		if i > 0 {
+			if _, err := replacer.WriteString(buf, "\n" + scanner.Text());err != nil {
+				return err
+			}
+			continue
+		}
+		if _, err := replacer.WriteString(buf, scanner.Text());err != nil {
+			return err
+		}
+		i++
 	}
-	t.Reader = strings.NewReader(strings.Join(lines, "\n"))
+	t.Reader = buf
 	return nil
 }
 
