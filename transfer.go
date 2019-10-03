@@ -13,7 +13,6 @@ import (
 //Transfer represents a data transfer
 type Transfer struct {
 	Replace  []*config.Replace
-	Size     int
 	Resource *config.Resource
 	Reader   io.Reader
 	Dest     *Datafile

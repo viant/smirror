@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
-	"github.com/viant/afs/storage"
 	"github.com/viant/afs/url"
 	"github.com/viant/afsc/gs"
 	"io"
@@ -60,7 +59,22 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 		response.Status = StatusNoMatch
 		return nil
 	}
+
+
+
 	response.Rule = route
+	options, err := s.secret.StorageOpts(ctx, route.Source)
+	if err != nil {
+		return err
+	}
+	exists, err := s.fs.Exists(ctx, request.URL, options...)
+	if err != nil {
+		return err
+	}
+	if ! exists {
+		response.Status = StatusNoFound
+		return nil
+	}
 	if route.Split != nil {
 		err = s.mirrorChunkedAsset(ctx, route, request, response)
 	} else {
@@ -75,10 +89,6 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 
 func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL string, response *Response) error {
 	options, err := s.secret.StorageOpts(ctx, route.Source)
-	if err != nil {
-		return err
-	}
-	object, err := s.fs.Object(ctx, URL, options...)
 	if err != nil {
 		return err
 	}
@@ -107,7 +117,6 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 		return fmt.Errorf("reader was empty")
 	}
 	dataCopy := &Transfer{
-		Size: int(object.Size()),
 		Resource: route.Dest,
 		Reader:   reader,
 		Replace:  route.Replace,
@@ -117,10 +126,6 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 
 func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, request *Request, response *Response) error {
 	options, err := s.secret.StorageOpts(ctx, route.Source)
-	if err != nil {
-		return err
-	}
-	object, err := s.fs.Object(ctx, request.URL, options...)
 	if err != nil {
 		return err
 	}
@@ -138,7 +143,7 @@ func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, r
 	}()
 	counter := int32(0)
 	waitGroup := &sync.WaitGroup{}
-	err = Split(reader, s.chunkWriter(ctx, object, request.URL, route, &counter, waitGroup, response), route.Split.MaxLines)
+	err = Split(reader, s.chunkWriter(ctx, request.URL, route, &counter, waitGroup, response), route.Split.MaxLines)
 	if err == nil {
 		waitGroup.Wait()
 	}
@@ -224,7 +229,7 @@ func (s *service) UpdateResources(ctx context.Context) error {
 	return nil
 }
 
-func (s *service) chunkWriter(ctx context.Context, object storage.Object,  URL string, route *config.Route, counter *int32, waitGroup *sync.WaitGroup, response *Response) func() io.WriteCloser {
+func (s *service) chunkWriter(ctx context.Context,  URL string, route *config.Route, counter *int32, waitGroup *sync.WaitGroup, response *Response) func() io.WriteCloser {
 	return func() io.WriteCloser {
 		splitCount := atomic.AddInt32(counter, 1)
 		destName := route.Split.Name(route, URL, splitCount)
@@ -236,7 +241,6 @@ func (s *service) chunkWriter(ctx context.Context, object storage.Object,  URL s
 			waitGroup.Add(1)
 			defer waitGroup.Done()
 			dataCopy := &Transfer{
-				Size:int(object.Size()),
 				Resource: route.Dest,
 				Replace:  route.Replace,
 				Reader:   writer.Reader,

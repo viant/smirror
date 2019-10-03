@@ -13,6 +13,8 @@ const (
 	StatusError = "error"
 	//StatusNoMatch status no match
 	StatusNoMatch = "noMatch"
+	//StatusNoFound status no found
+	StatusNoFound = "notFound"
 )
 
 //Request represents a mirror request
