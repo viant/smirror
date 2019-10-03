@@ -1,0 +1,31 @@
+[
+  {
+    "Source": {
+      "Prefix": "/data/p8",
+      "Suffix": ".csv.gz"
+    },
+    "Replace": {
+        "10": "33333333"
+    },
+    "Dest": {
+      "URL": "s3://${s3DestBucket}/data",
+      "Credentials": {
+        "URL": "gs://${gsConifgBucket}/Secrets/s3-mirror.json.enc",
+        "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
+      }
+    },
+    "Codec": "gzip",
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
+      }
+    ],
+    "PreserveDepth": 1
+  }
+]

@@ -1,10 +1,10 @@
 {
   "MetaURL": "s3://${s3OpsBucket}/StorageMirrorCron/meta.json",
   "TimeWindow": {
-    "DurationInSec": 720
+    "DurationInSec": 240
   },
   "Resources": {
     "CheckInMs": 100,
-    "BaseURL": "s3://${s3ConifgBucket}/StorageMirrorCron/dataflow/"
+    "BaseURL": "s3://${s3ConifgBucket}/StorageMirrorCron/dataflow"
   }
 }

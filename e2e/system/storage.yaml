@@ -7,6 +7,10 @@ pipeline:
         credentials: $gcpCredentials
       - URL:  gs://${s3DestBucket}/
         credentials: $awsCredentials
+      - URL:  s3://${s3OpsBucket}/
+        credentials: $awsCredentials
+      - URL:  s3://${s3ExternalBucket}/
+        credentials: $awsCredentials
 
   create3rdParty:
     action: storage:create

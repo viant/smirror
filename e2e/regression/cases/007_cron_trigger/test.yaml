@@ -27,7 +27,7 @@ pipeline:
     dest:
       credentials: $awsCredentials
       customKey:
-        Key: $partnerXKey
+        Key: $customer001CustomKey
       URL: s3://${s3ExternalBucket}/data/p7/events.csv
 
 

@@ -7,7 +7,7 @@
     "Dest": {
       "URL": "gs://${gsDestBucket}/data",
       "Credentials": {
-        "Parameter": "smirror.gs",
+        "Parameter": "storagemirror.gcp",
         "Key": "alias/smirror"
       }
     },
@@ -19,7 +19,7 @@
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "s3:///${s3OpsBucket}/e2e-mirror/errors/"
+        "URL": "s3:///${s3OpsBucket}/StorageMirror/errors/"
       }
     ],
     "PreserveDepth": 1

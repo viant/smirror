@@ -19,7 +19,7 @@ Configuration:
      "Dest": {
        "URL": "gs://${gsDestBucket}/data",
        "Credentials": {
-         "Parameter": "smirror.gs",
+         "Parameter": "storagemirror.gcp",
          "Key": "alias/storagemirror"
        }
      },
@@ -31,7 +31,7 @@ Configuration:
      "OnFailure": [
        {
          "Action": "move",
-         "URL": "s3:///${s3OpsBucket}/e2e-mirror/errors/"
+         "URL": "s3:///${s3OpsBucket}/StorageMirror/errors/"
        }
      ],
      "PreserveDepth": 1
@@ -44,10 +44,10 @@ Configuration:
 
 * event Type: google.storage.object.finalize
 * resource: projects/_/buckets/${gsTriggerBucket}
-* entryPoint: Fn
+* entryPoint: StorageMirror
 * environmentVariables:
   - LOGGING: 'true'
-  - CONFIG: gs://${gsTriggerBucket}/e2e-mirror/config/mirror.json
+  - CONFIG: gs://${gsConifgBucket}/StorageMirror/config.json
  
 
 

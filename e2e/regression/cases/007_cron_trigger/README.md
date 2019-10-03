@@ -1,6 +1,6 @@
 #### Scenario:
 
-Mirror suffixed *.csv data from gs://${gsTriggerBucket}/data/p1 to s3://${s3TriggerBucket}/data
+Mirror suffixed *.csv data from gs://${s3ExternalBucket}/data/p1 to gs://${gsTriggerBucket}/data
 
 #### Input:
 
@@ -11,9 +11,7 @@ Configuration:
 
 * Global Config: [@config,json](../../../config/s3Cron.json)
 
-* Route:
-
-[@route,json](rule.json)
+* Rule:  [@cron,json](cron.json)
 
 
 
@@ -24,9 +22,7 @@ Configuration:
 
 * Global Config: [@config,json](../../../config/s3.json)
 
-* Route:
-
-[@route,json](rule.json)
+* Rule:  [@route,json](rule.json)
 ```json
 [
   {
@@ -35,14 +31,14 @@ Configuration:
     "Source": {
 
       "CustomKey": {
-        "Parameter": "smirror.partnerXKey",
+        "Parameter": "storagemirror.customer001CustomKey",
         "Key": "alias/storagemirror"
       }
     },
     "Dest": {
       "URL": "gs://${gsDestBucket}/data",
       "Credentials": {
-        "Parameter": "smirror.gs",
+        "Parameter": "storagemirror.gcp",
         "Key": "alias/storagemirror"
       }
     },
@@ -54,7 +50,7 @@ Configuration:
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "s3:///${s3OpsBucket}/e2e-mirror/errors/"
+        "URL": "s3:///${s3OpsBucket}/StorageMirror/errors/"
       }
     ],
     "PreserveDepth": 1
@@ -62,21 +58,3 @@ Configuration:
 
 ]
 ```
-
-* Trigger:
-
-* event Type: google.storage.object.finalize
-* resource: projects/_/buckets/${gsTriggerBucket}
-* entryPoint: Fn
-* environmentVariables:
-  - LOGGING: 'true'
-  - CONFIG: gs://${gsTriggerBucket}/e2e-mirror/config/mirror.json
- 
-
-
-Data:
-- gs://${gsTriggerBucket}/data/p1/events.csv
-
-
-Output:
-- s3://${gsTriggerBucket}/data/p1/events.csv

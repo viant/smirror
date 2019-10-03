@@ -36,7 +36,7 @@ pipeline:
 
     deployGSSecret:
       action: aws/ssm:setParameter
-      name: smirror.gs
+      name: storagemirror.gcp
       '@description': Google Storage credentials
       type: SecureString
       keyId: alias/dstransfer
@@ -44,11 +44,11 @@ pipeline:
 
     deployCustomerKey:
       action: aws/ssm:setParameter
-      name: smirror.partnerXKey
+      name: storagemirror.customer001CustomKey
       '@description': PartnerX custom encryption key
       type: SecureString
       keyId: alias/storagemirror
-      value: $partnerXKey
+      value: $customer001CustomKey
 
 
   info:

@@ -1,6 +1,6 @@
 #### Scenario:
 
-Mirror data suffixed *.csv from gs://${gsTriggerBucket}/data/p1  to s3://${s3TriggerBucket}/data with compressed chunks (each no more than 10 rows)
+Mirror data suffixed *.csv from gs://${gsTriggerBucket}/data/p1  to s3://${s3DestBucket}/data with compressed chunks (each no more than 10 rows)
 
 #### Input:
 
@@ -36,7 +36,7 @@ Configuration:
          "OnError": [
            {
              "Action": "move",
-             "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
+             "URL": "gs:///${gsTriggerBucket}/StorageMirror/errors/"
            }
          ]
        },
@@ -49,10 +49,10 @@ Configuration:
 
 * event Type: google.storage.object.finalize
 * resource: projects/_/buckets/${gsTriggerBucket}
-* entryPoint: Fn
+* entryPoint: StorageMirror
 * environmentVariables:
   - LOGGING: 'true'
-  - CONFIG: gs://${gsTriggerBucket}/e2e-mirror/config/mirror.json
+  - CONFIG: gs://${gsConifgBucket}/StorageMirror/config.json
  
 
 

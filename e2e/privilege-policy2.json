@@ -16,6 +16,7 @@
         "ssm:GetParameter"
       ],
       "Resource": [
+        "arn:aws:ssm:${aws.region}:${aws.accountID}:parameter/*",
         "arn:aws:ssm:${aws.region}:${aws.accountID}:parameter/storagemirror.*"
       ]
     },

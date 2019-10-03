@@ -1,0 +1,28 @@
+pipeline:
+
+  setupRoute:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/rule.json
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsConifgBucket}/StorageMirror/dataflow/case_${parent.index}.json
+
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 25000
+    source:
+      URL: ${parent.path}/data/prepare/events.csv.gz
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsTriggerBucket}/data/p8/events.csv.gz
+
+  validate:
+    action: storage:download
+    udf: UnzipText
+    source:
+      credentials: $awsCredentials
+      URL: s3://${s3DestBucket}/data/p8/events.csv.gz
+    destKey: events
+    expect: $Cat('${parent.path}/data/expect/events.csv')

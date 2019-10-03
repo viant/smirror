@@ -4,14 +4,14 @@
       "Prefix": "/data/p7",
       "Suffix": ".csv",
       "CustomKey": {
-        "Parameter": "smirror.partnerXKey",
+        "Parameter": "storagemirror.customer001CustomKey",
         "Key": "alias/storagemirror"
       }
     },
     "Dest": {
       "URL": "gs://${gsDestBucket}/data",
       "Credentials": {
-        "Parameter": "smirror.gs",
+        "Parameter": "storagemirror.gcp",
         "Key": "alias/storagemirror"
       }
     },
@@ -23,7 +23,7 @@
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "s3:///${s3OpsBucket}/e2e-mirror/errors/"
+        "URL": "s3:///${s3OpsBucket}/StorageMirror/errors/"
       }
     ],
     "PreserveDepth": 1

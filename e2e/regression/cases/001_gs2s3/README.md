@@ -1,16 +1,14 @@
 #### Scenario:
 
-Mirror data from gs://${gsTriggerBucket}/data/p1 and suffixed *.csv to s3://${s3TriggerBucket}/data
+Mirror data from gs://${gsTriggerBucket}/data/p1 and suffixed *.csv to s3://${s3DestBucket}/data
 
 #### Input:
 
-Configuration:
+**Configuration**:
 
 * Global Config: [@config,json](../../../config/gs.json)
+* Rule: [@rule,json](rule.json)
 
-* Route:
-
-[@routes,json](rule.json)
 ```json
 [
   {
@@ -40,21 +38,22 @@ Configuration:
 ```
  
 
+* **Trigger**:
 
-* Trigger:
-
-* event Type: google.storage.object.finalize
-* resource: projects/_/buckets/${gsTriggerBucket}
-* entryPoint: Fn
-* environmentVariables:
-  - LOGGING: 'true'
-  - CONFIG: gs://${gsTriggerBucket}/e2e-mirror/config/mirror.json
+    * event Type: google.storage.object.finalize
+    * resource: projects/_/buckets/${gsTriggerBucket}
+    * entryPoint: StorageMirror
+    * environmentVariables:
+      - LOGGING: 'true'
+      - CONFIG: gs://${gsConifgBucket}/StorageMirror/config.json
  
 
 
-Data:
+**Data**:
 - gs://${gsTriggerBucket}/data/p1/events.csv
 
 
-Output:
-- s3://${gsTriggerBucket}/data/p1/events.csv
+#### Output
+
+**Data**
+- s3://${s3DestBucket}/data/p1/events.csv
