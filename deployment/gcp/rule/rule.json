@@ -18,13 +18,13 @@
     "OnSuccess": [
       {
         "Action": "move",
-        "URL": "gs:///${gsOpsBucket}/StorageMirror/processed/"
+        "URL": "gs://${gsOpsBucket}/StorageMirror/processed/"
       }
     ],
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
+        "URL": "gs://${gsOpsBucket}/StorageMirror/errors/"
       }
     ],
     "PreserveDepth": 2

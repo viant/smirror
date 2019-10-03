@@ -61,17 +61,13 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 		response.Status = StatusNoMatch
 		return nil
 	}
-	//if base.IsLoggingEnabled() {
-	//	fmt.Printf("matched: ")
-	//	toolbox.Dump(route)
-	//	fmt.Printf("\n")
-	//}
+	response.Rule = route
 	if route.Split != nil {
 		err = s.mirrorChunkedAsset(ctx, route, request, response)
 	} else {
 		err = s.mirrorAsset(ctx, route, request.URL, response)
 	}
-	jobContent := job.NewContext(ctx, err, request.URL)
+	jobContent := job.NewContext(ctx, err, request.URL, route.Name(request.URL))
 	if e := route.Actions.Run(jobContent, s.fs); e != nil && err == nil {
 		err = e
 	}

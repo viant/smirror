@@ -9,6 +9,7 @@ import (
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/storage"
 	"smirror/base"
+	"sync/atomic"
 	"time"
 )
 
@@ -19,6 +20,7 @@ type Routes struct {
 	Rules        []*Route
 	meta         *base.Meta
 	initialRules []*Route
+	inited       int32
 }
 
 //HasMatch returns the first match route
@@ -39,17 +41,16 @@ func (r Routes) Validate() error {
 		return nil
 	}
 	for i := range r.Rules {
-		if err := r.Rules[i].Validate();err != nil {
+		if err := r.Rules[i].Validate(); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-
 //Init initialises resources
 func (r *Routes) Init(ctx context.Context, fs afs.Service, projectID string) error {
-	if err := r.initRules();err != nil {
+	if err := r.initRules(); err != nil {
 		return err
 	}
 	r.meta = base.NewMeta(r.BaseURL, time.Duration(r.CheckInMs)*time.Millisecond)
@@ -97,7 +98,6 @@ func (c *Routes) loadAllResources(ctx context.Context, fs afs.Service) error {
 	return nil
 }
 
-
 func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
 	reader, err := storage.Download(ctx, object)
 	defer func() {
@@ -108,18 +108,19 @@ func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object 
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
 	}
-	transientRoutes := Routes{Rules:routes}
-	if err := transientRoutes.Validate();err != nil {
+	transientRoutes := Routes{Rules: routes}
+	if err := transientRoutes.Validate(); err != nil {
 		return errors.Wrapf(err, "invalid rule: %v", object.URL())
 	}
 	c.Rules = append(c.Rules, routes...)
 	return nil
 }
 
+
 func (r *Routes) initRules() error {
-	if len(r.initialRules) == 0 {
+	if atomic.CompareAndSwapInt32(&r.inited, 0, 1) {
 		if len(r.Rules) > 0 {
-			if err := r.Validate();err != nil {
+			if err := r.Validate(); err != nil {
 				return err
 			}
 			r.initialRules = r.Rules

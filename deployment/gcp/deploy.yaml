@@ -12,13 +12,15 @@ init:
   gsOpsBucket: viant_dataflow_operation
   gsDestBucket: viant_dataflow_mirrored
 
-  mirrorGSConfig: $Cat(config/config.json)
-  mirrorGSConfigJSON: $AsJSON($mirrorGSConfig)
 
 
 pipeline:
 
   setup:
+    init:
+      mirrorGSConfig: $Cat(config/config.json)
+      mirrorGSConfigJSON: $AsJSON($mirrorGSConfig)
+
     action: storage:upload
     sourceKey: mirrorGSConfigJSON
     expand: true

@@ -4,7 +4,6 @@ import (
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
-	"path"
 	"strings"
 )
 
@@ -22,11 +21,10 @@ type Action struct {
 }
 
 //DestURL returns destination URL
-func (a Action) DestURL(sourceURL string) string {
-	_, URLPath := url.Base(sourceURL, file.Scheme)
-	_, name := path.Split(URLPath)
-	return url.Join(a.URL, name)
+func (a Action) DestURL(relativePath string) string {
+	return url.Join(a.URL, relativePath)
 }
+
 
 //WriteError writes an error file if context has error
 func (a Action) WriteError(context *Context, service afs.Service) error {
@@ -41,7 +39,7 @@ func (a Action) Do(context *Context, service afs.Service) error {
 	case ActionDelete:
 		return service.Delete(context.Context, URL)
 	case ActionMove:
-		targetURL := a.DestURL(context.SourceURL)
+		targetURL := a.DestURL(context.RelativePath)
 		return service.Move(context.Context, URL, targetURL)
 	}
 	return nil

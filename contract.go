@@ -1,6 +1,7 @@
 package smirror
 
 import (
+	"smirror/config"
 	"sync"
 	"time"
 )
@@ -25,6 +26,7 @@ type Response struct {
 	DestURLs    []string `json:",omitempty"`
 	MessageIDs  []string `json:",omitempty"`
 	TimeTakenMs int
+	Rule        *config.Route `json:",omitempty"`
 	Status      string
 	Error       string `json:",omitempty"`
 	startTime   time.Time
