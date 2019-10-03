@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/matcher"
@@ -33,9 +34,24 @@ func (r Routes) HasMatch(URL string) *Route {
 	return nil
 }
 
+func (r Routes) Validate() error {
+	if len(r.Rules) == 0 {
+		return nil
+	}
+	for i := range r.Rules {
+		if err := r.Rules[i].Validate();err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+
 //Init initialises resources
 func (r *Routes) Init(ctx context.Context, fs afs.Service, projectID string) error {
-	r.initRules()
+	if err := r.initRules();err != nil {
+		return err
+	}
 	r.meta = base.NewMeta(r.BaseURL, time.Duration(r.CheckInMs)*time.Millisecond)
 	return r.load(ctx, fs)
 }
@@ -74,11 +90,13 @@ func (c *Routes) loadAllResources(ctx context.Context, fs afs.Service) error {
 			continue
 		}
 		if err = c.loadResources(ctx, fs, object); err != nil {
-			return err
+			//Report error, let the other rules work fine
+			fmt.Println(err)
 		}
 	}
 	return nil
 }
+
 
 func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
 	reader, err := storage.Download(ctx, object)
@@ -90,16 +108,24 @@ func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object 
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
 	}
+	transientRoutes := Routes{Rules:routes}
+	if err := transientRoutes.Validate();err != nil {
+		return errors.Wrapf(err, "invalid rule: %v", object.URL())
+	}
 	c.Rules = append(c.Rules, routes...)
 	return nil
 }
 
-func (r *Routes) initRules() {
+func (r *Routes) initRules() error {
 	if len(r.initialRules) == 0 {
 		if len(r.Rules) > 0 {
+			if err := r.Validate();err != nil {
+				return err
+			}
 			r.initialRules = r.Rules
 		} else {
 			r.initialRules = make([]*Route, 0)
 		}
 	}
+	return nil
 }

@@ -135,7 +135,7 @@ preserving parent folder (folderDepth:1) the following configuration can be used
         "Dest": {
           "URL": "gs://destBucket/data",
           "Credentials": {
-            "Parameter": "smirror.gs",
+            "Parameter": "storagemirror.gcp",
             "Key": "smirror"
           }
         },
@@ -161,7 +161,7 @@ preserving parent folder (folderDepth:1) the following configuration can be used
         "Dest": {
           "URL": "gs://destBucket/data/chunks/",
           "Credentials": {
-            "Parameter": "smirror.gs",
+            "Parameter": "storagemirror.gcp",
             "Key": "smirror"
           }
         },
@@ -221,7 +221,7 @@ the following configuration can be used with Mirror cloud function
         "OnFailure": [
           {
             "Action": "move",
-            "URL": "gs:///${gsTriggerBucket}/e2e-mirror/errors/"
+            "URL": "gs:///${gsTriggerBucket}/StorageMirror/errors/"
           }
         ],
         "PreserveDepth": 1
@@ -301,7 +301,7 @@ unset GOPATH
 export GO111MODULE=on
 go mod vendor
 
-gcloud functions deploy MyGsBucketToS3Mirror --entry-point Fn \ 
+gcloud functions deploy MyGsBucketToS3Mirror --entry-point StorageMirror \ 
     --trigger-resource ${gsTriggerBucket} 
     --trigger-event google.storage.object.finalize \
     --set-env-vars=LOGGING=true,CONFIG=gs://gsTriggerBucket/mirror/config/gs.json \
@@ -516,7 +516,7 @@ pipeline:
 - aws kms create-key  
 - aws kms create-alias --alias-name=smirror --target-key-id=KEY_ID
 - aws ssm put-parameter \
-    --name "smirror.gs" \
+    --name "storagemirror.gcp" \
     --value 'CONTENT OF GOOGLE SECRET HERE' \
     --type SecureString \
     --key-id alias/storagemirror

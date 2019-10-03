@@ -7,16 +7,16 @@ import (
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/storage"
 	"github.com/viant/afs/url"
+	"github.com/viant/afsc/s3"
 	"smirror/base"
 	cfg "smirror/config"
 	"smirror/cron/config"
+	"smirror/cron/meta"
 	"smirror/cron/trigger"
 	"smirror/cron/trigger/lambda"
 	"smirror/cron/trigger/mem"
-
-	"github.com/viant/afsc/s3"
-	"smirror/cron/meta"
 	"smirror/secret"
+	"strings"
 	"sync"
 	"time"
 )
@@ -36,37 +36,62 @@ type service struct {
 
 //Tick run cron service
 func (s *service) Tick(ctx context.Context) error {
+	matched, err := s.tick(ctx)
+	s.reportMatched(matched, err)
+	return err
+}
+
+func (s *service) tick(ctx context.Context) ([]storage.Object, error) {
 	changed, err := s.config.Resources.ReloadIfNeeded(ctx, s.fs)
 	if changed && err == nil {
 		err = s.UpdateSecrets(ctx)
 	}
 	if err != nil {
-		return err
+		return nil, err
 	}
+	var matched = make([]storage.Object, 0)
 	for _, resource := range s.config.Resources.Rules {
-		if err := s.processResource(ctx, resource); err != nil {
-			return err
+		processed, err := s.processResource(ctx, resource)
+		if err != nil {
+			return matched, err
+		}
+		if len(processed) > 0 {
+			matched = append(matched, processed...)
 		}
 	}
-	return nil
+	return matched, err
 }
 
-func (s *service) processResource(ctx context.Context, resource *config.Resource) error {
+func (s *service) reportMatched(matched []storage.Object, err error) {
+	if ! base.IsLoggingEnabled() {
+		return
+	}
+	var URLs = make([]string, 0)
+	for i := range matched {
+		URLs = append(URLs, fmt.Sprintf(`"%v"`, matched[i].URL()))
+	}
+	status := "ok"
+	if err != nil {
+		status = "error"
+	}
+	message := fmt.Sprintf(`{"status":"%v", matched":[%v]}`, status, strings.Join(URLs, ", "))
+	fmt.Println(message)
+}
+
+func (s *service) processResource(ctx context.Context, resource *config.Resource) ([]storage.Object, error) {
 	objects, err := s.getResourceCandidates(ctx, resource)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	pendings, err := s.metaService.PendingResources(ctx, objects)
-	if err != nil || len(pendings)  ==  0{
-		return err
+	if err != nil || len(pendings) == 0 {
+		return nil, err
 	}
-	if base.IsLoggingEnabled() {
-		fmt.Printf(`{"matched"": %v}\n"`, pendings)
-	}
+
 	if err = s.notifyAll(ctx, resource, pendings); err != nil {
-		return err
+		return nil, err
 	}
-	return s.metaService.AddProcessed(ctx, pendings)
+	return pendings, s.metaService.AddProcessed(ctx, pendings)
 }
 
 func (s *service) notify(ctx context.Context, resource *config.Resource, object storage.Object) error {

@@ -49,12 +49,12 @@ line9
 				Mirrors: config.Routes{
 					Rules: []*config.Route{
 						{
-							Source: config.Resource{
+							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
 								},
 							},
-							Dest: config.Resource{
+							Dest: &config.Resource{
 								URL: "mem://localhost/data",
 							},
 							Compression: &config.Compression{
@@ -87,13 +87,13 @@ line4`,
 				Mirrors: config.Routes{
 					Rules: []*config.Route{
 						{
-							Source: config.Resource{
+							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
 									Prefix: "/folder/",
 								},
 							},
-							Dest: config.Resource{
+							Dest: &config.Resource{
 								URL: "mem://localhost/cloned/data",
 							},
 						},
@@ -121,12 +121,12 @@ line4`,
 					Rules: []*config.Route{
 						{
 							PreserveDepth: 2,
-							Source: config.Resource{
+							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
 								},
 							},
-							Dest: config.Resource{
+							Dest: &config.Resource{
 								URL: "mem://localhost/cloned/data",
 							},
 						},
@@ -154,12 +154,12 @@ line4`,
 				Mirrors: config.Routes{
 					Rules: []*config.Route{
 						{
-							Source: config.Resource{
+							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
 								},
 							},
-							Dest: config.Resource{
+							Dest: &config.Resource{
 								URL: "mem://localhost/cloned/data",
 							},
 							Split: &config.Split{
@@ -203,12 +203,12 @@ line11
 				Mirrors: config.Routes{
 					Rules: []*config.Route{
 						{
-							Source: config.Resource{
+							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
 								},
 							},
-							Dest: config.Resource{
+							Dest: &config.Resource{
 								URL: "mem://localhost/data",
 							},
 							Split: &config.Split{
@@ -255,12 +255,12 @@ line11
 				Mirrors: config.Routes{
 					Rules: []*config.Route{
 						{
-							Source: config.Resource{
+							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt.gz",
 								},
 							},
-							Dest: config.Resource{
+							Dest: &config.Resource{
 								URL: "mem://localhost/data",
 							},
 							Split: &config.Split{
@@ -299,12 +299,12 @@ line4`,
 				Mirrors: config.Routes{
 					Rules: []*config.Route{
 						{
-							Source: config.Resource{
+							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
 								},
 							},
-							Dest: config.Resource{
+							Dest: &config.Resource{
 								URL: "mem://localhost/cloned/data",
 							},
 							Actions: job.Actions{
@@ -338,12 +338,12 @@ line4`,
 				Mirrors: config.Routes{
 					Rules: []*config.Route{
 						{
-							Source: config.Resource{
+							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
 								},
 							},
-							Dest: config.Resource{
+							Dest: &config.Resource{
 								URL: "mem://localhost/cloned/data",
 							},
 							Actions: job.Actions{

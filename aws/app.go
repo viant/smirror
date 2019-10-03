@@ -31,9 +31,6 @@ func handleRequest(ctx context.Context, s3Event events.S3Event) error {
 	if err != nil {
 		return err
 	}
-	if base.IsLoggingEnabled() {
-		fmt.Printf("uses service %T(%p), err: %v\n", service, service, err)
-	}
 
 	for _, resource := range s3Event.Records {
 		URL := resourceURL(resource)

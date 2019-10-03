@@ -23,13 +23,18 @@ func (t *Transfer) GetReader() (io.Reader, error) {
 	if t.Reader == nil {
 		return nil, fmt.Errorf("transfer reader was empty")
 	}
-	reader, err := t.getReader()
-	if err != nil || len(t.Replace) == 0 {
-		return reader, err
+	if len(t.Replace) > 0 {
+		if err := t.replaceData();err != nil {
+			return nil, err
+		}
 	}
-	data, err := ioutil.ReadAll(reader)
+	return t.getReader()
+}
+
+func (t *Transfer) replaceData() error {
+	data, err := ioutil.ReadAll(t.Reader)
 	if err != nil {
-		return nil, err
+		return  err
 	}
 	textData := string(data)
 	for k, v := range t.Replace {
@@ -39,9 +44,9 @@ func (t *Transfer) GetReader() (io.Reader, error) {
 		}
 		textData = strings.Replace(textData, k, v, count)
 	}
-	return strings.NewReader(textData), nil
+	t.Reader = strings.NewReader(textData)
+	return nil
 }
-
 
 func (t *Transfer)  getReader() (io.Reader, error) {
 	if t.Dest.Compression == nil {

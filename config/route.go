@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
 	"path"
@@ -11,15 +12,26 @@ import (
 
 //Route represent matching resource route rule
 type Route struct {
-	Dest    Resource
-	Source  Resource
-	Replace map[string]string
+	Dest    *Resource
+	Source  *Resource
+	Replace map[string]string `json:",omitempty"`
 
-	Split *Split
+	Split *Split `json:",omitempty"`
 	job.Actions
 	*Compression
 	//PreserveDepth  - preserves specified folder depth in dest URL
-	PreserveDepth int
+	PreserveDepth int `json:",omitempty"`
+}
+
+//Validate checks if route is valid
+func (r *Route) Validate() error {
+	if r.Source == nil {
+		return fmt.Errorf("source was empty")
+	}
+	if r.Dest == nil {
+		return fmt.Errorf("dest was empty")
+	}
+	return nil
 }
 
 //HasMatch returns true if URL matches prefix or suffix

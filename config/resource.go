@@ -9,13 +9,13 @@ import (
 //Represents a destination
 type Resource struct {
 	matcher.Basic
-	URL         string
-	Region      string
-	CustomKey   *CustomKey
-	Credentials *Credentials
-	Topic       string
+	URL         string `json:",omitempty"`
+	Region      string `json:",omitempty"`
+	CustomKey   *CustomKey `json:",omitempty"`
+	Credentials *Credentials `json:",omitempty"`
+	Topic       string `json:",omitempty"`
 	//Optional pubsub project ID, otherwise it uses default one.
-	ProjectID string
+	ProjectID string `json:",omitempty"`
 }
 
 func (r *Resource) Init(projectID string) {

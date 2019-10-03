@@ -27,7 +27,6 @@ func (c *Config) Init(ctx context.Context, fs afs.Service) (err error) {
 	if err = c.Mirrors.Init(ctx, fs, c.ProjectID); err != nil {
 		return err
 	}
-
 	for i := range c.Mirrors.Rules {
 		c.Mirrors.Rules[i].Dest.Init(c.ProjectID)
 	}
@@ -50,10 +49,10 @@ func (c *Config) Resources(ctx context.Context, fs afs.Service) ([]*config.Resou
 	for i := range c.Mirrors.Rules {
 		resource := c.Mirrors.Rules[i]
 		if resource.Source.Credentials != nil || resource.Source.CustomKey != nil {
-			result = append(result, &resource.Source)
+			result = append(result, resource.Source)
 		}
 		if resource.Dest.Credentials != nil || resource.Dest.CustomKey != nil {
-			result = append(result, &resource.Dest)
+			result = append(result, resource.Dest)
 		}
 	}
 	return result, nil

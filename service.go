@@ -8,10 +8,8 @@ import (
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
 	"github.com/viant/afsc/gs"
-	"github.com/viant/toolbox"
 	"io"
 	"io/ioutil"
-	"smirror/base"
 	"smirror/config"
 	"smirror/job"
 	"smirror/msgbus"
@@ -28,6 +26,7 @@ type Service interface {
 	Mirror(ctx context.Context, request *Request) *Response
 }
 
+
 type service struct {
 	mux    *sync.Mutex
 	config *Config
@@ -36,19 +35,20 @@ type service struct {
 	msgbus msgbus.Service
 }
 
+
 func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 	response := NewResponse()
+	response.TriggeredBy = request.URL
 	if err := s.mirror(ctx, request, response); err != nil {
 		response.Status = StatusError
 		response.Error = err.Error()
 	}
 	response.TimeTakenMs = int(time.Now().Sub(response.startTime) / time.Millisecond)
 	return response
-
 }
 
-func (s *service) mirror(ctx context.Context, request *Request, response *Response) (err error) {
 
+func (s *service) mirror(ctx context.Context, request *Request, response *Response) (err error) {
 	changed, err := s.config.Mirrors.ReloadIfNeeded(ctx, s.fs)
 	if changed && err == nil {
 		err = s.UpdateResources(ctx)
@@ -57,16 +57,15 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 		return err
 	}
 	route := s.config.Mirrors.HasMatch(request.URL)
-
 	if route == nil {
 		response.Status = StatusNoMatch
 		return nil
 	}
-	if base.IsLoggingEnabled() {
-		fmt.Printf("matched: ")
-		toolbox.Dump(route)
-		fmt.Printf("\n")
-	}
+	//if base.IsLoggingEnabled() {
+	//	fmt.Printf("matched: ")
+	//	toolbox.Dump(route)
+	//	fmt.Printf("\n")
+	//}
 	if route.Split != nil {
 		err = s.mirrorChunkedAsset(ctx, route, request, response)
 	} else {
@@ -79,8 +78,9 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 	return err
 }
 
+
 func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL string, response *Response) error {
-	options, err := s.secret.StorageOpts(ctx, &route.Source)
+	options, err := s.secret.StorageOpts(ctx, route.Source)
 	if err != nil {
 		return err
 	}
@@ -88,11 +88,9 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 	if err != nil {
 		return err
 	}
-
-
 	sourceCompression := config.NewCompressionForURL(URL)
 	destCompression := route.Compression
-	if sourceCompression.Equals(destCompression) {
+	if sourceCompression.Equals(destCompression) && len(route.Replace) == 0 {
 		sourceCompression = nil
 		destCompression = nil
 	}
@@ -107,20 +105,19 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 	}()
 	destName := route.Name(URL)
 	destURL := url.Join(route.Dest.URL, destName)
-
 	if reader == nil {
 		return fmt.Errorf("reader was empty")
 	}
-
 	dataCopy := &Transfer{
-		Resource: &route.Dest,
+		Resource: route.Dest,
 		Reader:   reader,
+		Replace:  route.Replace,
 		Dest:     NewDatafile(destURL, destCompression)}
 	return s.transfer(ctx, dataCopy, response)
 }
 
 func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, request *Request, response *Response) error {
-	options, err := s.secret.StorageOpts(ctx, &route.Source)
+	options, err := s.secret.StorageOpts(ctx, route.Source)
 	if err != nil {
 		return err
 	}
@@ -145,6 +142,7 @@ func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, r
 	return err
 }
 
+
 func (s *service) transfer(ctx context.Context, transfer *Transfer, response *Response) error {
 	if transfer.Resource.Topic != "" {
 		return s.publish(ctx, transfer, response)
@@ -154,6 +152,7 @@ func (s *service) transfer(ctx context.Context, transfer *Transfer, response *Re
 	}
 	return fmt.Errorf("invalid transfer: %v", transfer)
 }
+
 
 func (s *service) publish(ctx context.Context, transfer *Transfer, response *Response) error {
 	reader, err := transfer.GetReader()
@@ -203,6 +202,7 @@ func (s *service) Init(ctx context.Context) error {
 	return s.UpdateResources(ctx)
 }
 
+//UpdateResources udpates resources
 func (s *service) UpdateResources(ctx context.Context) error {
 	resources, err := s.config.Resources(ctx, s.fs)
 	if err != nil {
@@ -235,7 +235,8 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rou
 			waitGroup.Add(1)
 			defer waitGroup.Done()
 			dataCopy := &Transfer{
-				Resource: &route.Dest,
+				Resource: route.Dest,
+				Replace:route.Replace,
 				Reader:   writer.Reader,
 				Dest:     NewDatafile(destURL, nil),
 			}

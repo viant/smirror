@@ -35,7 +35,8 @@ func (s *service) loadState(ctx context.Context) (*State, error) {
 	if err != nil {
 		return nil, err
 	}
-	return state, json.NewDecoder(reader).Decode(state)
+	err = json.NewDecoder(reader).Decode(state)
+	return state, err
 }
 
 func (s *service) storeState(ctx context.Context, state *State) error {
@@ -56,8 +57,8 @@ func (s *service) PendingResources(ctx context.Context, candidates []storage.Obj
 	var result = make([]storage.Object, 0)
 	processed := state.ProcessMap()
 	for i, candidate := range candidates {
-		_, has := processed[candidate.URL()]
-		if !has {
+		modified, has := processed[candidate.URL()]
+		if !has || !  modified.Equal(candidate.ModTime()) {
 			result = append(result, candidates[i])
 		}
 	}

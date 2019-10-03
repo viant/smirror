@@ -21,7 +21,7 @@ no direct cloud event integration.
         "DestFunction": "myLambdaFunction",
         "CustomKey": {
           "Parameter": "smirror.partnerX.customKey",
-          "Key": "smirror"
+          "Key": "storagemirror"
         }
       }
     ]

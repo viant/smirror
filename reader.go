@@ -9,7 +9,7 @@ import (
 	"smirror/config"
 )
 
-//NewReader returns compression or regular reader
+//NewReader returns compression or regular reader returning raw data
 func NewReader(reader io.ReadCloser, compression *config.Compression) (io.ReadCloser, error) {
 	if compression == nil {
 		return reader, nil

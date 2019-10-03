@@ -3,24 +3,24 @@ package config
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/storage"
-	"github.com/viant/toolbox"
 	"smirror/base"
+	"sync/atomic"
 	"time"
 )
 
 //Resources represents resources rules to check for changes to trigger storage event
 type Resources struct {
-	BaseURL       string
-	CheckInMs int
-	Rules         []*Resource
-	initialRules  []*Resource
-	projectID     string
-	meta          *base.Meta
+	BaseURL      string
+	CheckInMs    int
+	Rules        []*Resource
+	initialRules []*Resource
+	inited       int32
+	projectID    string
+	meta         *base.Meta
 }
 
 //Init initialises resources
@@ -38,8 +38,6 @@ func (r *Resources) loadAndInit(ctx context.Context, fs afs.Service) (err error)
 	for i := range r.Rules {
 		r.Rules[i].Init(r.projectID)
 	}
-	toolbox.Dump(r.Rules)
-	fmt.Printf("\n")
 	return nil
 }
 
@@ -48,23 +46,21 @@ func (r *Resources) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, e
 	if err != nil || ! changed {
 		return changed, err
 	}
-	if base.IsLoggingEnabled() {
-		fmt.Printf("reloading rules\n")
-	}
 	return true, r.loadAndInit(ctx, fs)
 }
 
-func (c *Resources) loadAllResources(ctx context.Context, fs afs.Service) error {
-	if c.BaseURL == "" {
+func (r *Resources) loadAllResources(ctx context.Context, fs afs.Service) error {
+	if r.BaseURL == "" {
 		return nil
 	}
-	c.Rules = c.initialRules
-	exists, err := fs.Exists(ctx, c.BaseURL)
+	r.Rules = r.initialRules
+	exists, err := fs.Exists(ctx, r.BaseURL)
 	if err != nil || !exists {
 		return err
 	}
+
 	suffixMatcher, _ := matcher.NewBasic("", ".json", "", nil)
-	routesObject, err := fs.List(ctx, c.BaseURL, suffixMatcher)
+	routesObject, err := fs.List(ctx, r.BaseURL, suffixMatcher)
 	if err != nil {
 		return err
 	}
@@ -72,15 +68,14 @@ func (c *Resources) loadAllResources(ctx context.Context, fs afs.Service) error 
 		if object.IsDir() {
 			continue
 		}
-		fmt.Printf("downloading: %v\n", object.URL())
-		if err = c.loadResources(ctx, fs, object); err != nil {
+		if err = r.loadResources(ctx, fs, object); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (c *Resources) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
+func (r *Resources) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
 	reader, err := storage.Download(ctx, object)
 	if err != nil {
 		return err
@@ -93,11 +88,12 @@ func (c *Resources) loadResources(ctx context.Context, storage afs.Service, obje
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
 	}
+	r.Rules = append(r.Rules, resources...)
 	return err
 }
 
 func (r *Resources) initRules() {
-	if len(r.initialRules) == 0 {
+	if atomic.CompareAndSwapInt32(&r.inited, 0, 1) {
 		if len(r.Rules) > 0 {
 			r.initialRules = r.Rules
 		} else {

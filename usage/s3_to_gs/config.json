@@ -10,7 +10,7 @@
         "Dest": {
           "URL": "gs://destBucket/data",
           "Credentials": {
-            "Parameter": "smirror.gs",
+            "Parameter": "storagemirror.gcp",
             "Key": "smirror"
           }
         },
@@ -36,7 +36,7 @@
         "Dest": {
           "URL": "gs://destBucket/data/chunks/",
           "Credentials": {
-            "Parameter": "smirror.gs",
+            "Parameter": "storagemirror.gcp",
             "Key": "smirror"
           }
         },

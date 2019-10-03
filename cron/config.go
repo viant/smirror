@@ -16,13 +16,17 @@ import (
 type Config struct {
 	base.Config
 	MetaURL    string
-	TimeWindow *config.TimeWindow
+	TimeWindow config.TimeWindow
 	Resources  config.Resources
 }
 
 //Init initialises routes
 func (c *Config) Init(ctx context.Context, fs afs.Service) error {
 	c.Config.Init()
+	c.TimeWindow.Init()
+	if err := c.TimeWindow.Validate();err != nil {
+		return err
+	}
 	return c.Resources.Init(ctx, fs, c.ProjectID)
 }
 

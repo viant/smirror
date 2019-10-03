@@ -21,11 +21,12 @@ type Request struct {
 
 //Response represents a response
 type Response struct {
-	DestURLs    []string
-	MessageIDs  []string
+	TriggeredBy string
+	DestURLs    []string `json:",omitempty"`
+	MessageIDs  []string `json:",omitempty"`
 	TimeTakenMs int
 	Status      string
-	Error       string
+	Error       string `json:",omitempty"`
 	startTime   time.Time
 	mutex       *sync.Mutex
 }
