@@ -104,7 +104,7 @@ func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object 
 		_ = reader.Close()
 	}()
 	routes := make([]*Route, 0)
-	err = json.NewDecoder(reader).Decode(&routes);
+	err = json.NewDecoder(reader).Decode(&routes)
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
 	}
@@ -115,7 +115,6 @@ func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object 
 	c.Rules = append(c.Rules, routes...)
 	return nil
 }
-
 
 func (r *Routes) initRules() error {
 	if atomic.CompareAndSwapInt32(&r.inited, 0, 1) {

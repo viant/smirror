@@ -25,7 +25,6 @@ func (a Action) DestURL(relativePath string) string {
 	return url.Join(a.URL, relativePath)
 }
 
-
 //WriteError writes an error file if context has error
 func (a Action) WriteError(context *Context, service afs.Service) error {
 	moveURL := a.DestURL(context.SourceURL) + "-error"

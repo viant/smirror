@@ -58,7 +58,7 @@ func (s *service) PendingResources(ctx context.Context, candidates []storage.Obj
 	processed := state.ProcessMap()
 	for i, candidate := range candidates {
 		modified, has := processed[candidate.URL()]
-		if !has || !  modified.Equal(candidate.ModTime()) {
+		if !has || !modified.Equal(candidate.ModTime()) {
 			result = append(result, candidates[i])
 		}
 	}

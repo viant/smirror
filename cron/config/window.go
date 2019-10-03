@@ -12,7 +12,7 @@ type TimeWindow struct {
 }
 
 //Init initialises time window
-func (t *TimeWindow) Init()  {
+func (t *TimeWindow) Init() {
 	if t.DurationInSec != 0 {
 		t.Duration = time.Duration(t.DurationInSec) * time.Second
 	}

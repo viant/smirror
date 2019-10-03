@@ -12,7 +12,7 @@ import (
 
 //Transfer represents a data transfer
 type Transfer struct {
-	Replace map[string]string
+	Replace  map[string]string
 	Resource *config.Resource
 	Reader   io.Reader
 	Dest     *Datafile
@@ -24,7 +24,7 @@ func (t *Transfer) GetReader() (io.Reader, error) {
 		return nil, fmt.Errorf("transfer reader was empty")
 	}
 	if len(t.Replace) > 0 {
-		if err := t.replaceData();err != nil {
+		if err := t.replaceData(); err != nil {
 			return nil, err
 		}
 	}
@@ -34,7 +34,7 @@ func (t *Transfer) GetReader() (io.Reader, error) {
 func (t *Transfer) replaceData() error {
 	data, err := ioutil.ReadAll(t.Reader)
 	if err != nil {
-		return  err
+		return err
 	}
 	textData := string(data)
 	for k, v := range t.Replace {
@@ -48,7 +48,7 @@ func (t *Transfer) replaceData() error {
 	return nil
 }
 
-func (t *Transfer)  getReader() (io.Reader, error) {
+func (t *Transfer) getReader() (io.Reader, error) {
 	if t.Dest.Compression == nil {
 		return t.Reader, nil
 	}

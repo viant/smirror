@@ -17,7 +17,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "prefix match",
 			Route: Route{
-				Source: Resource{
+				Source: &Resource{
 					Basic: matcher.Basic{
 						Prefix: "/folder/",
 					},
@@ -29,7 +29,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "prefix no match",
 			Route: Route{
-				Source: Resource{
+				Source: &Resource{
 					Basic: matcher.Basic{
 						Prefix: "folder/",
 					},
@@ -41,7 +41,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "suffix match",
 			Route: Route{
-				Source: Resource{
+				Source: &Resource{
 					Basic: matcher.Basic{
 						Suffix: ".csv",
 					},
@@ -53,7 +53,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "suffix no match",
 			Route: Route{
-				Source: Resource{
+				Source: &Resource{
 					Basic: matcher.Basic{
 						Suffix: ".tsv",
 					},
@@ -65,7 +65,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "filter no match",
 			Route: Route{
-				Source: Resource{
+				Source: &Resource{
 					Basic: matcher.Basic{
 						Suffix: ".tsv",
 						Filter: `^[a-z]*/data/\\d+/`,
@@ -78,7 +78,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		{
 			description: "filter match",
 			Route: Route{
-				Source: Resource{
+				Source: &Resource{
 					Basic: matcher.Basic{
 						Suffix: ".tsv",
 						Filter: `^\/[a-z]+/data/\d+/`,

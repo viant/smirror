@@ -6,6 +6,6 @@ import (
 
 //CustomKey represents custom key
 type CustomKey struct {
-	Secret `json:",omitempty"`
+	Secret    `json:",omitempty"`
 	AES256Key *option.AES256Key `json:",omitempty"`
 }

@@ -26,7 +26,6 @@ type Service interface {
 	Mirror(ctx context.Context, request *Request) *Response
 }
 
-
 type service struct {
 	mux    *sync.Mutex
 	config *Config
@@ -34,7 +33,6 @@ type service struct {
 	secret secret.Service
 	msgbus msgbus.Service
 }
-
 
 func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 	response := NewResponse()
@@ -47,7 +45,6 @@ func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 	response.TimeTakenMs = int(time.Now().Sub(response.startTime) / time.Millisecond)
 	return response
 }
-
 
 func (s *service) mirror(ctx context.Context, request *Request, response *Response) (err error) {
 	changed, err := s.config.Mirrors.ReloadIfNeeded(ctx, s.fs)
@@ -74,7 +71,6 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 	}
 	return err
 }
-
 
 func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL string, response *Response) error {
 	options, err := s.secret.StorageOpts(ctx, route.Source)
@@ -139,7 +135,6 @@ func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, r
 	return err
 }
 
-
 func (s *service) transfer(ctx context.Context, transfer *Transfer, response *Response) error {
 	if transfer.Resource.Topic != "" {
 		return s.publish(ctx, transfer, response)
@@ -149,7 +144,6 @@ func (s *service) transfer(ctx context.Context, transfer *Transfer, response *Re
 	}
 	return fmt.Errorf("invalid transfer: %v", transfer)
 }
-
 
 func (s *service) publish(ctx context.Context, transfer *Transfer, response *Response) error {
 	reader, err := transfer.GetReader()
@@ -233,7 +227,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rou
 			defer waitGroup.Done()
 			dataCopy := &Transfer{
 				Resource: route.Dest,
-				Replace:route.Replace,
+				Replace:  route.Replace,
 				Reader:   writer.Reader,
 				Dest:     NewDatafile(destURL, nil),
 			}

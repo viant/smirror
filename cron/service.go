@@ -63,7 +63,7 @@ func (s *service) tick(ctx context.Context) ([]storage.Object, error) {
 }
 
 func (s *service) reportMatched(matched []storage.Object, err error) {
-	if ! base.IsLoggingEnabled() {
+	if !base.IsLoggingEnabled() {
 		return
 	}
 	var URLs = make([]string, 0)

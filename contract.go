@@ -27,7 +27,7 @@ type Response struct {
 	MessageIDs  []string `json:",omitempty"`
 	TimeTakenMs int
 	Rule        *config.Route `json:",omitempty"`
-	TotalRules int
+	TotalRules  int
 	Status      string
 	Error       string `json:",omitempty"`
 	startTime   time.Time

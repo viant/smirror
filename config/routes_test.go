@@ -17,7 +17,7 @@ func TestRoutes_HasMatch(t *testing.T) {
 			description: "suffix match",
 			Routes: Routes{
 				Rules: []*Route{
-					&Route{
+					{
 						Source: &Resource{
 							Basic: matcher.Basic{
 								Suffix: ".tsv",
@@ -27,7 +27,7 @@ func TestRoutes_HasMatch(t *testing.T) {
 							URL: "dst://abc",
 						},
 					},
-					&Route{
+					{
 						Source: &Resource{
 							Basic: matcher.Basic{
 								Suffix: ".csv",
@@ -45,8 +45,8 @@ func TestRoutes_HasMatch(t *testing.T) {
 		{
 			description: "prefix np match",
 			Routes: Routes{
-				Rules:[]*Route{
-					&Route{
+				Rules: []*Route{
+					{
 						Source: &Resource{
 							Basic: matcher.Basic{
 								Prefix: "/s",
@@ -56,7 +56,7 @@ func TestRoutes_HasMatch(t *testing.T) {
 							URL: "dst://abc",
 						},
 					},
-					&Route{
+					{
 						Source: &Resource{
 							Basic: matcher.Basic{
 								Prefix: "/g",

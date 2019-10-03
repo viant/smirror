@@ -24,7 +24,7 @@ type Config struct {
 func (c *Config) Init(ctx context.Context, fs afs.Service) error {
 	c.Config.Init()
 	c.TimeWindow.Init()
-	if err := c.TimeWindow.Validate();err != nil {
+	if err := c.TimeWindow.Validate(); err != nil {
 		return err
 	}
 	return c.Resources.Init(ctx, fs, c.ProjectID)

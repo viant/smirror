@@ -9,11 +9,11 @@ import (
 //Represents a destination
 type Resource struct {
 	matcher.Basic
-	URL         string `json:",omitempty"`
-	Region      string `json:",omitempty"`
-	CustomKey   *CustomKey `json:",omitempty"`
+	URL         string       `json:",omitempty"`
+	Region      string       `json:",omitempty"`
+	CustomKey   *CustomKey   `json:",omitempty"`
 	Credentials *Credentials `json:",omitempty"`
-	Topic       string `json:",omitempty"`
+	Topic       string       `json:",omitempty"`
 	//Optional pubsub project ID, otherwise it uses default one.
 	ProjectID string `json:",omitempty"`
 }

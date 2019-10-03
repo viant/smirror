@@ -43,7 +43,7 @@ func (r *Resources) loadAndInit(ctx context.Context, fs afs.Service) (err error)
 
 func (r *Resources) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, error) {
 	changed, err := r.meta.HasChanged(ctx, fs)
-	if err != nil || ! changed {
+	if err != nil || !changed {
 		return changed, err
 	}
 	return true, r.loadAndInit(ctx, fs)
@@ -84,7 +84,7 @@ func (r *Resources) loadResources(ctx context.Context, storage afs.Service, obje
 		_ = reader.Close()
 	}()
 	resources := make([]*Resource, 0)
-	err = json.NewDecoder(reader).Decode(&resources);
+	err = json.NewDecoder(reader).Decode(&resources)
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
 	}
