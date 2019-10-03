@@ -1,0 +1,32 @@
+[
+  {
+    "Source": {
+      "Prefix": "/data/test",
+      "Suffix": ".csv.gz"
+    },
+    "Dest": {
+      "URL": "s3://${s3DestBucket}/testdata",
+      "Credentials": {
+        "URL": "gs://${gsConfigBucket}/Secrets/s3-myspace.json.enc",
+        "Key": "projects/${gcpProject}/locations/us-central1/keyRings/storagemirror_ring/cryptoKeys/storagemirror"
+      }
+    },
+    "Replace": {
+      "10": "33333333"
+    },
+    "Codec": "gzip",
+    "OnSuccess": [
+      {
+        "Action": "move",
+        "URL": "gs:///${gsOpsBucket}/StorageMirror/processed/"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
+      }
+    ],
+    "PreserveDepth": 2
+  }
+]

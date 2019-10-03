@@ -1,0 +1,6 @@
+{
+  "Mirrors": {
+    "BaseURL": "gs://viant_dataflow_config/StorageMirror/dataflow",
+    "CheckInMs": 60000
+  }
+}

@@ -1,0 +1,65 @@
+
+init:
+  appPath: /tmp/smirror
+  functionName: StorageMirror
+  gcpCredentials: viant-dataflow
+  gcp: ${secrets.$gcpCredentials}
+  projectID: $gcp.ProjectID
+  serviceAccount: $gcp.ClientEmail
+
+  gsConfigBucket: viant_dataflow_config
+  gsTriggerBucket: viant_dataflow_trigger
+  gsOpsBucket: viant_dataflow_operation
+  gsDestBucket: viant_dataflow_mirrored
+
+  mirrorGSConfig: $Cat(config/config.json)
+  mirrorGSConfigJSON: $AsJSON($mirrorGSConfig)
+
+
+pipeline:
+
+  setup:
+    action: storage:upload
+    sourceKey: mirrorGSConfigJSON
+    expand: true
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsConfigBucket}/StorageMirror/config.json
+
+
+  deploy:
+    checkOut:
+      action: vc/git:checkout
+      Origin:
+        URL: https://github.com/viant/smirror.git
+      Dest:
+        URL: ${appPath}
+
+    package:
+      action: exec:run
+      target: $target
+      checkError: true
+      commands:
+        - cd ${appPath}
+        - unset GOPATH
+        - export GO111MODULE=on
+        - go mod vendor
+
+    upload:
+      action: gcp/cloudfunctions:deploy
+      credentials: $gcpCredentials
+      '@name': StorageMirror
+      entryPoint: StorageMirror
+      runtime: go111
+      availableMemoryMb: 2048
+      timeout: 540s
+      serviceAccountEmail: $serviceAccount
+      eventTrigger:
+        eventType: google.storage.object.finalize
+        resource: projects/_/buckets/${gsTriggerBucket}
+      environmentVariables:
+        LOGGING: 'true'
+        CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
+      source:
+        URL: ${appPath}/
+      sleepTimeMs: 5000

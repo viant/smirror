@@ -1,0 +1,38 @@
+init:
+  gcpCredentials: viant-dataflow
+  gcp: ${secrets.$gcpCredentials}
+  projectID: $gcp.ProjectID
+  serviceAccount: $gcp.ClientEmail
+  gsConfigBucket: viant_dataflow_config
+  awsCredentials: aws-e2e
+  s3Secrets: ${secrets.$awsCredentials}
+
+pipeline:
+
+  deployGCPKey:
+    action: gcp/kms:deployKey
+    credentials: $gcpCredentials
+    ring: storagemirror_ring
+    key: storagemirror
+    purpose: ENCRYPT_DECRYPT
+    logging: false
+    bindings:
+      - role: roles/cloudkms.cryptoKeyEncrypterDecrypter
+        members:
+          - serviceAccount:${gcp.serviceAccount}
+
+  info:
+    action: print
+    message: $AsString($s3Secrets)
+
+
+  encryptS3Credentials:
+    action: gcp/kms:encrypt
+    ring: storagemirror_ring
+    key: storagemirror
+    plainData: $AsJSON($s3Secrets)
+    dest:
+      URL: gs://${gsConfigBucket}/Secrets/s3-myspace.json.enc
+      credentials: ${gcpCredentials}
+    logging: false
+
