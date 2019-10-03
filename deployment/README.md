@@ -101,7 +101,7 @@ Name candidates: ${prefix}-ops
 
 This bucket stores all data that needs to be mirror 
 
-**${gsDestBucket}**
+**${gsTriggerBucket}**
 
 
 
