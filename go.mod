@@ -8,7 +8,7 @@ require (
 	github.com/go-errors/errors v1.0.1 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.3.0
-	github.com/viant/afs v0.2.1
+	github.com/viant/afs v0.2.2
 	github.com/viant/afsc v0.2.2
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.28.0

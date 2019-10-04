@@ -1,14 +1,17 @@
 package smirror
 
 import (
-	"bufio"
 	"bytes"
 	"compress/gzip"
 	"fmt"
 	"io"
 	"smirror/config"
 	"strings"
+	"unsafe"
 )
+
+const bufferSize = 1024 * 1024
+var lineBreak = []byte{'\n'}
 
 //Transfer represents a data transfer
 type Transfer struct {
@@ -31,44 +34,58 @@ func (t *Transfer) GetReader() (io.Reader, error) {
 	return t.getReader()
 }
 
+
+func byteToString(data []byte) string {
+	ptr := unsafe.Pointer(&data)
+	return  *(*string)(ptr)
+}
+
+
+
 func (t *Transfer) replaceData() error {
-	buf := new(bytes.Buffer)
+	previous := ""
+	replacer := t.Replacer()
+	writer := new(bytes.Buffer)
+	buffer := make([]byte, bufferSize)
+	pending := make([]byte, bufferSize)
+	for ; ; {
+		bytesRead, e := t.Reader.Read(buffer)
+		if bytesRead == 0 {
+			if e != nil || e == io.EOF {
+				break
+			}
+		}
+		data := buffer[:bytesRead]
+		for ;; {
+			index := bytes.Index(data, lineBreak)
+			if index == -1 {
+				copy(pending, data)
+				previous = byteToString(pending[:len(data)])
+				break
+			}
+			text := byteToString(data[:index+1])
+			if previous != "" {
+				if _, err := replacer.WriteString(writer, previous + text); err != nil {
+					return err
+				}
+				previous = ""
+			} else if _, err := replacer.WriteString(writer, text); err != nil {
+				return err
+			}
+			data = data[index+1:]
+		}
+	}
+	t.Reader = writer
+	return nil
+}
+
+func (t *Transfer) Replacer() (*strings.Replacer) {
 	pairs := make([]string, 0)
 	for _, replace := range t.Replace {
 		pairs = append(pairs, replace.From)
 		pairs = append(pairs, replace.To)
 	}
-	replacer := strings.NewReplacer(pairs...)
-	scanner := bufio.NewScanner(t.Reader)
-	scanner.Split(bufio.ScanLines)
-	i := 0
-	for scanner.Scan() {
-		if i > 0 {
-			if _, err := replacer.WriteString(buf, "\n" + scanner.Text());err != nil {
-				return err
-			}
-			continue
-		}
-		if _, err := replacer.WriteString(buf, scanner.Text());err != nil {
-			return err
-		}
-		i++
-	}
-	t.Reader = buf
-	return nil
-}
-
-func (t *Transfer) replace(line string) string {
-	for _, replace := range t.Replace {
-		from := replace.From
-		to := replace.To
-		count := strings.Count(line, from)
-		if count == 0 {
-			continue
-		}
-		line = strings.Replace(line, from, to, count)
-	}
-	return line
+	return strings.NewReplacer(pairs...)
 }
 
 func (t *Transfer) getReader() (io.Reader, error) {

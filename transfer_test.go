@@ -27,9 +27,27 @@ this is my line 2
 					"is": "abc",
 				},
 				expect:`thabc abc my line 1
-thabc abc my line 2`,
-			},
+thabc abc my line 2
+`,
 
+			},
+			{
+				description:"multi line replacement",
+				data:`
+"123213"",""
+adaew"",""
+""1
+`,
+				replace:map[string]string{
+					`""`: `"`,
+				},
+				expect:`
+"123213","
+adaew","
+"1
+`,
+
+			},
 		}
 
 		for _, useCase := range useCases {
