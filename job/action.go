@@ -17,9 +17,9 @@ const (
 
 //Action represents an action
 type Action struct {
-	Action string //empty Delete,Move
-	URL    string
-	Message interface{}
+	Action      string //empty Delete,Move
+	URL         string
+	Message     interface{}
 	Credentials *auth.Credentials
 }
 

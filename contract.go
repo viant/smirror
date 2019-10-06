@@ -1,20 +1,10 @@
 package smirror
 
 import (
+	"smirror/base"
 	"smirror/config"
 	"sync"
 	"time"
-)
-
-const (
-	//StatusOK status ok
-	StatusOK = "ok"
-	//StatusError status error
-	StatusError = "error"
-	//StatusNoMatch status no match
-	StatusNoMatch = "noMatch"
-	//StatusNoFound status no found
-	StatusNoFound = "notFound"
 )
 
 //Request represents a mirror request
@@ -51,7 +41,7 @@ func NewRequest(URL string) *Request {
 //NewResponse returns a new response
 func NewResponse() *Response {
 	return &Response{
-		Status:     StatusOK,
+		Status:     base.StatusOK,
 		startTime:  time.Now(),
 		DestURLs:   make([]string, 0),
 		MessageIDs: make([]string, 0),

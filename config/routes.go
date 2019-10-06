@@ -9,6 +9,7 @@ import (
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/storage"
 	"smirror/base"
+	"strings"
 	"sync/atomic"
 	"time"
 )
@@ -112,7 +113,19 @@ func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object 
 	if err := transientRoutes.Validate(); err != nil {
 		return errors.Wrapf(err, "invalid rule: %v", object.URL())
 	}
-	c.Rules = append(c.Rules, routes...)
+
+	for i := range routes {
+		if routes[i].Info.Workflow == "" {
+			name := object.Name()
+			if strings.HasSuffix(name, ".json") {
+				name = string(name[:len(name)-5])
+			}
+			routes[i].Info.Workflow = name
+		}
+		c.Rules = append(c.Rules, routes[i])
+
+	}
+
 	return nil
 }
 

@@ -1,107 +1,86 @@
 package smirror
 
 import (
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"fmt"
 	"io"
 	"smirror/config"
-	"strings"
-	"unsafe"
 )
 
-const bufferSize = 1024 * 1024
 var lineBreak = []byte{'\n'}
 
 //Transfer represents a data transfer
 type Transfer struct {
-	Replace  []*config.Replace
+	rewriter *Rewriter
 	Resource *config.Resource
 	Reader   io.Reader
 	Dest     *Datafile
 }
 
 //GetReader returns a reader
-func (t *Transfer) GetReader() (io.Reader, error) {
+func (t *Transfer) GetReader() (reader io.Reader, err error) {
 	if t.Reader == nil {
 		return nil, fmt.Errorf("transfer reader was empty")
 	}
-	if len(t.Replace) > 0 {
-		if err := t.replaceData(); err != nil {
-			return nil, err
-		}
-	}
+
 	return t.getReader()
 }
 
+func (t *Transfer) getReader() (reader io.Reader, err error) {
+	reader = t.Reader
+	t.Reader = nil
+	if t.rewriter == nil {
+		t.rewriter = NewRewriter()
+	}
 
-func byteToString(data []byte) string {
-	ptr := unsafe.Pointer(&data)
-	return  *(*string)(ptr)
-}
+	if (t.Dest == nil || t.Dest.Compression == nil) && !t.rewriter.HasReplacer() {
+		return reader, nil
+	}
 
+	buffer := new(bytes.Buffer)
+	var writer io.Writer = buffer
 
-
-func (t *Transfer) replaceData() error {
-	previous := ""
-	replacer := t.Replacer()
-	writer := new(bytes.Buffer)
-	buffer := make([]byte, bufferSize)
-	pending := make([]byte, bufferSize)
-	for ; ; {
-		bytesRead, e := t.Reader.Read(buffer)
-		if bytesRead == 0 {
-			if e != nil || e == io.EOF {
-				break
+	if t.Dest != nil && t.Dest.Compression != nil {
+		if t.Dest.Compression.Codec != "" {
+			if t.Dest.Codec == config.GZipCodec {
+				gzipWriter := gzip.NewWriter(buffer)
+				writer = gzipWriter
+				defer func() {
+					if err := gzipWriter.Flush(); err == nil {
+						err = gzipWriter.Close()
+					}
+				}()
 			}
-		}
-		data := buffer[:bytesRead]
-		for ;; {
-			index := bytes.Index(data, lineBreak)
-			if index == -1 {
-				copy(pending, data)
-				previous = byteToString(pending[:len(data)])
-				break
-			}
-			text := byteToString(data[:index+1])
-			if previous != "" {
-				if _, err := replacer.WriteString(writer, previous + text); err != nil {
-					return err
-				}
-				previous = ""
-			} else if _, err := replacer.WriteString(writer, text); err != nil {
-				return err
-			}
-			data = data[index+1:]
+		} else {
+			return nil, fmt.Errorf("unsupported compression: %v", t.Dest.Compression.Codec)
 		}
 	}
-	t.Reader = writer
-	return nil
-}
-
-func (t *Transfer) Replacer() (*strings.Replacer) {
-	pairs := make([]string, 0)
-	for _, replace := range t.Replace {
-		pairs = append(pairs, replace.From)
-		pairs = append(pairs, replace.To)
-	}
-	return strings.NewReplacer(pairs...)
-}
-
-func (t *Transfer) getReader() (io.Reader, error) {
-	if t.Dest.Compression == nil {
-		return t.Reader, nil
-	}
-	if t.Dest.Codec == config.GZipCodec {
-		buffer := new(bytes.Buffer)
-		gzipWriter := gzip.NewWriter(buffer)
-		_, err := io.Copy(gzipWriter, t.Reader)
-		if err == nil {
-			if err = gzipWriter.Flush(); err == nil {
-				err = gzipWriter.Close()
-			}
-		}
+	if !t.rewriter.HasReplacer() {
+		_, err := io.Copy(writer, reader)
 		return buffer, err
 	}
-	return nil, fmt.Errorf("unsupported compression: %v", t.Dest.Compression.Codec)
+
+	scanner := bufio.NewScanner(reader)
+	scanner.Buffer(make([]byte, bufferSize), 10*bufferSize)
+
+	if scanner.Scan() {
+		if err = t.rewriter.Write(writer, scanner.Bytes()); err != nil {
+			return nil, err
+		}
+	}
+
+	for scanner.Scan() {
+		if err = scanner.Err(); err != nil {
+			return nil, err
+		}
+		if _, err = writer.Write(lineBreak); err != nil {
+			return nil, err
+		}
+		if err = t.rewriter.Write(writer, scanner.Bytes()); err != nil {
+			return nil, err
+		}
+	}
+	return buffer, err
 }

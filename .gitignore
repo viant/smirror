@@ -4,3 +4,5 @@ vendor/
 logs/
 *.zip
 smirror
+local_test.go
+

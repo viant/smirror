@@ -12,6 +12,9 @@ type Split struct {
 	MaxLines int
 	//Template has to have %v placeholder for file name, and %d (or padded placeholder i.e. %04d) chunk number
 	Template string
+
+	//MaxSize max size, if file larger then splits
+	MaxSize int
 }
 
 //Name returns a chunk name for supplied URL and mirrorChunkeddAsset number

@@ -10,11 +10,13 @@ import (
 	"github.com/viant/afsc/gs"
 	"io"
 	"io/ioutil"
+	"smirror/base"
 	"smirror/config"
 	"smirror/job"
 	"smirror/msgbus"
 	"smirror/msgbus/pubsub"
 	"smirror/secret"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -37,8 +39,13 @@ type service struct {
 func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 	response := NewResponse()
 	response.TriggeredBy = request.URL
-	if err := s.mirror(ctx, request, response); err != nil {
-		response.Status = StatusError
+	err := s.mirror(ctx, request, response)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			response.Status = base.StatusNoFound
+		} else {
+			response.Status = base.StatusError
+		}
 		response.Error = err.Error()
 	}
 	response.TotalRules = len(s.config.Mirrors.Rules)
@@ -56,11 +63,9 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 	}
 	route := s.config.Mirrors.HasMatch(request.URL)
 	if route == nil {
-		response.Status = StatusNoMatch
+		response.Status = base.StatusNoMatch
 		return nil
 	}
-
-
 
 	response.Rule = route
 	options, err := s.secret.StorageOpts(ctx, route.Source)
@@ -71,8 +76,8 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 	if err != nil {
 		return err
 	}
-	if ! exists {
-		response.Status = StatusNoFound
+	if !exists {
+		response.Status = base.StatusNoFound
 		return nil
 	}
 	if route.Split != nil {
@@ -106,6 +111,7 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 	if err != nil {
 		return err
 	}
+
 	defer func() {
 		if reader != nil {
 			_ = reader.Close()
@@ -117,9 +123,9 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 		return fmt.Errorf("reader was empty")
 	}
 	dataCopy := &Transfer{
+		rewriter: NewRewriter(route.Replace...),
 		Resource: route.Dest,
 		Reader:   reader,
-		Replace:  route.Replace,
 		Dest:     NewDatafile(destURL, destCompression)}
 	return s.transfer(ctx, dataCopy, response)
 }
@@ -143,7 +149,8 @@ func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, r
 	}()
 	counter := int32(0)
 	waitGroup := &sync.WaitGroup{}
-	err = Split(reader, s.chunkWriter(ctx, request.URL, route, &counter, waitGroup, response), route.Split.MaxLines)
+	rewriter := NewRewriter(route.Replace...)
+	err = Split(reader, s.chunkWriter(ctx, request.URL, route, &counter, waitGroup, response), route.Split, rewriter)
 	if err == nil {
 		waitGroup.Wait()
 	}
@@ -172,7 +179,7 @@ func (s *service) publish(ctx context.Context, transfer *Transfer, response *Res
 	switch s.config.SourceScheme {
 	case gs.Scheme:
 		attributes := make(map[string]interface{})
-		attributes["Dest"] = transfer.Dest.URL
+		attributes[base.DestAttribute] = transfer.Dest.URL
 		messageIDs, err := s.msgbus.Publish(ctx, transfer.Resource.Topic, data, attributes)
 		if err != nil {
 			return err
@@ -208,7 +215,7 @@ func (s *service) Init(ctx context.Context) error {
 	return s.UpdateResources(ctx)
 }
 
-//UpdateResources udpates resources
+//UpdateResources updates resources
 func (s *service) UpdateResources(ctx context.Context) error {
 	resources, err := s.config.Resources(ctx, s.fs)
 	if err != nil {
@@ -229,7 +236,7 @@ func (s *service) UpdateResources(ctx context.Context) error {
 	return nil
 }
 
-func (s *service) chunkWriter(ctx context.Context,  URL string, route *config.Route, counter *int32, waitGroup *sync.WaitGroup, response *Response) func() io.WriteCloser {
+func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Route, counter *int32, waitGroup *sync.WaitGroup, response *Response) func() io.WriteCloser {
 	return func() io.WriteCloser {
 		splitCount := atomic.AddInt32(counter, 1)
 		destName := route.Split.Name(route, URL, splitCount)
@@ -242,7 +249,6 @@ func (s *service) chunkWriter(ctx context.Context,  URL string, route *config.Ro
 			defer waitGroup.Done()
 			dataCopy := &Transfer{
 				Resource: route.Dest,
-				Replace:  route.Replace,
 				Reader:   writer.Reader,
 				Dest:     NewDatafile(destURL, nil),
 			}

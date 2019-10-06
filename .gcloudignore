@@ -16,3 +16,4 @@ images/
 .DS_Store
 *.zip
 smirror
+local_test.go

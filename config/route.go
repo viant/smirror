@@ -12,6 +12,7 @@ import (
 
 //Route represent matching resource route rule
 type Route struct {
+	Info    Info
 	Dest    *Resource
 	Source  *Resource
 	Replace []*Replace `json:",omitempty"`
