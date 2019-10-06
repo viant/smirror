@@ -7,10 +7,10 @@ const (
 )
 
 //IsNotFound returns true if not found error
-func IsNotFound(err error) bool {
-	if err == nil {
+func IsNotFound(message string) bool {
+	if message == "" {
 		return false
 	}
-	message := strings.Replace(strings.ToLower(err.Error()), " ", "", len(err.Error()))
+	message = strings.Replace(strings.ToLower(message), " ", "", len(message))
 	return strings.Contains(message, notFoundMessage)
 }
