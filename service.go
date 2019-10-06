@@ -16,7 +16,6 @@ import (
 	"smirror/msgbus"
 	"smirror/msgbus/pubsub"
 	"smirror/secret"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -41,7 +40,7 @@ func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 	response.TriggeredBy = request.URL
 	err := s.mirror(ctx, request, response)
 	if err != nil {
-		if strings.Contains(err.Error(), "not found") {
+		if IsNotFound(err) {
 			response.Status = base.StatusNoFound
 			response.Error = ""
 		} else {
