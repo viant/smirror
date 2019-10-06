@@ -43,10 +43,11 @@ func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			response.Status = base.StatusNoFound
+			response.Error = ""
 		} else {
 			response.Status = base.StatusError
+			response.Error = err.Error()
 		}
-		response.Error = err.Error()
 	}
 	response.TotalRules = len(s.config.Mirrors.Rules)
 	response.TimeTakenMs = int(time.Now().Sub(response.startTime) / time.Millisecond)
