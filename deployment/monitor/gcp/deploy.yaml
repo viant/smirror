@@ -1,6 +1,6 @@
 
 init:
-  appPath: /tmp/smirror
+  appPath: /tmp/smonitor
   functionName: StorageMonitor
   gcpCredentials: viant-dataflow
   gcp: ${secrets.$gcpCredentials}
@@ -32,6 +32,7 @@ pipeline:
     upload:
       action: gcp/cloudfunctions:deploy
       credentials: $gcpCredentials
+      public: true
       '@name': $functionName
       entryPoint: $functionName
       runtime: go111

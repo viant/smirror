@@ -546,6 +546,11 @@ curl -d @monitor.json -X POST  -H "Content-Type: application/json"  $monitorEndp
 }
 ```
 
+_where:_
+- **UnprocessedDuration** - check for any unprocessed data file over specified time
+- **ErrorRecency** - specified errors within specified time
+
+
 ## Limitation
 
 This project uses serverless stack, so any transfer exceeded memory  
