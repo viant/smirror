@@ -45,7 +45,6 @@ func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 		response.Error = err.Error()
 	}
 
-
 	if IsNotFound(response.Error) {
 		response.Status = base.StatusNoFound
 		response.Error = ""
@@ -178,12 +177,17 @@ func (s *service) publish(ctx context.Context, transfer *Transfer, response *Res
 	if err != nil {
 		return err
 	}
+
 	switch s.config.SourceScheme {
 	case gs.Scheme:
 		attributes := make(map[string]interface{})
 		attributes[base.DestAttribute] = transfer.Dest.URL
+
 		messageIDs, err := s.msgbus.Publish(ctx, transfer.Resource.Topic, data, attributes)
 		if err != nil {
+			if IsNotFound(err.Error()) {
+				return errors.Errorf("failed to publish data, no such topic: %v", transfer.Resource.Topic)
+			}
 			return err
 		}
 		response.MessageIDs = append(response.MessageIDs, messageIDs...)
@@ -230,7 +234,7 @@ func (s *service) UpdateResources(ctx context.Context) error {
 	}
 	if s.config.UseMessageDest() && s.msgbus == nil {
 		if s.config.SourceScheme == gs.Scheme {
-			if s.msgbus, err = pubsub.New(ctx); err != nil {
+			if s.msgbus, err = pubsub.New(ctx, s.config.ProjectID); err != nil {
 				return errors.Wrapf(err, "unable to create publisher for %v", s.config.SourceScheme)
 			}
 		}
