@@ -1,0 +1,9 @@
+{
+  "ConfigURL":    "gs://${gcp.projectId}_config/StorageMirror/config.json",
+
+  "TriggerURL":   "gs://${gcp.projectId}_trigger",
+  "UnprocessedDuration": "2hoursAgo",
+
+  "ErrorURL":     "gs://${gcp.projectId}_operation/StorageMirror/errors/",
+  "ErrorRecency": "3hourAgo"
+}
