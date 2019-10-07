@@ -45,6 +45,7 @@ This project provide serverless implementation for cloud storage mirror. All ext
 To mirror data from google storage that match /data/ prefix and '.csv.gz' suffix to s3://destBucket/data
 preserving parent folder (folderDepth:1) the following configuration can be used with Mirror cloud function
 
+
 [@gs://sourceBucket/config/config.json](usage/gs_to_s3/config.json)
 ```json
 {

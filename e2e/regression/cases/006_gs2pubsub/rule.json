@@ -5,6 +5,7 @@
       "Suffix": ".csv"
     },
     "Dest": {
+
       "Topic": "smirrorTopic"
     },
     "Split": {

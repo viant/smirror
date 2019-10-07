@@ -4,16 +4,23 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/pkg/errors"
+	"log"
 	"net/http"
 	"smirror/mon"
 )
 
 //StorageMonitor cloud function entry point
 func StorageMonitor(w http.ResponseWriter, r *http.Request) {
+	if r.ContentLength > 0 {
+		defer func() {
+			_ = r.Body.Close()
+		}()
+	}
 	err := checkStorage(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
 }
 
 func checkStorage(writer http.ResponseWriter, httpRequest *http.Request) error {
@@ -26,5 +33,8 @@ func checkStorage(writer http.ResponseWriter, httpRequest *http.Request) error {
 		return err
 	}
 	response := service.Check(context.Background(), request)
-	return json.NewEncoder(writer).Encode(response)
+	if err =  json.NewEncoder(writer).Encode(response);err != nil {
+		log.Fatal(err)
+	}
+	return nil
 }

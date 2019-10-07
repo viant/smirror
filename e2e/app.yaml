@@ -2,10 +2,12 @@ init:
   fnAppPath: $Pwd(..)
   mirrorAppZip: $Pwd(../aws/smirror.zip)
   mirrorCronZip: $Pwd(../cron/aws/smirrorcron.zip)
+  mirrorSqsZip: $Pwd(../aws/sqs/smirrorsqs.zip)
   functionName: StorageMirror
-  cronFunctionName: StorageMirrorCron
-  privilegePolicy1: privilege-policy1.json
-  privilegePolicy2: privilege-policy2.json
+  privilegePolicy: privilege-policy.json
+  privilegePolicyCron: privilege-policy-cron.json
+  privilegePolicySQS: privilege-policy-sqs.json
+
 
 pipeline:
   package:
@@ -25,77 +27,102 @@ pipeline:
       - cd ../cron/aws
       - go build -o smirrorcron
       - zip -j smirrorcron.zip smirrorcron
+      - cd ../../aws/sqs
+      - go build -o smirrorsqs
+      - zip -j smirrorsqs.zip smirrorsqs
 
-  deployCludFunction:
-    action: gcp/cloudfunctions:deploy
-    credentials: $gcpCredentials
-    '@name': $functionName
-    entryPoint: StorageMirror
-    serviceAccount: ${gcp.serviceAccount}
-    runtime: go111
-    availableMemoryMB: 256
-    eventTrigger:
-      eventType: google.storage.object.finalize
-      resource: projects/_/buckets/${gsTriggerBucket}
-    environmentVariables:
-      LOGGING: 'true'
-      CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
-    source:
-      URL: ${fnAppPath}/
-    sleepTimeMs: 5000
+#
+#  deployCludFunction:
+#    action: gcp/cloudfunctions:deploy
+#    credentials: $gcpCredentials
+#    '@name': $functionName
+#    entryPoint: StorageMirror
+#    serviceAccount: ${gcp.serviceAccount}
+#    runtime: go111
+#    availableMemoryMB: 256
+#    eventTrigger:
+#      eventType: google.storage.object.finalize
+#      resource: projects/_/buckets/${gsTriggerBucket}
+#    environmentVariables:
+#      LOGGING: 'true'
+#      CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
+#    source:
+#      URL: ${fnAppPath}/
+#    sleepTimeMs: 5000
 
-  deployLambda:
+#  deployLambda:
+#    action: aws/lambda:deploy
+#    credentials: $awsCredentials
+#    functionname: $functionName
+#    runtime:  go1.x
+#    handler: smirror
+#    timeout: 360
+#    environment:
+#      variables:
+#        LOGGING: 'true'
+#        CONFIG: s3://${s3ConfigBucket}/StorageMirror/config.json
+#    code:
+#      zipfile: $LoadBinary(${mirrorAppZip})
+#    rolename: lambda-${functionName}-executor
+#    define:
+#      - policyname: kms-${functionName}-role
+#        policydocument: $Cat('${privilegePolicy}')
+#    attach:
+#      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+#
+#  setTrigger:
+#    action: aws/s3:setupBucketNotification
+#    sleepTimeMs: 20000
+#    bucket: ${s3TriggerBucket}
+#    lambdaFunctionConfigurations:
+#      - functionName: $functionName
+#        id: ObjectCreatedEvents
+#        events:
+#          - s3:ObjectCreated:*
+#        filter:
+#          prefix:
+#            - data
+
+
+  deployStorageMirrorSqs:
     action: aws/lambda:deploy
     credentials: $awsCredentials
-    functionname: $functionName
+    functionname: ${functionName}SQS
     runtime:  go1.x
-    handler: smirror
-    timeout: 360
-    environment:
-      variables:
-        LOGGING: 'true'
-        CONFIG: s3://${s3ConfigBucket}/StorageMirror/config.json
+    handler: smirrorsqs
     code:
-      zipfile: $LoadBinary(${mirrorAppZip})
-    rolename: lambda-${functionName}-executor
+      zipfile: $LoadBinary(${mirrorSqsZip})
+    rolename: lambda-${functionName}SQS-executor
     define:
-      - policyname: kms-${functionName}-role
-        policydocument: $Cat('${privilegePolicy1}')
+      - policyname: sqs-my-queue-role
+        policydocument: $Cat('${privilegePolicySQS}')
     attach:
       - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    triggers:
+      - source: StorageMirror
+        type: sqs
+        enabled: true
+        batchSize: 2
 
-  setTrigger:
-    action: aws/s3:setupBucketNotification
-    sleepTimeMs: 20000
-    bucket: ${s3TriggerBucket}
-    lambdaFunctionConfigurations:
-      - functionName: $functionName
-        id: ObjectCreatedEvents
-        events:
-          - s3:ObjectCreated:*
-        filter:
-          prefix:
-            - data
-
-
-  deployCronLambad:
-    action: aws/lambda:deploy
-    credentials: $awsCredentials
-    functionname: $cronFunctionName
-    runtime:  go1.x
-    handler: smirrorcron
-    timeout: 360
-    environment:
-      variables:
-        LOGGING: 'true'
-        CONFIG: s3://${s3ConfigBucket}/StorageMirrorCron/config.json
-    code:
-      zipfile: $LoadBinary(${mirrorCronZip})
-    schedule:
-      expression: rate(1 minute)
-    rolename: ${cronFunctionName}-executor
-    define:
-      - policyname: ${cronFunctionName}-role
-        policydocument: $Cat('${privilegePolicy2}')
-    attach:
-      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+#
+#  deployCronLambad:
+#    action: aws/lambda:deploy
+#    credentials: $awsCredentials
+#    functionname: ${functionName}Cron
+#    runtime:  go1.x
+#    handler: smirrorcron
+#    timeout: 360
+#    environment:
+#      variables:
+#        LOGGING: 'true'
+#        CONFIG: s3://${s3ConfigBucket}/StorageMirrorCron/config.json
+#    code:
+#      zipfile: $LoadBinary(${mirrorCronZip})
+#    schedule:
+#      expression: rate(1 minute)
+#    rolename: ${functionName}Cron-executor
+#    define:
+#      - policyname: ${functionName}Cron-role
+#        policydocument: $Cat('${privilegePolicyCron}')
+#    attach:
+#      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole

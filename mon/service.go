@@ -106,7 +106,7 @@ func (s *service) loadRoutes(ctx context.Context, URL string) (*Routes, error) {
 func (s *service) checkProcessed(ctx context.Context, request *Request, response *Response) error {
 	routes, err := s.loadRoutes(ctx, request.ConfigURL)
 	if err != nil {
-		return errors.Wrapf(err, "failed to load routes: %v", request.ConfigURL)
+		return errors.Wrapf(err, "failed to load routes: configf from URL :%v", request.ConfigURL)
 	}
 	if err := routes.Mirrors.Init(ctx, s.fs, ""); err != nil {
 		return err
