@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	flambda "github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	flambda "github.com/aws/aws-sdk-go/service/lambda"
 	"log"
 	"os"
 )

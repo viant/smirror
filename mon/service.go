@@ -85,6 +85,9 @@ func (s *service) checkErrors(ctx context.Context, request *Request, response *R
 		if err != nil {
 			return err
 		}
+		if len(message) > 150 {
+			message = message[:150]
+		}
 		response.AddError(object, string(message))
 	}
 	response.ErrorCount = len(response.Errors)
