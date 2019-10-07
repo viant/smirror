@@ -1,22 +1,22 @@
-
 init:
+
+  '!gcpCredentials': $params.authWith
   appPath: /tmp/smirror
   functionName: StorageMirror
-  gcpCredentials: viant-dataflow
+
   gcp: ${secrets.$gcpCredentials}
-  projectID: $gcp.ProjectID
+  gcpProject: $gcp.ProjectID
   serviceAccount: $gcp.ClientEmail
 
 
 
-  gsConfigBucket: viant_dataflow_config
-  gsTriggerBucket: viant_dataflow_trigger
-  gsOpsBucket: viant_dataflow_operation
-  gsDestBucket: viant_dataflow_mirrored
+  gsConfigBucket: ${gcpProject}_config
+  gsTriggerBucket: ${gcpProject}_trigger
+  gsOpsBucket: ${gcpProject}_operation
+  gsDestBucket: ${gcpProject}_mirrored
   
   configLocation: config/config.json
   configText: $Cat('$configLocation')
-
 
 pipeline:
 

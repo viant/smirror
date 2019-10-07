@@ -240,74 +240,12 @@ The following are used by storage mirror services:
 
 - _$configBucket_: bucket storing storage mirror configuration and mirror rules
 - _$triggerBucket_: bucket storing data that needs to be mirror, event triggered by GCP
-- _$opsBucket_: bucker string error, processed mirrors 
+- _$operationBucket_: bucker string error, processed mirrors
 -  config:Mirrors.BaseURL: location storing routes rules as JSON Array
-
 
 The following [Deployment](deployment/mirror/README.md) details storage mirror generic deployment.
 
 
-#### Google Cloud Function 
-
-- With **endly cli**
-
-```bash
-endly deploy
-```
-
-[@deploy.yaml](usage/deploy/gcp/deploy.yaml)
-```yaml
-init:
-  appPath: $Pwd(../..)
-  gsTriggerBucket: ${s3TriggerBucket}
-
-pipeline:
-
-  package:
-    action: exec:run
-    target: $target
-    commands:
-      - unset GOPATH
-      - cd ${appPath}
-      - export GO111MODULE=on
-      - go mod vendor
-
-  deploy:
-    action: gcp/cloudfunctions:deploy
-    credentials: gcp-e2e
-    '@name': StorageMirror
-    entryPoint: StorageMirror
-    runtime: go111
-    availableMemoryMb: 2048
-    timeout: 540s
-    eventTrigger:
-      eventType: google.storage.object.finalize
-      resource: projects/_/buckets/${gsTriggerBucket}
-    environmentVariables:
-      LOGGING: 'true'
-      CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
-    source:
-      URL: ${appPath}/
-    sleepTimeMs: 5000
-```
-
-
-
-- With **gcloud cli**
-
-```bash
-unset GOPATH
-export GO111MODULE=on
-go mod vendor
-
-gcloud functions deploy MyGsBucketToS3Mirror --entry-point StorageMirror \ 
-    --trigger-resource ${gsTriggerBucket} 
-    --trigger-event google.storage.object.finalize \
-    --set-env-vars=LOGGING=true,CONFIG=gs://gsTriggerBucket/mirror/config/gs.json \
-    --memory=512M \
-    --timeout=540s \
-    --runtime=go111 
-```
 
 
 
@@ -321,70 +259,6 @@ endly deploy
 ```
 
 [@deploy.yaml](usage/deploy/aws/deploy.yaml)
-```yaml
-init:
-  appPath: $Pwd(/tmp/smirror)
-  gsTriggerBucket: mys3TriggerBucket
-  s3ConfigBucket: mys3ConfigBucket
-  codeZip: ${appPath}/aws/smirror.zip
-  functionName: StorageMirror
-  privilegePolicy: privilege-policy.json
-  awsCredentials: aws-e2e
-
-pipeline:
-  checkOut:
-    action: vc/git:checkout
-    Origin:
-      URL: https://github.com/viant/smirror.git
-
-  package:
-    action: exec:run
-    target: $target
-    checkError: true
-    commands:
-      - cd ${appPath}
-      - unset GOPATH
-      - export GO111MODULE=on
-      - go mod vendor
-      - export GOOS=linux
-      - export GOARCH=amd64
-      - cd aws
-      - go build -o smirror
-      - zip -j smirror.zip smirror
-
-  deploy:
-    action: aws/lambda:deploy
-    credentials: $awsCredentials
-    functionname: $functionName
-    runtime:  go1.x
-    handler: smirror
-    timeout: 360
-    environment:
-      variables:
-        LOGGING: 'true'
-        CONFIG: s3://${s3ConfigBucket}/StorageMirror/mirror.json
-    code:
-      zipfile: $LoadBinary(${codeZip})
-    rolename: lambda-${functionName}-executor
-    define:
-      - policyname: kms-${functionName}-role
-        policydocument: $Cat('${privilegePolicy}')
-    attach:
-      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-
-  setTrigger:
-    action: aws/s3:setupBucketNotification
-    sleepTimeMs: 20000
-    bucket: ${s3TriggerBucket}
-    lambdaFunctionConfigurations:
-      - functionName: $functionName
-        id: ObjectCreatedEvents
-        events:
-          - s3:ObjectCreated:*
-        filter:
-          prefix:
-            - data
-```
 
 Where lambda uses permissions defined in [@privilege-policy.json](usage/deploy/aws/privilege-policy.json)
 
@@ -393,8 +267,6 @@ Where lambda uses permissions defined in [@privilege-policy.json](usage/deploy/a
 
 - With **sam cli**
 -[Serverless-deploying](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-deploying.html)
-
-
 
 
 
@@ -569,6 +441,8 @@ cd smirror/e2e
 ### Update mirrors bucket for both S3, Google Storage in e2e/run.yaml (gsTriggerBucket, s3TriggerBucket)
 endly 
 ```
+
+
 
 ## Code Coverage
 

@@ -1,12 +1,16 @@
 init:
   gcpCredentials: viant-dataflow
-  gsConfigBucket: viant_dataflow_config
-  gsTriggerBucket: viant_dataflow_trigger
-  gsOpsBucket: viant_dataflow_operation
-  gsDestBucket: viant_dataflow_mirrored
-  s3DestBucket: ms-e2e-storagemirror-outbound
+
+
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
+
+
+  gsConfigBucket: ${gcpProject}_config
+  gsTriggerBucket: ${gcpProject}_trigger
+  gsOpsBucket: ${gcpProject}_operation
+  gsDestBucket: ${gcpProject}_mirrored
+  s3DestBucket: ms-e2e-storagemirror-outbound
 
 
 pipeline:

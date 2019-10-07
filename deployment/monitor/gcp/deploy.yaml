@@ -1,8 +1,8 @@
-
 init:
+
+  '!gcpCredentials': $params.authWith
   appPath: /tmp/smonitor
   functionName: StorageMonitor
-  gcpCredentials: viant-dataflow
   gcp: ${secrets.$gcpCredentials}
   serviceAccount: $gcp.ClientEmail
 
