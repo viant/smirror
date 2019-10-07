@@ -22,31 +22,35 @@ func (s *service) topicInProject(topic string) string {
 }
 
 //Publish publishes data to message bus
-func (s *service) Publish(ctx context.Context, topic string, data []byte, attributes map[string]interface{}) ([]string, error) {
-	request := &pubsub.PublishRequest{
+func (s *service) Publish(ctx context.Context, request *msgbus.Request) (*msgbus.Response, error) {
+	response := &msgbus.Response{MessageIDs:make([]string, 0)}
+	return response, s.publish(ctx, request, response)
+}
+
+func (s *service) publish(ctx context.Context, request *msgbus.Request, response *msgbus.Response)  error {
+	publishRequest := &pubsub.PublishRequest{
 		Messages: []*pubsub.PubsubMessage{
 			{
-				Data: base64.StdEncoding.EncodeToString(data),
+				Data: base64.StdEncoding.EncodeToString(request.Data),
 			},
 		},
 	}
-
-	if len(attributes) > 0 {
-		request.Messages[0].Attributes = make(map[string]string)
-		for k, v := range attributes {
-			request.Messages[0].Attributes[k] = fmt.Sprintf("%s", v)
+	if len(request.Attributes) > 0 {
+		publishRequest.Messages[0].Attributes = make(map[string]string)
+		for k, v := range request.Attributes {
+			publishRequest.Messages[0].Attributes[k] = fmt.Sprintf("%s", v)
 		}
 	}
 
-	topic = s.topicInProject(topic)
-	publish := pubsub.NewProjectsService(s.Service).Topics.Publish(topic, request)
+	topic := s.topicInProject(request.Dest)
+	publishCall := pubsub.NewProjectsService(s.Service).Topics.Publish(topic, publishRequest)
 
-	publish.Context(ctx)
-	response, err := publish.Do()
-	if err != nil {
-		return nil, err
+	publishCall.Context(ctx)
+	callResponse,  err := publishCall.Do()
+	if err == nil {
+		response.MessageIDs = callResponse.MessageIds
 	}
-	return response.MessageIds, nil
+	return err
 }
 
 //New creates a service
