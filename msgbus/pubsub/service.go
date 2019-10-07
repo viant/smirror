@@ -23,11 +23,11 @@ func (s *service) topicInProject(topic string) string {
 
 //Publish publishes data to message bus
 func (s *service) Publish(ctx context.Context, request *msgbus.Request) (*msgbus.Response, error) {
-	response := &msgbus.Response{MessageIDs:make([]string, 0)}
+	response := &msgbus.Response{MessageIDs: make([]string, 0)}
 	return response, s.publish(ctx, request, response)
 }
 
-func (s *service) publish(ctx context.Context, request *msgbus.Request, response *msgbus.Response)  error {
+func (s *service) publish(ctx context.Context, request *msgbus.Request, response *msgbus.Response) error {
 	publishRequest := &pubsub.PublishRequest{
 		Messages: []*pubsub.PubsubMessage{
 			{
@@ -46,7 +46,7 @@ func (s *service) publish(ctx context.Context, request *msgbus.Request, response
 	publishCall := pubsub.NewProjectsService(s.Service).Topics.Publish(topic, publishRequest)
 
 	publishCall.Context(ctx)
-	callResponse,  err := publishCall.Do()
+	callResponse, err := publishCall.Do()
 	if err == nil {
 		response.MessageIDs = callResponse.MessageIds
 	}
