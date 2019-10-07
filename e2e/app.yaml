@@ -20,7 +20,7 @@ pipeline:
       - export GOARCH=amd64
       - go mod vendor
       - cd aws
-      - go build -o smirror
+      - go build smirror.go
       - zip -j smirror.zip smirror
       - cd ../cron/aws
       - go build -o smirrorcron

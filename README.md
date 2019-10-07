@@ -244,8 +244,7 @@ The following are used by storage mirror services:
 -  config:Mirrors.BaseURL: location storing routes rules as JSON Array
 
 
-
-The following [Deployment](deployment/README.md) details generic deployment.
+The following [Deployment](deployment/mirror/README.md) details storage mirror generic deployment.
 
 
 #### Google Cloud Function 
@@ -524,11 +523,34 @@ pipeline:
 ```
 
 
+## Monitoring 
+
+[StorageMonitor](mon) can be used to monitor trigger and error buckets.
 
 
+
+```bash
+curl -d @monitor.json -X POST  -H "Content-Type: application/json"  $monitorEndpoint
+```
+
+[@monitor.json](usage/monitor.json)
+```json
+{
+  "ConfigURL":    "gs://${gcp.projectId}_config/StorageMirror/config.json",
+
+  "TriggerURL":   "gs://${gcp.projectId}_trigger",
+  "UnprocessedDuration": "2hoursAgo",
+
+  "ErrorURL":     "gs://${gcp.projectId}_operation/StorageMirror/errors/",
+  "ErrorRecency": "3hourAgo"
+}
+```
+
+## Limitation
+
+This project uses serverless stack, so any transfer exceeded memory  
 
 ## End to end testing
-
 
 ### Prerequisites:
 
@@ -536,17 +558,12 @@ pipeline:
   - [Google secrets](https://github.com/viant/endly/tree/master/doc/secrets#google-cloud-credentials) for dedicated e2e project  ~/.secret/gcp-e2e.json 
   - [AWS secrets](https://github.com/viant/endly/tree/master/doc/secrets#asw-credentials) for dedicated e2e account ~/.secret/aws-e2e.json 
 
-
 ```bash
 git clone https://github.com/viant/smirror.git
 cd smirror/e2e
 ### Update mirrors bucket for both S3, Google Storage in e2e/run.yaml (gsTriggerBucket, s3TriggerBucket)
 endly 
 ```
-
-
-## Monitoring and limitation
-
 
 ## Code Coverage
 
@@ -561,10 +578,8 @@ The source code is made available under the terms of the Apache License, Version
 Individual files may be made available under their own specific license,
 all compatible with Apache License, Version 2. Please see individual files for details.
 
-
 <a name="Credits-and-Acknowledgements"></a>
 
 ## Credits and Acknowledgements
 
 **Library Author:** Adrian Witas
-

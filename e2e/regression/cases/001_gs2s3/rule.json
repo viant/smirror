@@ -17,7 +17,6 @@
         "URL": "gs://${gsOpsBucket}/StorageMirror/processed/"
       }
     ],
-
     "OnFailure": [
       {
         "Action": "move",

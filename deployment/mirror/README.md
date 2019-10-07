@@ -19,7 +19,7 @@ The following google storage layout is used:
 
 This bucket stores all configuration files:
 
-**${gsConfigBucket}:**
+**${ConfigBucket}:**  
 
 ```bash
     /
@@ -31,7 +31,7 @@ This bucket stores all configuration files:
         
 ```            
 
-Name candidates: ${prefix}-config
+
 
 Where:
 
@@ -80,28 +80,26 @@ and routes files store JSON array with process routes.
 ```
 
 
-##### Operational bucket
+##### Operation bucket
 
 This bucket stores all processed, error files. 
 
-**${gsOpsBucket}:**
+**${OpsBucket}:**
 
 ```bash
     /
     | - StorageMirror
     |      |- errors
     |      |- processed
-        
+    |      |- replayed
+       
 ```            
-
-Name candidates: ${prefix}-ops
-
 
 ##### Trigger bucket (inbound) 
 
 This bucket stores all data that needs to be mirror 
 
-**${gsTriggerBucket}**
+**${TriggerBucket}**
 
 
 
@@ -112,14 +110,14 @@ This bucket stores all data that needs to be mirror
                 |- dataXXX.csv.gz 
 ```    
 
-Name candidates: ${prefix}-storagemirror-inbound
+
 
 
 ##### Mirrored bucket (outbound) 
 
 This bucket stores all data that was mirrored from other cloud storage 
 
-**${gsDestBucket}**
+**${DestBucket}**
 
 
 ```bash
@@ -129,4 +127,4 @@ This bucket stores all data that was mirrored from other cloud storage
                 |- dataXXX.csv.gz 
 ```    
 
-Name candidates: ${prefix}-storagemirror-outbound
+
