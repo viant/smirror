@@ -17,7 +17,7 @@
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs://myProject-smirro-ops/data/errors/"
+        "URL": "gs://${gcpProject}_operations/data/errors/"
       }
     ],
     "Codec": "gzip",

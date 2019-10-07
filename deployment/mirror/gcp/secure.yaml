@@ -1,11 +1,12 @@
 init:
-  gcpCredentials: viant-dataflow
+  '!gcpCredentials': $params.authWith
   gcp: ${secrets.$gcpCredentials}
-  projectID: $gcp.ProjectID
+  gcpProject: $gcp.ProjectID
   serviceAccount: $gcp.ClientEmail
-  gsConfigBucket: viant_dataflow_config
+  gsConfigBucket: ${gcpProject}_config
   awsCredentials: aws-e2e
   s3Secrets: ${secrets.$awsCredentials}
+
 
 pipeline:
 
@@ -25,14 +26,12 @@ pipeline:
     action: print
     message: $AsString($s3Secrets)
 
-
   encryptS3Credentials:
     action: gcp/kms:encrypt
     ring: storagemirror_ring
     key: storagemirror
     plainData: $AsJSON($s3Secrets)
     dest:
-      URL: gs://${gsConfigBucket}/Secrets/s3-myspace.json.enc
+      URL: gs://${gsConfigBucket}/Secrets/s3-ms.json.enc
       credentials: ${gcpCredentials}
     logging: false
-

@@ -7,7 +7,7 @@
     "Dest": {
       "URL": "s3://${s3DestBucket}/testdata",
       "Credentials": {
-        "URL": "gs://${gsConfigBucket}/Secrets/s3-myspace.json.enc",
+        "URL": "gs://${gsConfigBucket}/Secrets/s3-ms.json.enc",
         "Key": "projects/${gcpProject}/locations/us-central1/keyRings/storagemirror_ring/cryptoKeys/storagemirror"
       }
     },

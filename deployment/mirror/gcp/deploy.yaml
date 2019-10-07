@@ -1,15 +1,12 @@
 init:
 
   '!gcpCredentials': $params.authWith
-  appPath: /tmp/smirror
-  functionName: StorageMirror
-
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
   serviceAccount: $gcp.ClientEmail
 
-
-
+  appPath: /tmp/smirror
+  functionName: StorageMirror
   gsConfigBucket: ${gcpProject}_config
   gsTriggerBucket: ${gcpProject}_trigger
   gsOpsBucket: ${gcpProject}_operation
