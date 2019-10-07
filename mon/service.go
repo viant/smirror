@@ -10,6 +10,7 @@ import (
 	"github.com/viant/afs/storage"
 	"io/ioutil"
 	"smirror/base"
+	"strings"
 	"time"
 )
 
@@ -76,17 +77,22 @@ func (s *service) checkErrors(ctx context.Context, request *Request, response *R
 		if object.IsDir() {
 			continue
 		}
-		reader, err := s.fs.Download(ctx, object)
-		if err != nil {
-			return err
-		}
-		message, err := ioutil.ReadAll(reader)
-		_ = reader.Close()
-		if err != nil {
-			return err
-		}
-		if len(message) > 150 {
-			message = message[:150]
+
+		hasErrorMessage := strings.HasSuffix(object.URL(), "-error")
+		message := []byte{}
+		if hasErrorMessage {
+			reader, err := s.fs.Download(ctx, object)
+			if err != nil {
+				return err
+			}
+			message, err := ioutil.ReadAll(reader)
+			_ = reader.Close()
+			if err != nil {
+				return err
+			}
+			if len(message) > 150 {
+				message = message[:150]
+			}
 		}
 		response.AddError(object, string(message))
 	}
