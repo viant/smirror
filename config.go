@@ -36,7 +36,7 @@ func (c *Config) Init(ctx context.Context, fs afs.Service) (err error) {
 //UseMessageDest returns true if any routes uses message bus
 func (c *Config) UseMessageDest() bool {
 	for _, resource := range c.Mirrors.Rules {
-		if resource.Dest.Topic != "" {
+		if resource.Dest.Topic != "" || resource.Dest.Queue != "" {
 			return true
 		}
 	}
