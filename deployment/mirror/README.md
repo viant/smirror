@@ -46,9 +46,10 @@ Where:
 
 ```json
 {
-
-  "CheckInMs": 60000,
-  "BaseURL": "gs://${configBucket}/StorageMirror/dataflow/"
+  "Mirrors": {
+    "BaseURL": "gs://${gsConfigBucket}/StorageMirror/dataflow",
+    "CheckInMs": 60000
+  }
 }
 ```
 
@@ -58,30 +59,40 @@ and routes files store JSON array with process routes.
 ```json
 [
   {
-    "Source": { 
-      "Prefix": "/data/",
+    "Source": {
+      "Prefix": "/data/test",
       "Suffix": ".csv.gz"
     },
     "Dest": {
-      "URL": "s3://destBucket/data",
+      "URL": "s3://${s3DestBucket}/testdata",
       "Credentials": {
-        "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
-        "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
+        "URL": "gs://${gsConfigBucket}/Secrets/s3-ms.json.enc",
+        "Key": "projects/${gcpProject}/locations/us-central1/keyRings/storagemirror_ring/cryptoKeys/storagemirror"
       }
     },
+    "Replace": {
+      "10": "33333333"
+    },
+    "Codec": "gzip",
     "OnSuccess": [
       {
-        "Action": "delete"
+        "Action": "move",
+        "URL": "gs://${gsOpsBucket}/StorageMirror/processed/"
       }
     ],
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs://myProject-smirro-ops/data/errors/"
+        "URL": "gs://${gsOpsBucket}/StorageMirror/errors/"
       }
     ],
-    "Codec": "gzip",
-    "PreserveDepth": 1
+    "PreserveDepth": 2,
+    "Info": {
+      "Workflow": "My workflow name here",
+      "Description": "quick desciption",
+      "ProjectURL": "JIRA/WIKi or any link referece",
+      "LeadEngineer": "data flow requestor"
+    }
   }
 ]
 ```
@@ -146,7 +157,6 @@ endly authWith=myGCPSecretFile deploy.yaml
 ```
 _where:_
 - [@deploy.yaml](gcp/deploy.yaml)
-
 
 
 ###### deploy with gcloud

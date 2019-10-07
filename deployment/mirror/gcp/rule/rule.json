@@ -27,6 +27,12 @@
         "URL": "gs://${gsOpsBucket}/StorageMirror/errors/"
       }
     ],
-    "PreserveDepth": 2
+    "PreserveDepth": 2,
+    "Info": {
+      "Workflow": "My workflow name here",
+      "Description": "quick desciption",
+      "ProjectURL": "JIRA/WIKi or any link referece",
+      "LeadEngineer": "data flow requestor"
+    }
   }
 ]
