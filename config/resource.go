@@ -15,6 +15,7 @@ type Resource struct {
 	CustomKey   *CustomKey        `json:",omitempty"`
 	Credentials *auth.Credentials `json:",omitempty"`
 	Topic       string            `json:",omitempty"`
+	Queue       string            `json:",omitempty"`
 	//Optional pubsub project ID, otherwise it uses default one.
 	ProjectID string `json:",omitempty"`
 }
