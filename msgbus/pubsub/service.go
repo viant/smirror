@@ -56,7 +56,7 @@ func New(ctx context.Context, projectId string) (msgbus.Service, error) {
 		return nil, err
 	}
 	return &service{
-		projectID:projectId,
-		Service: srv,
+		projectID: projectId,
+		Service:   srv,
 	}, nil
 }
