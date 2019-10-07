@@ -3,7 +3,6 @@ package mon
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/matcher"
@@ -57,7 +56,10 @@ func (s *service) check(ctx context.Context, request *Request, response *Respons
 func (s *service) list(ctx context.Context, URL string, modifiedBefore, modifiedAfter *time.Time) ([]storage.Object, error) {
 	timeMatcher := matcher.NewModification(modifiedBefore, modifiedAfter)
 	recursive := option.NewRecursive(true)
-	fmt.Printf("listing: %v\n", URL)
+	exists, _ := s.fs.Exists(ctx, URL)
+	if !exists {
+		return []storage.Object{}, nil
+	}
 	return s.fs.List(ctx, URL, timeMatcher, recursive)
 }
 
