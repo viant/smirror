@@ -40,7 +40,7 @@ type Response struct {
 	Dataflows        []*Dataflow `json:",omitempty"`
 	Errors           []*Error    `json:",omitempty"`
 	Status           string
-	Error            string
+	Error            string `json:",omitempty"`
 	workflowMap      map[string]*Dataflow
 }
 
