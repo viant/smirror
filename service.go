@@ -8,6 +8,7 @@ import (
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
 	"github.com/viant/afsc/gs"
+	"github.com/viant/afsc/s3"
 	"io"
 	"io/ioutil"
 	"smirror/base"
@@ -15,6 +16,7 @@ import (
 	"smirror/job"
 	"smirror/msgbus"
 	"smirror/msgbus/pubsub"
+	"smirror/msgbus/sqs"
 	"smirror/secret"
 	"sync"
 	"sync/atomic"
@@ -182,15 +184,22 @@ func (s *service) publish(ctx context.Context, transfer *Transfer, response *Res
 	case gs.Scheme:
 		attributes := make(map[string]interface{})
 		attributes[base.DestAttribute] = transfer.Dest.URL
-
-		messageIDs, err := s.msgbus.Publish(ctx, transfer.Resource.Topic, data, attributes)
+		dest := transfer.Resource.Topic
+		if dest == "" {
+			dest = transfer.Resource.Queue
+		}
+		pubResponse, err := s.msgbus.Publish(ctx, &msgbus.Request{
+			Dest:       dest,
+			Data:       data,
+			Attributes: attributes,
+		})
 		if err != nil {
 			if IsNotFound(err.Error()) {
 				return errors.Errorf("failed to publish data, no such topic: %v", transfer.Resource.Topic)
 			}
 			return err
 		}
-		response.MessageIDs = append(response.MessageIDs, messageIDs...)
+		response.MessageIDs = append(response.MessageIDs, pubResponse.MessageIDs...)
 		return nil
 	}
 	return fmt.Errorf("unsupported message msgbus %v", s.config.SourceScheme)
@@ -232,11 +241,19 @@ func (s *service) UpdateResources(ctx context.Context) error {
 			return errors.Wrap(err, "failed to init resource secrets")
 		}
 	}
+
 	if s.config.UseMessageDest() && s.msgbus == nil {
-		if s.config.SourceScheme == gs.Scheme {
+		switch s.config.SourceScheme {
+		case gs.Scheme:
 			if s.msgbus, err = pubsub.New(ctx, s.config.ProjectID); err != nil {
-				return errors.Wrapf(err, "unable to create publisher for %v", s.config.SourceScheme)
+				return errors.Wrapf(err, "unable to create pubsub publisher for %v", s.config.SourceScheme)
 			}
+		case s3.Scheme:
+			if s.msgbus, err = sqs.New(ctx); err != nil {
+				return errors.Wrapf(err, "unable to create sqs publisher for %v", s.config.SourceScheme)
+			}
+		default:
+			return errors.Errorf("unsupported scheme for publisher: '%v'", s.config.SourceScheme)
 		}
 	}
 	return nil
@@ -249,7 +266,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rou
 		destURL := url.Join(route.Dest.URL, destName)
 		return NewWriter(route, func(writer *Writer) error {
 			if writer.Reader == nil {
-				return fmt.Errorf("writer reader was empty")
+				return fmt.Errorf("Writer reader was empty")
 			}
 			waitGroup.Add(1)
 			defer waitGroup.Done()
