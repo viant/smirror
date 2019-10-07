@@ -25,6 +25,9 @@ type Action struct {
 
 //DestURL returns destination URL
 func (a Action) DestURL(relativePath string) string {
+	if strings.Contains(relativePath, "://") {
+		_, relativePath = url.Base(relativePath, "file")
+	}
 	return url.Join(a.URL, relativePath)
 }
 
