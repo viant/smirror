@@ -15,7 +15,6 @@ import (
 
 //Service represents monitoring service
 type Service interface {
-
 	//Check checks un process file and mirror errors
 	Check(context.Context, *Request) *Response
 }
@@ -32,6 +31,11 @@ func (s *service) Check(ctx context.Context, request *Request) *Response {
 	if err != nil {
 		response.Error = err.Error()
 		response.Status = base.StatusError
+	} else if response.UnprocessedCount > 0 {
+		response.Status = base.StatusUnProcess
+	} else if len(response.Errors) > 0 {
+		response.Status = base.StatusError
+		response.Error = response.Errors[0].Message
 	}
 	return response
 }

@@ -9,6 +9,10 @@ const (
 	StatusNoMatch = "noMatch"
 	//StatusNoFound status no found
 	StatusNoFound = "notFound"
+
+	//StatusUnProcess status un processed file
+	StatusUnProcess = "unprocessed"
+
 	//DestAttribute dest attribute
 	DestAttribute = "Dest"
 

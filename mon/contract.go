@@ -32,10 +32,10 @@ type Request struct {
 
 //Response represents monitoring response
 type Response struct {
-	MaxDelayInSec    int
 	UnprocessedCount int
-	ProcessCount     int
-	ProcessedBytes   int
+	MaxDelayInSec    int `json:",omitempty"`
+	ProcessCount     int `json:",omitempty"`
+	ProcessedBytes   int `json:",omitempty"`
 	ErrorCount       int
 	Dataflows        []*Dataflow `json:",omitempty"`
 	Errors           []*Error    `json:",omitempty"`
