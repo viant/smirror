@@ -8,6 +8,7 @@
 -[Deployment](#deployment)
     - [Google Cloud Function](#google-cloud-function)
 
+
 The following document describes global shared storage mirror deployments for various data transfer processes, with one
 SMirror lambda and cloud functions per bucket.
 
@@ -26,7 +27,7 @@ The following google storage layout is used for universal deployment
 
 This bucket stores all configuration files:
 
-**${ConfigBucket}:**  
+**${configBucket}:**  
 
 ```bash
     /
@@ -47,7 +48,7 @@ Where:
 ```json
 {
   "Mirrors": {
-    "BaseURL": "gs://${gsConfigBucket}/StorageMirror/dataflow",
+    "BaseURL": "gs://${configBucket}/StorageMirror/dataflow",
     "CheckInMs": 60000
   }
 }
@@ -59,40 +60,29 @@ and routes files store JSON array with process routes.
 ```json
 [
   {
-    "Source": {
-      "Prefix": "/data/test",
-      "Suffix": ".csv.gz"
-    },
+    "Prefix": "/data/",
+    "Suffix": ".csv.gz",
     "Dest": {
-      "URL": "s3://${s3DestBucket}/testdata",
+      "URL": "s3://${destBucket}/data",
       "Credentials": {
-        "URL": "gs://${gsConfigBucket}/Secrets/s3-ms.json.enc",
-        "Key": "projects/${gcpProject}/locations/us-central1/keyRings/storagemirror_ring/cryptoKeys/storagemirror"
+        "URL": "gs://${configBucket}/StorageMirror/Secrets/s3-cred.json.enc",
+        "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
       }
     },
-    "Replace": {
-      "10": "33333333"
-    },
-    "Codec": "gzip",
     "OnSuccess": [
       {
         "Action": "move",
-        "URL": "gs://${gsOpsBucket}/StorageMirror/processed/"
+        "URL": "gs://${opsBucket}/processed/"
       }
     ],
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs://${gsOpsBucket}/StorageMirror/errors/"
+        "URL": "gs://${opsBucket}/errors/"
       }
     ],
-    "PreserveDepth": 2,
-    "Info": {
-      "Workflow": "My workflow name here",
-      "Description": "quick desciption",
-      "ProjectURL": "JIRA/WIKi or any link referece",
-      "LeadEngineer": "data flow requestor"
-    }
+    "Codec": "gzip",
+    "PreserveDepth": 1
   }
 ]
 ```
@@ -102,7 +92,7 @@ and routes files store JSON array with process routes.
 
 This bucket stores all processed, error files. 
 
-**${OpsBucket}:**
+**${opsBucket}:**
 
 ```bash
     /
@@ -117,8 +107,7 @@ This bucket stores all processed, error files.
 
 This bucket stores all data that needs to be mirror 
 
-**${TriggerBucket}**
-
+**${triggerBucket}**
 
 
 ```bash
@@ -130,12 +119,11 @@ This bucket stores all data that needs to be mirror
 
 
 
-
 ##### Mirrored bucket 
 
 This bucket stores all data that was mirrored from other cloud storage 
 
-**${DestBucket}**
+**${destBucket}**
 
 
 ```bash
@@ -152,9 +140,11 @@ This bucket stores all data that was mirrored from other cloud storage
 
 ###### deploy with endly cli
 
+
 ```bash
-endly authWith=myGCPSecretFile deploy.yaml
+endly deploy.yaml authWith=myGCPSecretFile
 ```
+
 _where:_
 - [@deploy.yaml](gcp/deploy.yaml)
 
@@ -169,9 +159,9 @@ export GO111MODULE=on
 go mod vendor
 
 gcloud functions deploy MyGsBucketToS3Mirror --entry-point StorageMirror \ 
-    --trigger-resource ${gsTriggerBucket} 
+    --trigger-resource ${triggerBucket} 
     --trigger-event google.storage.object.finalize \
-    --set-env-vars=LOGGING=true,CONFIG=gs://gsTriggerBucket/mirror/config/gs.json \
+    --set-env-vars=LOGGING=true,CONFIG=gs://triggerBucket/mirror/config/gs.json \
     --memory=512M \
     --timeout=540s \
     --runtime=go111 

@@ -7,6 +7,15 @@
         "sqs:*"
       ],
       "Resource": "arn:aws:sqs:*:${aws.accountID}:StorageMirror"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+        "arn:aws:lambda:${aws.region}:${aws.accountID}:function:*"
+      ]
     }
   ]
 }

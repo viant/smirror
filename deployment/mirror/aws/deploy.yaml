@@ -1,0 +1,99 @@
+init:
+
+  '!awsCredentials': $params.authWith
+  appPath: /tmp/smirror
+  appLocation: ${appPath}/aws/smirror.zip
+  functionName: StorageMirror
+  privilegePolicy: privilege-policy.json
+
+  configLocation: config/config.json
+  configText: $Cat('$configLocation')
+
+  bucketNs: ms_dataflow
+  configBucket: ${bucketNs}_config
+  triggerBucket: ${bucketNs}_trigger
+
+pipeline:
+
+  package:
+    action: exec:run
+    target: $target
+    checkError: true
+    commands:
+      - unset GOPATH
+      - cd ${fnAppPath}
+      - export GO111MODULE=on
+      - export GOOS=linux
+      - export GOARCH=amd64
+      - go mod vendor
+      - cd aws
+      - go build smirror.go
+      - zip -j smirror.zip smirror
+
+  info:
+    action: print
+    init:
+      configJSON: $AsJSON($configText)
+    message: $configJSON
+
+    setup:
+      action: storage:upload
+      init:
+        configJSON: $AsJSON($configText)
+      sourceKey: configJSON
+      expand: true
+      dest:
+        credentials: $awsCredentials
+        URL: s3://${configBucket}/StorageMirror/config.json
+
+  deploy:
+    checkOut:
+      action: vc/git:checkout
+      Origin:
+        URL: https://github.com/viant/smirror.git
+      Dest:
+        URL: ${appPath}
+
+    package:
+      action: exec:run
+      target: $target
+      checkError: true
+      commands:
+        - cd ${appPath}
+        - unset GOPATH
+        - export GO111MODULE=on
+        - rm -rf vendor
+        - go mod vendor
+        - cd aws
+        - go build smirror.go
+        - zip -j smirror.zip smirror
+
+    deployLambda:
+      action: aws/lambda:deploy
+      credentials: $awsCredentials
+      functionname: $functionName
+      runtime:  go1.x
+      handler: smirror
+      timeout: 360
+      environment:
+        variables:
+          LOGGING: 'true'
+          CONFIG: s3://${configBucket}/StorageMirror/config.json
+      code:
+        zipfile: $LoadBinary(${appLocation})
+      rolename: lambda-${functionName}-executor
+      define:
+        - policyname: kms-${functionName}-role
+          policydocument: $Cat('${privilegePolicy}')
+      attach:
+        - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  setBucketLambdaNotification:
+    action: aws/s3:setupBucketNotification
+    sleepTimeMs: 20000
+    bucket: ${triggerBucket}
+    lambdaFunctionConfigurations:
+      - functionName: $functionName
+        id: ObjectCreatedEvents
+        events:
+          - s3:ObjectCreated:*

@@ -1,17 +1,12 @@
 init:
-  gcpCredentials: viant-dataflow
-
-
+  '!gcpCredentials': $params.authWith
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
-
-
-  gsConfigBucket: ${gcpProject}_config
-  gsTriggerBucket: ${gcpProject}_trigger
-  gsOpsBucket: ${gcpProject}_operation
-  gsDestBucket: ${gcpProject}_mirrored
-  s3DestBucket: ms-e2e-storagemirror-outbound
-
+  bucketNs: $gcp.ProjectID
+  configBucket: ${bucketNs}_config
+  triggerBucket: ${bucketNs}_trigger
+  opsBucket: ${bucketNs}_operation
+  destBucket: ${bucketNs}_mirrored
 
 pipeline:
   setupRoute:
@@ -21,7 +16,7 @@ pipeline:
       URL: rule.json
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsConfigBucket}/StorageMirror/dataflow/test-rule.json
+      URL: gs://${configBucket}/StorageMirror/dataflow/test-rule.json
 
   trigger:
     action: storage:copy
@@ -29,4 +24,4 @@ pipeline:
       URL: events.csv.gz
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsTriggerBucket}/data/test/events.csv.gz
+      URL: gs://${triggerBucket}/data/test/events.csv.gz

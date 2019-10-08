@@ -33,7 +33,7 @@ pipeline:
       '@name': $functionName
       entryPoint: $functionName
       runtime: go111
-      availableMemoryMb: 1024
+      availableMemoryMb: 256
       timeout: 540s
       serviceAccountEmail: $serviceAccount
       environmentVariables:

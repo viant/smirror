@@ -3,7 +3,7 @@ init:
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
   serviceAccount: $gcp.ClientEmail
-  gsConfigBucket: ${gcpProject}_config
+  configBucket: ${gcpProject}_config
   awsCredentials: aws-e2e
   s3Secrets: ${secrets.$awsCredentials}
 
@@ -32,6 +32,6 @@ pipeline:
     key: storagemirror
     plainData: $AsJSON($s3Secrets)
     dest:
-      URL: gs://${gsConfigBucket}/Secrets/s3-ms.json.enc
+      URL: gs://${configBucket}/Secrets/s3-ms.json.enc
       credentials: ${gcpCredentials}
     logging: false
