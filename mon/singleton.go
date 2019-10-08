@@ -3,7 +3,7 @@ package mon
 var singleton Service
 var singletonEnvKey string
 
-//NewFromEnv returns new service for env key
+//NewFromEnv returns singleton service for env key
 func NewFromEnv(envKey string) (Service, error) {
 	if singleton != nil && envKey == singletonEnvKey {
 		return singleton, nil

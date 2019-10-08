@@ -7,11 +7,13 @@ import (
 	"github.com/viant/toolbox"
 	"smirror/base"
 	"smirror/config"
+	"strings"
 	"time"
 )
 
-const defaultTriggerAge = "1hourAgo"
-const defaultErrorRecency = "1hourAgo"
+const defaultTriggerAge = "1hour"
+const defaultErrorRecency = "1hour"
+const agoKeyword = "Ago"
 
 //Request represents monitoring request
 type Request struct {
@@ -104,19 +106,28 @@ func (r *Request) Init() (err error) {
 	if r.UnprocessedDuration == "" {
 		r.UnprocessedDuration = defaultTriggerAge
 	}
+	if ! (strings.Contains(strings.ToLower(r.UnprocessedDuration), "ago") || strings.Contains(strings.ToLower(r.UnprocessedDuration), "past")) {
+		r.UnprocessedDuration += agoKeyword
+	}
 	if r.unprocessedModifiedBefore, err = toolbox.TimeAt(r.UnprocessedDuration); err != nil {
 		return errors.Wrapf(err, "invalid UnprocessedDuration: %v", r.UnprocessedDuration)
 	}
+
 	if r.ProcessedRecency == "" {
 		r.ProcessedRecency = defaultTriggerAge
 	}
-
+	if ! (strings.Contains(strings.ToLower(r.ProcessedRecency), "ago") || strings.Contains(strings.ToLower(r.ProcessedRecency), "past")) {
+		r.ProcessedRecency += agoKeyword
+	}
 	if r.processedModifiedAfter, err = toolbox.TimeAt(r.ProcessedRecency); err != nil {
 		return errors.Wrapf(err, "invalid ErrorRecency: %v", r.ProcessedRecency)
 	}
 
 	if r.ErrorRecency == "" {
 		r.ErrorRecency = defaultErrorRecency
+	}
+	if ! (strings.Contains(strings.ToLower(r.ErrorRecency), "ago") || strings.Contains(strings.ToLower(r.ErrorRecency), "past")) {
+		r.ErrorRecency += agoKeyword
 	}
 	if r.errorModifiedAfter, err = toolbox.TimeAt(r.ErrorRecency); err != nil {
 		return errors.Wrapf(err, "invalid ErrorRecency: %v", r.ErrorRecency)

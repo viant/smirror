@@ -13,7 +13,7 @@ import (
 
 const DestEnvKey = "DEST"
 
-func handleMessages(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
+func handleMessages(ctx context.Context, sqsEvent events.SNSEvent) (err error) {
 
 	dest := os.Getenv(DestEnvKey)
 	if dest == "" {
@@ -24,7 +24,7 @@ func handleMessages(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
 		return err
 	}
 	for _, record := range sqsEvent.Records {
-		if err = notify(dest, []byte(record.Body)); err != nil {
+		if err = notify(dest, []byte(record.SNS.Message)); err != nil {
 			return err
 		}
 	}
