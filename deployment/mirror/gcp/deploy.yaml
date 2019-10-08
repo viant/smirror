@@ -2,7 +2,7 @@ init:
 
   '!gcpCredentials': $params.authWith
   gcp: ${secrets.$gcpCredentials}
-  bucketNs: $gcp.ProjectID
+  bucketNs: viant_dataflow
 
   serviceAccount: $gcp.ClientEmail
 

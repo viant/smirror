@@ -1,11 +1,12 @@
 init:
   '!gcpCredentials': $params.authWith
+  '!awsCredentials': $params.awsSecrets
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
   serviceAccount: $gcp.ClientEmail
   configBucket: ${gcpProject}_config
   awsCredentials: aws-e2e
-  s3Secrets: ${secrets.$awsCredentials}
+  secrets: ${secrets.$awsCredentials}
 
 
 pipeline:
@@ -24,13 +25,13 @@ pipeline:
 
   info:
     action: print
-    message: $AsString($s3Secrets)
+    message: $AsString($secrets)
 
   encryptS3Credentials:
     action: gcp/kms:encrypt
     ring: storagemirror_ring
     key: storagemirror
-    plainData: $AsJSON($s3Secrets)
+    plainData: $AsJSON($secrets)
     dest:
       URL: gs://${configBucket}/Secrets/s3-ms.json.enc
       credentials: ${gcpCredentials}

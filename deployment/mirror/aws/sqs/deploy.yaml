@@ -1,0 +1,84 @@
+init:
+
+  '!awsCredentials': $params.authWith
+  appPath: /tmp/smirrorsqs
+  appLocation: ${appPath}/aws/sqs/smirrorsqs.zip
+  functionName: StorageMirrorSqs
+  privilegePolicy: privilege-policy.json
+
+  bucketNs: ms-dataflow
+  triggerBucket: ${bucketNs}-sqs-trigger
+
+
+pipeline:
+
+  setupQueue:
+    action: msg:setupResource
+    credentials: $awsCredentials
+    resources:
+      - URL: ${bucketNs}StorageMirrorQueue
+        type: queue
+        vendor: aws
+
+  deploy:
+    checkOut:
+      action: vc/git:checkout
+      Origin:
+        URL: https://github.com/viant/smirror.git
+      Dest:
+        URL: ${appPath}
+
+    package:
+      action: exec:run
+      target: $target
+      checkError: true
+      commands:
+        - cd ${appPath}
+        - unset GOPATH
+        - export GO111MODULE=on
+        - rm -rf vendor
+        - go mod vendor
+        - cd aws/sqs
+        - go build -o smirrorsqs
+        - zip -j smirrorsqs.zip smirrorsqs
+
+    deployLambda:
+      action: aws/lambda:deploy
+      credentials: $awsCredentials
+      functionname: $functionName
+      runtime:  go1.x
+      handler: smirrorsqs
+      timeout: 360
+      environment:
+        variables:
+          DEST: StorageMirror
+      code:
+        zipfile: $LoadBinary(${appLocation})
+      rolename: lambda-${functionName}-executor
+      define:
+        - policyname: lambda-${functionName}-rolesmirrorsqs.go
+          policydocument: $Cat('${privilegePolicy}')
+      attach:
+        - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      triggers:
+        - source: ${bucketNs}StorageMirrorQueue
+          type: sqs
+          enabled: true
+          batchSize: 1
+
+
+  setupSqsBucket:
+    action: storage:create
+    isDir: true
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${triggerBucket}/
+
+  setBucketSqsNotification:
+    action: aws/s3:setupBucketNotification
+    sleepTimeMs: 20000
+    bucket: ${triggerBucket}
+    queueConfigurations:
+      queueArn:
+      events:
+        -

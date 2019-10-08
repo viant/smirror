@@ -56,6 +56,7 @@ func (s *service) replay(ctx context.Context, request *Request, response *Respon
 		if err := s.fs.Move(ctx, destURL, sourceURL); err != nil {
 			return err
 		}
+		response.Replayed = append(response.Replayed, sourceURL)
 	}
 	return nil
 }

@@ -9,9 +9,11 @@ init:
   configLocation: config/config.json
   configText: $Cat('$configLocation')
 
-  bucketNs: ms_dataflow
-  configBucket: ${bucketNs}_config
-  triggerBucket: ${bucketNs}_trigger
+  bucketNs: ms-dataflow
+  configBucket: ${bucketNs}-config
+  triggerBucket: ${bucketNs}-trigger
+  opsBucket: ${bucketNs}-operations
+
 
 pipeline:
 
@@ -21,7 +23,7 @@ pipeline:
     checkError: true
     commands:
       - unset GOPATH
-      - cd ${fnAppPath}
+      - cd ${appPath}
       - export GO111MODULE=on
       - export GOOS=linux
       - export GOARCH=amd64
@@ -30,21 +32,37 @@ pipeline:
       - go build smirror.go
       - zip -j smirror.zip smirror
 
+
+  createBuckets:
+    trigger:
+      action: storage:create
+      isDir: true
+      dest:
+        credentials: $awsCredentials
+        URL: s3://${triggerBucket}/
+    ops:
+      action: storage:create
+      isDir: true
+      dest:
+        credentials: $awsCredentials
+        URL: s3://${opsBucket}/
+
+  uploadConfig:
+    action: storage:upload
+    init:
+      configJSON: $AsJSON($configText)
+    sourceKey: configJSON
+    expand: true
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${configBucket}/StorageMirror/config.json
+
   info:
     action: print
     init:
       configJSON: $AsJSON($configText)
     message: $configJSON
 
-    setup:
-      action: storage:upload
-      init:
-        configJSON: $AsJSON($configText)
-      sourceKey: configJSON
-      expand: true
-      dest:
-        credentials: $awsCredentials
-        URL: s3://${configBucket}/StorageMirror/config.json
 
   deploy:
     checkOut:
@@ -83,7 +101,7 @@ pipeline:
         zipfile: $LoadBinary(${appLocation})
       rolename: lambda-${functionName}-executor
       define:
-        - policyname: kms-${functionName}-role
+        - policyname: lambda-${functionName}-role
           policydocument: $Cat('${privilegePolicy}')
       attach:
         - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
@@ -97,3 +115,6 @@ pipeline:
         id: ObjectCreatedEvents
         events:
           - s3:ObjectCreated:*
+        filter:
+          prefix:
+            - data
