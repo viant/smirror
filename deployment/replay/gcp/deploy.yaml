@@ -1,6 +1,6 @@
 init:
   '!gcpCredentials': $params.authWith
-  appPath: /tmp/smonitor
+  appPath: /tmp/replay
   functionName: StorageReplay
   gcp: ${secrets.$gcpCredentials}
   serviceAccount: $gcp.ClientEmail

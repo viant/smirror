@@ -6,9 +6,7 @@ init:
   gcp: ${secrets.$gcpCredentials}
   serviceAccount: $gcp.ClientEmail
 
-
 pipeline:
-
 
   deploy:
     checkOut:

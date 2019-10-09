@@ -1,0 +1,48 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:DescribeParameters"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters",
+        "ssm:GetParameter"
+      ],
+      "Resource": [
+        "arn:aws:ssm:${aws.region}:${aws.accountID}:parameter/*",
+        "arn:aws:ssm:${aws.region}:${aws.accountID}:parameter/storagemirror.*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt"
+      ],
+      "Resource": [
+        "arn:aws:kms:${aws.region}:${aws.accountID}:alias/storagemirror",
+        "arn:aws:kms:${aws.region}:${aws.accountID}:alias/*",
+        "arn:aws:kms:${aws.region}:${aws.accountID}:key/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${configBucket}",
+        "arn:aws:s3:::${configBucket}/*",
+        "arn:aws:s3:::${opsBucket}",
+        "arn:aws:s3:::${opsBucket}/*",
+        "arn:aws:s3:::${triggerBucket}",
+        "arn:aws:s3:::${triggerBucket}/*"
+      ]
+    }
+  ]
+}

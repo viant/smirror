@@ -249,29 +249,6 @@ The following [Deployment](deployment/mirror/README.md) details storage mirror g
 
 
 
-
-
-###### Deploying lambda
-
-- With **endly cli**
-
-```bash
-endly deploy
-```
-
-[@deploy.yaml](usage/deploy/aws/deploy.yaml)
-
-Where lambda uses permissions defined in [@privilege-policy.json](usage/deploy/aws/privilege-policy.json)
-
-- With **aws cli** 
--[Serverless-deploying](https://docs.aws.amazon.com/lambda/latest/dg/with-userapp.html)
-
-- With **sam cli**
--[Serverless-deploying](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-deploying.html)
-
-
-
-
 ###### Encrypting AWS credentials with GCP KMS 
 
 In our example s3-cred.json.enc is encrypted version of [@s3-cred.json](usage/gs_to_s3/s3-cred.json) storing AWS credentials.
@@ -409,19 +386,37 @@ curl -d @monitor.json -X POST  -H "Content-Type: application/json"  $monitorEndp
 [@monitor.json](usage/monitor.json)
 ```json
 {
-  "ConfigURL":    "gs://${gcp.projectId}_config/StorageMirror/config.json",
-
-  "TriggerURL":   "gs://${gcp.projectId}_trigger",
-  "UnprocessedDuration": "2hoursAgo",
-
-  "ErrorURL":     "gs://${gcp.projectId}_operation/StorageMirror/errors/",
-  "ErrorRecency": "3hourAgo"
+  "ConfigURL":    "gs://${configBucket}/StorageMirror/config.json",
+  "TriggerURL":   "gs://${triggerBucket}",
+  "UnprocessedDuration": "2hours",
+  "ErrorURL":     "gs://${opsBucket}/StorageMirror/errors/",
+  "ErrorRecency": "3hours"
 }
 ```
 
 _where:_
 - **UnprocessedDuration** - check for any unprocessed data file over specified time
 - **ErrorRecency** - specified errors within specified time
+
+
+## Replay
+
+
+```bash
+curl -d @replay.json -X POST  -H "Content-Type: application/json"  $replayEndpoint
+```
+
+[@replay.json](usage/replay.json)
+```json
+{
+  "TriggerURL": "gs://${triggerBucket}",
+  "ReplayBucket":"${replayBucket}",
+  "UnprocessedDuration": "1hour"
+}
+```
+
+_where:_
+- **UnprocessedDuration** - check for any unprocessed data file over specified time
 
 
 ## Limitation
