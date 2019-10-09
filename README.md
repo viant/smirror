@@ -378,6 +378,7 @@ pipeline:
 [StorageMonitor](mon) can be used to monitor trigger and error buckets.
 
 
+**On Google Cloud Platform:**
 
 ```bash
 curl -d @monitor.json -X POST  -H "Content-Type: application/json"  $monitorEndpoint
@@ -397,6 +398,35 @@ curl -d @monitor.json -X POST  -H "Content-Type: application/json"  $monitorEndp
 _where:_
 - **UnprocessedDuration** - check for any unprocessed data file over specified time
 - **ErrorRecency** - specified errors within specified time
+
+
+On Amazon Web Service cloud
+
+
+```endly monitor.yaml authWith=aws-e2e```
+[@monitor.yaml](usage/monitor.yaml)
+
+```yaml
+init:
+  '!awsCredentials': $params.authWith
+  bucketPrefix: ms-dataflow
+  configBucket: ${bucketPrefix}-config
+  triggerBucket: ${bucketPrefix}-trigger
+  opsBucket: ${bucketPrefix}-operations
+
+  monitor:
+    ConfigURL: s3://${configBucket}/StorageMirror/config.json
+    TriggerURL: s3://${triggerBucket}
+    ErrorURL:  gs://${opsBucket}/StorageMirror/errors/
+
+
+pipeline:
+  trigger:
+    action: aws/lambda:call
+    credentials: $awsCredentials
+    functionname: StorageMonitor
+    payload: $AsJSON($monitor)
+```
 
 
 ## Replay

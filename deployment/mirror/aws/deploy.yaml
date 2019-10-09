@@ -93,6 +93,7 @@ pipeline:
       runtime:  go1.x
       handler: smirror
       timeout: 360
+      memorySize: 3072
       environment:
         variables:
           LOGGING: 'true'
