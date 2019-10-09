@@ -12,8 +12,6 @@ import (
 	"strings"
 )
 
-//ConfigEnvKey config eng key
-const ConfigEnvKey = "CONFIG"
 
 //Config represents routes
 type Config struct {

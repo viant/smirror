@@ -29,7 +29,7 @@ func StorageMirror(ctx context.Context, event gs.Event) (err error) {
 }
 
 func storageMirror(ctx context.Context, event gs.Event) (*Response, error) {
-	service, err := NewFromEnv(ctx, ConfigEnvKey)
+	service, err := NewFromEnv(ctx, base.ConfigEnvKey)
 	if err != nil {
 		return nil, err
 	}

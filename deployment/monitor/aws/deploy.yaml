@@ -1,0 +1,63 @@
+init:
+
+  '!gcpCredentials': $params.authWith
+  appPath: /tmp/smonitor
+  functionName: StorageMonitor
+  gcp: ${secrets.$gcpCredentials}
+  serviceAccount: $gcp.ClientEmail
+
+pipeline:
+
+  deploy:
+    checkOut:
+      action: vc/git:checkout
+      Origin:
+        URL: https://github.com/viant/smirror.git
+      Dest:
+        URL: ${appPath}
+
+    package:
+      action: exec:run
+      target: $target
+      checkError: true
+      commands:
+        - cd ${appPath}
+        - unset GOPATH
+        - export GO111MODULE=on
+        - rm -rf vendor
+        - go mod vendor
+        - cd aws/monitor
+        - go build -o smonitor
+        - zip -j smirror.zip smirror
+
+    deployLambda:
+      action: aws/lambda:deploy
+      credentials: $awsCredentials
+      functionname: $functionName
+      runtime:  go1.x
+      handler: s
+      timeout: 360
+      environment:
+        variables:
+          LOGGING: 'true'
+      code:
+        zipfile: $LoadBinary(${appLocation})
+      rolename: lambda-${functionName}-executor
+      define:
+        - policyname: lambda-${functionName}-role
+          policydocument: $Cat('${privilegePolicy}')
+      attach:
+        - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  setBucketLambdaNotification:
+    action: aws/s3:setupBucketNotification
+    sleepTimeMs: 20000
+    bucket: ${triggerBucket}
+    lambdaFunctionConfigurations:
+      - functionName: $functionName
+        id: ObjectCreatedEvents
+        events:
+          - s3:ObjectCreated:*
+        filter:
+          prefix:
+            - data

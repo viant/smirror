@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
+	"smirror/base"
 	"smirror/mon"
 )
 
@@ -37,7 +38,7 @@ func checkStorage(writer http.ResponseWriter, httpRequest *http.Request) (err er
 	if err = json.NewDecoder(httpRequest.Body).Decode(&request); err != nil {
 		return errors.Wrapf(err, "failed to decode %T", request)
 	}
-	service, err := mon.NewFromEnv(ConfigEnvKey)
+	service, err := mon.NewFromEnv(base.ConfigEnvKey)
 	if err != nil {
 		return err
 	}

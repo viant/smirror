@@ -18,4 +18,7 @@ const (
 
 	//UnclassifiedDataflow
 	UnclassifiedDataflow = "unclassified"
+
+	//ConfigEnvKey config eng key
+	ConfigEnvKey = "CONFIG"
 )
