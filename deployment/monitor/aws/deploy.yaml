@@ -6,10 +6,10 @@ init:
   functionName: StorageMonitor
   handler: smonitor
   appLocation: ${appPath}/aws/monitor/${handler}.zip
-  bucketNs: ms-dataflow
-  configBucket: ${bucketNs}-config
-  triggerBucket: ${bucketNs}-trigger
-  opsBucket: ${bucketNs}-operations
+  bucketPrefix: ms-dataflow
+  configBucket: ${bucketPrefix}-config
+  triggerBucket: ${bucketPrefix}-trigger
+  opsBucket: ${bucketPrefix}-operations
 
 pipeline:
 

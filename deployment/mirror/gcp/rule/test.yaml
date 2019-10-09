@@ -2,11 +2,11 @@ init:
   '!gcpCredentials': $params.authWith
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
-  bucketNs: $gcp.ProjectID
-  configBucket: ${bucketNs}_config
-  triggerBucket: ${bucketNs}_trigger
-  opsBucket: ${bucketNs}_operation
-  destBucket: ${bucketNs}_mirrored
+  bucketPrefix: $gcp.ProjectID
+  configBucket: ${bucketPrefix}_config
+  triggerBucket: ${bucketPrefix}_trigger
+  opsBucket: ${bucketPrefix}_operation
+  destBucket: ${bucketPrefix}_mirrored
 
 pipeline:
   setupRoute:

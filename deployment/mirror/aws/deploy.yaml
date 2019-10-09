@@ -10,10 +10,10 @@ init:
   privilegePolicy: privilege-policy.json
   configLocation: config/config.json
   configText: $Cat('$configLocation')
-  bucketNs: ms-dataflow
-  configBucket: ${bucketNs}-config
-  triggerBucket: ${bucketNs}-trigger
-  opsBucket: ${bucketNs}-operations
+  bucketPrefix: ms-dataflow
+  configBucket: ${bucketPrefix}-config
+  triggerBucket: ${bucketPrefix}-trigger
+  opsBucket: ${bucketPrefix}-operations
 
 
 pipeline:

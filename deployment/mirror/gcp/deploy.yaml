@@ -2,7 +2,7 @@ init:
 
   '!gcpCredentials': $params.authWith
   gcp: ${secrets.$gcpCredentials}
-  bucketNs: viant_dataflow
+  bucketPrefix: viant_dataflow
 
   serviceAccount: $gcp.ClientEmail
 
@@ -10,10 +10,10 @@ init:
   functionName: StorageMirror
   
   
-  configBucket: ${bucketNs}_config
-  triggerBucket: ${bucketNs}_trigger
-  opsBucket: ${bucketNs}_operation
-  destBucket: ${bucketNs}_mirrored
+  configBucket: ${bucketPrefix}_config
+  triggerBucket: ${bucketPrefix}_trigger
+  opsBucket: ${bucketPrefix}_operation
+  destBucket: ${bucketPrefix}_mirrored
   
   configLocation: config/config.json
   configText: $Cat('$configLocation')

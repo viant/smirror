@@ -6,9 +6,9 @@ init:
   functionName: StorageMirrorSns
   privilegePolicy: privilege-policy.json
 
-  bucketNs: ms-dataflow
-  triggerBucket: ${bucketNs}-sns-trigger
-  topic: ${bucketNs}StorageMirrorTopic
+  bucketPrefix: ms-dataflow
+  triggerBucket: ${bucketPrefix}-sns-trigger
+  topic: ${bucketPrefix}StorageMirrorTopic
 
 pipeline:
   setup:

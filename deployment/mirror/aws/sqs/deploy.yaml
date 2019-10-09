@@ -6,9 +6,9 @@ init:
   functionName: StorageMirrorSqs
   privilegePolicy: privilege-policy.json
 
-  bucketNs: ms-dataflow
-  triggerBucket: ${bucketNs}-sqs-trigger
-  queue: ${bucketNs}StorageMirrorQueue
+  bucketPrefix: ms-dataflow
+  triggerBucket: ${bucketPrefix}-sqs-trigger
+  queue: ${bucketPrefix}StorageMirrorQueue
 
 pipeline:
 
