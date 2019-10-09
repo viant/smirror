@@ -1,0 +1,64 @@
+init:
+  '!awsCredentials': $params.authWith
+
+  appPath: /tmp/sreplay
+  privilegePolicy: privilege-policy.json
+  functionName: StorageMonitor
+  handler: sreplay
+  appLocation: ${appPath}/aws/replay/${handler}.zip
+  bucketPrefix: ms-dataflow
+  configBucket: ${bucketPrefix}-config
+  triggerBucket: ${bucketPrefix}-trigger
+  replayBucket: ${bucketPrefix}-replay
+  opsBucket: ${bucketPrefix}-operations
+
+pipeline:
+
+  createReplayBucket:
+    action: storage:create
+    isDir: true
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${replayBucket}/
+
+  deploy:
+    checkOut:
+      action: vc/git:checkout
+      Origin:
+        URL: https://github.com/viant/smirror.git
+      Dest:
+        URL: ${appPath}
+
+    package:
+      action: exec:run
+      target: $target
+      checkError: true
+      commands:
+        - cd ${appPath}
+        - export GO111MODULE=on
+        - export GOOS=linux
+        - export GOARCH=amd64
+        - go mod vendor
+        - cd aws/replay
+        - go build -o $handler
+        - zip -j ${handler}.zip ${handler}
+
+    deployLambda:
+      action: aws/lambda:deploy
+      credentials: $awsCredentials
+      functionname: $functionName
+      runtime:  go1.x
+      handler: $handler
+      timeout: 900
+      memorySize: 256
+      environment:
+        variables:
+          LOGGING: 'true'
+      code:
+        zipfile: $LoadBinary(${appLocation})
+      rolename: lambda-${functionName}-executor
+      define:
+        - policyname: lambda-${functionName}-role
+          policydocument: $Cat('${privilegePolicy}')
+      attach:
+        - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole

@@ -43,7 +43,7 @@ This bucket stores all configuration files:
 
 Where:
 
-[@smirror.json](usage/gcp/config.json)
+[@smirror.json](mirror/usage/gcp/config.json)
 
 ```json
 {
@@ -56,7 +56,7 @@ Where:
 
 and routes files store JSON array with process routes.
 
-[@route_rule1.json](usage/gcp/route_rule1.json)
+[@route_rule1.json](mirror/usage/gcp/route_rule1.json)
 ```json
 [
   {
@@ -149,7 +149,7 @@ endly deploy.yaml authWith=myGCPSecretFile
 ```
 
 _where:_
-- [@deploy.yaml](gcp/deploy.yaml)
+- [@deploy.yaml](mirror/gcp/deploy.yaml)
 
 
 To deploy with gcloud cli use the followig commands:
@@ -193,8 +193,8 @@ endly deploy.yaml authWith=myAWSSecretFile
 ```
 
 _where:_
-- [@deploy.yaml](aws/deploy.yaml)
-- [@privilege-policy.json](aws/privilege-policy.json)
+- [@deploy.yaml](mirror/aws/deploy.yaml)
+- [@privilege-policy.json](mirror/aws/privilege-policy.json)
 
 
 **Testing deployment:**
@@ -209,7 +209,7 @@ endly secure.yaml authWith=aws-e2e gcpSecrets=gcp-e2e
 ```
 
 where:
-[@secure.yaml](aws/secure.yaml)
+[@secure.yaml](mirror/aws/secure.yaml)
 
 -  **Test Mirror Rule** 
 
@@ -220,8 +220,8 @@ endly test.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
 ```
 
 where:
-- [@test.yaml](aws/rule/test.yaml)
-- [@rule.json](aws/rule/rule.json)
+- [@test.yaml](mirror/aws/rule/test.yaml)
+- [@rule.json](mirror/aws/rule/rule.json)
 
 
 
@@ -233,8 +233,8 @@ To deploy with endly automation runner use the following workflow:
 endly deploy.yaml authWith=myAWSSecretFile
 ```
 _where:_
-- [@deploy.yaml](aws/sqs/deploy.yaml)
-- [@privilege-policy.json](aws/sqs/privilege-policy.json)
+- [@deploy.yaml](mirror/aws/sqs/deploy.yaml)
+- [@privilege-policy.json](mirror/aws/sqs/privilege-policy.json)
 
 -  **Test Mirror Rule** 
 
@@ -245,8 +245,8 @@ endly test_sqs.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
 ```
 
 where:
-- [@test_sqs.yaml](aws/rule/test_sqs.yaml)
-- [@rule.json](aws/rule/rule.json)
+- [@test_sqs.yaml](mirror/aws/rule/test_sqs.yaml)
+- [@rule.json](mirror/aws/rule/rule.json)
 
 
 
@@ -259,8 +259,8 @@ To deploy with endly automation runner use the following workflow:
 endly deploy.yaml authWith=myAWSSecretFile
 ```
 _where:_
-- [@deploy.yaml](aws/sns/deploy.yaml)
-- [@privilege-policy.json](aws/sns/privilege-policy.json)
+- [@deploy.yaml](mirror/aws/sns/deploy.yaml)
+- [@privilege-policy.json](mirror/aws/sns/privilege-policy.json)
 
 **Test Mirror Rule**
 
@@ -271,14 +271,36 @@ endly test_sns.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
 ```
 
 where:
-- [@test_sns.yaml](aws/rule/test_sqs.yaml)
-- [@rule.json](aws/rule/rule.json)
+- [@test_sns.yaml](mirror/aws/rule/test_sqs.yaml)
+- [@rule.json](mirror/aws/rule/rule.json)
 
 
 ###### StorageMirror Cron
 
 
+
 ###### StorageMonitor
 
 
+To deploy with endly automation runner use the following workflow:
+
+```bash
+endly deploy.yaml authWith=myAWSSecretFile
+```
+_where:_
+- [@deploy.yaml](monitor/aws/deploy.yaml)
+- [@privilege-policy.json](monitor/aws/privilege-policy.json)
+
+
 ###### StorageReplay
+
+
+To deploy with endly automation runner use the following workflow:
+
+```bash
+endly deploy.yaml authWith=myAWSSecretFile
+```
+_where:_
+- [@deploy.yaml](replay/aws/deploy.yaml)
+- [@privilege-policy.json](replay/aws/privilege-policy.json)
+

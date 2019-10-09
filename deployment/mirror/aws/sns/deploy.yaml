@@ -63,11 +63,11 @@ pipeline:
         - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
 
-    setupSubscription:
-      action: aws/sns:setupSubscription
-      protocol: lambda
-      endpoint: $functionName
-      topic: $topic
+  setupSubscription:
+    action: aws/sns:setupSubscription
+    protocol: lambda
+    endpoint: $functionName
+    topic: $topic
 
 
 
