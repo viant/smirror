@@ -5,8 +5,8 @@ init:
   functionName: StorageMirror
 
   handler: smirror
-  #appPath: /tmp/${handler}
-  appPath: $Pwd(../../..)
+  #appPath: $Pwd(../../..)
+  appPath: /tmp/${handler}
   appLocation: ${appPath}/aws/${handler}.zip
   privilegePolicy: privilege-policy.json
   configLocation: config/config.json
@@ -15,7 +15,8 @@ init:
   configBucket: ${bucketPrefix}-config
   triggerBucket: ${bucketPrefix}-trigger
   opsBucket: ${bucketPrefix}-operations
-
+  triggerSqsBucket: ${bucketPrefix}-sqs-trigger
+  triggerSnsBucket: ${bucketPrefix}-sns-trigger
 
 pipeline:
 
@@ -51,12 +52,12 @@ pipeline:
 
 
   deploy:
-#    checkOut:
-#      action: vc/git:checkout
-#      Origin:
-#        URL: https://github.com/viant/smirror.git
-#      Dest:
-#        URL: ${appPath}
+    checkOut:
+      action: vc/git:checkout
+      Origin:
+        URL: https://github.com/viant/smirror.git
+      Dest:
+        URL: ${appPath}
 
     package:
       action: exec:run

@@ -40,7 +40,11 @@
         "arn:aws:s3:::${opsBucket}",
         "arn:aws:s3:::${opsBucket}/*",
         "arn:aws:s3:::${triggerBucket}",
-        "arn:aws:s3:::${triggerBucket}/*"
+        "arn:aws:s3:::${triggerBucket}/*",
+        "arn:aws:s3:::${triggerSqsBucket}",
+        "arn:aws:s3:::${triggerSqsBucket}/*",
+        "arn:aws:s3:::${triggerSnsBucket}",
+        "arn:aws:s3:::${triggerSnsBucket}/*"
       ]
     }
   ]
