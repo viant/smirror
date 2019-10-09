@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	flambda "github.com/aws/aws-sdk-go/service/lambda"
-	"github.com/viant/toolbox"
 	"log"
 	"os"
 )
@@ -20,7 +20,6 @@ func handleMessages(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
 	if dest == "" {
 		log.Print("env.%v key was empty", DestEnvKey)
 	}
-	toolbox.DumpIndent(sqsEvent, true)
 	if len(sqsEvent.Records) == 0 {
 		return err
 	}
@@ -46,10 +45,12 @@ func notify(destination string, payload []byte) error {
 		return err
 	}
 	service := flambda.New(sess)
-	_, err = service.Invoke(&flambda.InvokeInput{
+	input := &flambda.InvokeInput{
 		FunctionName:   &destination,
 		Payload:        payload,
 		InvocationType: aws.String(flambda.InvocationTypeEvent),
-	})
+	}
+	output, err := service.Invoke(input)
+	fmt.Printf("notified: %v, %v %v\n", input, output, err)
 	return err
 }
