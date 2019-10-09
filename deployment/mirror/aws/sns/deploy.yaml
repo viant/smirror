@@ -1,8 +1,9 @@
 init:
 
   '!awsCredentials': $params.authWith
-  appPath: /tmp/smirrorsns
-  appLocation: ${appPath}/aws/sns/smirrorsns.zip
+  handler: smirrorsns
+  appPath: /tmp/${handler}
+  appLocation: ${appPath}/aws/sns/${handler}.zip
   functionName: StorageMirrorSns
   privilegePolicy: privilege-policy.json
 
@@ -35,18 +36,19 @@ pipeline:
         - cd ${appPath}
         - unset GOPATH
         - export GO111MODULE=on
-        - rm -rf vendor
+        - export GOOS=linux
+        - export GOARCH=amd64
         - go mod vendor
         - cd aws/sns
-        - go build -o smirrorsns
-        - zip -j smirrorsns.zip smirrorsns
+        - go build -o ${handler}
+        - zip -j ${handler}.zip ${handler}
 
     deployLambda:
       action: aws/lambda:deploy
       credentials: $awsCredentials
       functionname: $functionName
       runtime:  go1.x
-      handler: smirrorsns
+      handler: ${handler}
       timeout: 360
       environment:
         variables:
@@ -55,7 +57,7 @@ pipeline:
         zipfile: $LoadBinary(${appLocation})
       rolename: lambda-${functionName}-executor
       define:
-        - policyname: lambda-${functionName}-rolesmirrorsns.go
+        - policyname: lambda-${functionName}-role
           policydocument: $Cat('${privilegePolicy}')
       attach:
         - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole

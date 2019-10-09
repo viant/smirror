@@ -35,6 +35,8 @@
         "s3:*"
       ],
       "Resource": [
+        "arn:aws:s3:::*",
+        "arn:aws:s3:::*/*",
         "arn:aws:s3:::${configBucket}",
         "arn:aws:s3:::${configBucket}/*",
         "arn:aws:s3:::${opsBucket}",

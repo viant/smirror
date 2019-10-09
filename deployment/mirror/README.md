@@ -211,7 +211,7 @@ endly secure.yaml authWith=aws-e2e gcpSecrets=gcp-e2e
 where:
 [@secure.yaml](aws/secure.yaml)
 
--  Test trigger 
+-  **Test Mirror Rule** 
 
 ```bash
 cd $SmirrorRoot
@@ -236,7 +236,7 @@ _where:_
 - [@deploy.yaml](aws/sqs/deploy.yaml)
 - [@privilege-policy.json](aws/sqs/privilege-policy.json)
 
--  Test trigger 
+-  **Test Mirror Rule** 
 
 ```bash
 cd $SmirrorRoot
@@ -261,6 +261,18 @@ endly deploy.yaml authWith=myAWSSecretFile
 _where:_
 - [@deploy.yaml](aws/sns/deploy.yaml)
 - [@privilege-policy.json](aws/sns/privilege-policy.json)
+
+**Test Mirror Rule**
+
+```bash
+cd $SmirrorRoot
+cd deployment/mirror/aws/rule
+endly test_sns.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
+```
+
+where:
+- [@test_sns.yaml](aws/rule/test_sqs.yaml)
+- [@rule.json](aws/rule/rule.json)
 
 
 ###### StorageMirror Cron
