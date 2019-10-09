@@ -27,9 +27,9 @@ pipeline:
       checkError: true
       commands:
         - cd ${appPath}
-        - unset GOPATH
         - export GO111MODULE=on
-        - rm -rf vendor
+        - export GOOS=linux
+        - export GOARCH=amd64
         - go mod vendor
         - cd aws/monitor
         - go build -o $handler
