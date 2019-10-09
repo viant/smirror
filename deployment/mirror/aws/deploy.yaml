@@ -95,7 +95,6 @@ pipeline:
 
   setBucketLambdaNotification:
     action: aws/s3:setupBucketNotification
-    sleepTimeMs: 20000
     bucket: ${triggerBucket}
     lambdaFunctionConfigurations:
       - functionName: $functionName
