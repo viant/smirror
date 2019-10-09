@@ -136,10 +136,13 @@ This bucket stores all data that was mirrored from other cloud storage
 
 ## Deployment
 
-#### Google Cloud Function 
 
-###### deploy with endly cli
 
+### Google Cloud Function 
+
+###### StorageMirror
+
+To deploy with endly automation runner use the following workflow:
 
 ```bash
 endly deploy.yaml authWith=myGCPSecretFile
@@ -149,7 +152,7 @@ _where:_
 - [@deploy.yaml](gcp/deploy.yaml)
 
 
-###### deploy with gcloud
+To deploy with gcloud cli use the followig commands:
 
 ```bash
 git chckout https://github.com/viant/smirror.git
@@ -166,4 +169,56 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point StorageMirror \
     --timeout=540s \
     --runtime=go111 
 ```
+
+
+###### StorageMonitor
+
+###### StorageReplay
+
+### AWS Lambda function 
+
+
+###### StorageMirror
+
+To deploy with endly automation runner use the following workflow:
+
+```bash
+endly deploy.yaml authWith=myAWSSecretFile
+```
+
+_where:_
+- [@deploy.yaml](aws/deploy.yaml)
+- [@privilege-policy.json](aws/privilege-policy.json)
+
+
+
+###### StorageMonitor
+
+###### StorageReplay
+
+
+###### StorageMirror SQS Proxy
+
+To deploy with endly automation runner use the following workflow:
+
+```bash
+endly deploy.yaml authWith=myAWSSecretFile
+```
+_where:_
+- [@deploy.yaml](aws/sqs/deploy.yaml)
+- [@privilege-policy.json](aws/sqs/privilege-policy.json)
+
+
+###### StorageMirror SNS Proxy
+
+
+To deploy with endly automation runner use the following workflow:
+
+```bash
+endly deploy.yaml authWith=myAWSSecretFile
+```
+_where:_
+- [@deploy.yaml](aws/sns/deploy.yaml)
+- [@privilege-policy.json](aws/sns/privilege-policy.json)
+
 

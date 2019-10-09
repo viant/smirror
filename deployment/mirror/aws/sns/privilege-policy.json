@@ -3,10 +3,8 @@
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": [
-        "sqs:*"
-      ],
-      "Resource": "arn:aws:sqs:*:${aws.accountID}:${queue}"
+      "Action": ["sns:*"],
+      "Resource": "arn:aws:sqs:*:${aws.accountID}:${topic}"
     },
     {
       "Effect": "Allow",

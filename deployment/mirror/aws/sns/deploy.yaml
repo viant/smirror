@@ -1,23 +1,22 @@
 init:
 
   '!awsCredentials': $params.authWith
-  appPath: /tmp/smirrorsqs
-  appLocation: ${appPath}/aws/sqs/smirrorsqs.zip
-  functionName: StorageMirrorSqs
+  appPath: /tmp/smirrorsns
+  appLocation: ${appPath}/aws/sns/smirrorsns.zip
+  functionName: StorageMirrorSns
   privilegePolicy: privilege-policy.json
 
   bucketNs: ms-dataflow
-  triggerBucket: ${bucketNs}-sqs-trigger
-  queue: ${bucketNs}StorageMirrorQueue
+  triggerBucket: ${bucketNs}-sns-trigger
+  topic: ${bucketNs}StorageMirrorTopic
 
 pipeline:
-
-  setupQueue:
+  setup:
     action: msg:setupResource
     credentials: $awsCredentials
     resources:
-      - URL: $queue
-        type: queue
+      - URL: $topic
+        type: topic
         vendor: aws
 
   deploy:
@@ -38,16 +37,16 @@ pipeline:
         - export GO111MODULE=on
         - rm -rf vendor
         - go mod vendor
-        - cd aws/sqs
-        - go build -o smirrorsqs
-        - zip -j smirrorsqs.zip smirrorsqs
+        - cd aws/sns
+        - go build -o smirrorsns
+        - zip -j smirrorsns.zip smirrorsns
 
     deployLambda:
       action: aws/lambda:deploy
       credentials: $awsCredentials
       functionname: $functionName
       runtime:  go1.x
-      handler: smirrorsqs
+      handler: smirrorsns
       timeout: 360
       environment:
         variables:
@@ -56,29 +55,34 @@ pipeline:
         zipfile: $LoadBinary(${appLocation})
       rolename: lambda-${functionName}-executor
       define:
-        - policyname: lambda-${functionName}-rolesmirrorsqs.go
+        - policyname: lambda-${functionName}-rolesmirrorsns.go
           policydocument: $Cat('${privilegePolicy}')
       attach:
         - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      triggers:
-        - source: $queue
-          type: sqs
-          enabled: true
-          batchSize: 1
 
 
-  setupSqsBucket:
+    setupSubscription:
+      action: aws/sns:setupSubscription
+      protocol: lambda
+      endpoint: $functionName
+      topic: $topic
+
+
+
+  setupSnsBucket:
     action: storage:create
     isDir: true
     dest:
       credentials: $awsCredentials
       URL: s3://${triggerBucket}/
 
-  setBucketQueueNotification:
+
+  setBucketTopicNotification:
     action: aws/s3:setupBucketNotification
+    credentials: $awsCredentials
     bucket: ${triggerBucket}
-    queueConfigurations:
-      - queue: $queue
+    topicConfigurations:
+      - topic: $topic
         id: ObjectCreatedEvents
         events:
           - s3:ObjectCreated:*
