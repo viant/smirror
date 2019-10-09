@@ -1,14 +1,14 @@
 init:
 
   '!awsCredentials': $params.authWith
-  appPath: /tmp/smirror
-  appLocation: ${appPath}/aws/smirror.zip
-  functionName: StorageMirror
-  privilegePolicy: privilege-policy.json
 
+  functionName: StorageMirror
+  appPath: /tmp/smirror
+  handler: smirror
+  appLocation: ${appPath}/aws/$Phandler}.zip
+  privilegePolicy: privilege-policy.json
   configLocation: config/config.json
   configText: $Cat('$configLocation')
-
   bucketNs: ms-dataflow
   configBucket: ${bucketNs}-config
   triggerBucket: ${bucketNs}-trigger
@@ -16,22 +16,6 @@ init:
 
 
 pipeline:
-
-  package:
-    action: exec:run
-    target: $target
-    checkError: true
-    commands:
-      - unset GOPATH
-      - cd ${appPath}
-      - export GO111MODULE=on
-      - export GOOS=linux
-      - export GOARCH=amd64
-      - go mod vendor
-      - cd aws
-      - go build smirror.go
-      - zip -j smirror.zip smirror
-
 
   createBuckets:
     trigger:
@@ -77,23 +61,24 @@ pipeline:
       target: $target
       checkError: true
       commands:
-        - cd ${appPath}
         - unset GOPATH
+        - cd ${appPath}
         - export GO111MODULE=on
-        - rm -rf vendor
+        - export GOOS=linux
+        - export GOARCH=amd64
         - go mod vendor
         - cd aws
-        - go build smirror.go
-        - zip -j smirror.zip smirror
+        - go build -o $handler
+        - zip -j ${handler}.zip $handler
 
     deployLambda:
       action: aws/lambda:deploy
       credentials: $awsCredentials
       functionname: $functionName
       runtime:  go1.x
-      handler: smirror
-      timeout: 360
-      memorySize: 3072
+      handler: $handler
+      timeout: 900
+      memorySize: 2048
       environment:
         variables:
           LOGGING: 'true'

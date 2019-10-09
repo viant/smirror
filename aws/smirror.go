@@ -27,7 +27,7 @@ func handleRequest(ctx context.Context, s3Event events.S3Event) error {
 	if len(s3Event.Records) == 0 {
 		return nil
 	}
-	service, err := smirror.NewFromEnv(ctx, smirror.ConfigEnvKey)
+	service, err := smirror.NewFromEnv(ctx, base.ConfigEnvKey)
 	if err != nil {
 		return err
 	}

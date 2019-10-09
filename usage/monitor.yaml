@@ -11,9 +11,15 @@ init:
     ErrorURL:  s3://${opsBucket}/StorageMirror/errors/
 
 
+
 pipeline:
+  info:
+    action: print
+    message: $AsJSON($monitor)
+
   trigger:
     action: aws/lambda:call
     credentials: $awsCredentials
     functionname: StorageMonitor
     payload: $AsJSON($monitor)
+
