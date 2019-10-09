@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
@@ -48,9 +47,8 @@ func notify(destination string, payload []byte) error {
 	input := &flambda.InvokeInput{
 		FunctionName:   &destination,
 		Payload:        payload,
-		InvocationType: aws.String(flambda.InvocationTypeRequestResponse),
+		InvocationType: aws.String(flambda.InvocationTypeEvent),
 	}
-	output, err := service.Invoke(input)
-	fmt.Printf("notified: %v, %v %v\n", input, output, err)
+	_, err = service.Invoke(input)
 	return err
 }

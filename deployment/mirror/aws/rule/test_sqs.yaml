@@ -34,7 +34,7 @@ pipeline:
   checkDest:
     action: storage:exists
     assets:
-      - URL: gs://${destBucket}/testdata/data/test/events.csv.gz
+      - URL: gs://${destBucket}/testdata/data/test/events_sqs.csv.gz
         credentials: $gcpCredentials
 
 
@@ -45,11 +45,11 @@ pipeline:
       URL: events.csv.gz
     dest:
       credentials: $awsCredentials
-      URL: s3://${triggerBucket}/data/test/events.csv.gz
+      URL: s3://${triggerBucket}/data/test/events_sqs.csv.gz
 
 
   verify:
     action: storage:exists
     assets:
-      - URL: gs://${destBucket}/testdata/data/test/events.csv.gz
+      - URL: gs://${destBucket}/testdata/data/test/events_sqs.csv.gz
         credentials: $gcpCredentials
