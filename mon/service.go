@@ -2,6 +2,8 @@ package mon
 
 import (
 	"context"
+	_ "github.com/viant/afsc/s3"
+	_ "github.com/viant/afsc/gs"
 	"encoding/json"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"

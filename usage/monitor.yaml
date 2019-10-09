@@ -8,7 +8,7 @@ init:
   monitor:
     ConfigURL: s3://${configBucket}/StorageMirror/config.json
     TriggerURL: s3://${triggerBucket}
-    ErrorURL:  gs://${opsBucket}/StorageMirror/errors/
+    ErrorURL:  s3://${opsBucket}/StorageMirror/errors/
 
 
 pipeline:
