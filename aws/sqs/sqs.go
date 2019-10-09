@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	flambda "github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/viant/toolbox"
 	"log"
 	"os"
 )
@@ -19,7 +20,7 @@ func handleMessages(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
 	if dest == "" {
 		log.Print("env.%v key was empty", DestEnvKey)
 	}
-
+	toolbox.DumpIndent(sqsEvent, true)
 	if len(sqsEvent.Records) == 0 {
 		return err
 	}

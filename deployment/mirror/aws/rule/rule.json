@@ -1,0 +1,35 @@
+[
+  {
+    "Source": {
+      "Prefix": "/data/test",
+      "Suffix": ".csv.gz"
+    },
+    "Dest": {
+      "URL": "gs://${destBucket}/testdata",
+      "Credentials": {
+        "Parameter": "StorrageMirror.GCP.Test",
+        "Key": "alias/storagemirror"
+      }
+    },
+    "Codec": "gzip",
+    "OnSuccess": [
+      {
+        "Action": "move",
+        "URL": "s3://${opsBucket}/StorageMirror/processed/"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "s3://${opsBucket}/StorageMirror/errors/"
+      }
+    ],
+    "PreserveDepth": 2,
+    "Info": {
+      "Workflow": "My workflow name here",
+      "Description": "quick desciption",
+      "ProjectURL": "JIRA/WIKi or any link referece",
+      "LeadEngineer": "data flow requestor"
+    }
+  }
+]

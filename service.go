@@ -2,6 +2,7 @@ package smirror
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
@@ -104,6 +105,7 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 	if err != nil {
 		return err
 	}
+
 	sourceCompression := config.NewCompressionForURL(URL)
 	destCompression := route.Compression
 	if sourceCompression.Equals(destCompression) && len(route.Replace) == 0 {
@@ -112,7 +114,7 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 	}
 	reader, err = NewReader(reader, sourceCompression)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to create reader")
 	}
 
 	defer func() {
@@ -120,6 +122,7 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 			_ = reader.Close()
 		}
 	}()
+
 	destName := route.Name(URL)
 	destURL := url.Join(route.Dest.URL, destName)
 	if reader == nil {
@@ -165,9 +168,14 @@ func (s *service) transfer(ctx context.Context, transfer *Transfer, response *Re
 		return s.publish(ctx, transfer, response)
 	}
 	if transfer.Resource.URL != "" {
-		return s.upload(ctx, transfer, response)
+		err := s.upload(ctx, transfer, response)
+		if err != nil {
+			return errors.Wrapf(err, "failed to transfer: %v to %v", transfer.Resource.URL, transfer.Dest.URL)
+		}
+		return nil
 	}
-	return fmt.Errorf("invalid transfer: %v", transfer)
+	JSON, _ := json.Marshal(transfer)
+	return fmt.Errorf("invalid transfer: %s", JSON)
 }
 
 func (s *service) publish(ctx context.Context, transfer *Transfer, response *Response) error {
@@ -208,14 +216,14 @@ func (s *service) publish(ctx context.Context, transfer *Transfer, response *Res
 func (s *service) upload(ctx context.Context, transfer *Transfer, response *Response) error {
 	reader, err := transfer.GetReader()
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to get reader for: %v", transfer.Resource.URL)
 	}
 	options, err := s.secret.StorageOpts(ctx, transfer.Resource)
 	if err != nil {
 		return err
 	}
 	if err = s.fs.Upload(ctx, transfer.Dest.URL, file.DefaultFileOsMode, reader, options...); err != nil {
-		return err
+		return errors.Wrapf(err, "failed to upload %v", transfer.Dest.URL)
 	}
 	response.AddURL(transfer.Dest.URL)
 	return nil
@@ -279,6 +287,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rou
 		})
 	}
 }
+
 
 //New creates a new mirror service
 func New(ctx context.Context, config *Config) (Service, error) {

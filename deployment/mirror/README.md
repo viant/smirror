@@ -171,9 +171,15 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point StorageMirror \
 ```
 
 
+Testing deployment:
+
+
+
 ###### StorageMonitor
 
 ###### StorageReplay
+
+
 
 ### AWS Lambda function 
 
@@ -191,10 +197,32 @@ _where:_
 - [@privilege-policy.json](aws/privilege-policy.json)
 
 
+**Testing deployment:**
 
-###### StorageMonitor
+-  Secure google storage credentials (google secrets)
 
-###### StorageReplay
+
+```bash
+cd $SmirrorRoot
+cd deployment/mirror/aws
+endly secure.yaml authWith=aws-e2e gcpSecrets=gcp-e2e
+```
+
+where:
+[@secure.yaml](aws/secure.yaml)
+
+-  Test trigger 
+
+```bash
+cd $SmirrorRoot
+cd deployment/mirror/aws/rule
+endly test.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
+```
+
+where:
+- [@test.yaml](aws/rule/test.yaml)
+- [@rule.json](aws/rule/rule.json)
+
 
 
 ###### StorageMirror SQS Proxy
@@ -207,6 +235,19 @@ endly deploy.yaml authWith=myAWSSecretFile
 _where:_
 - [@deploy.yaml](aws/sqs/deploy.yaml)
 - [@privilege-policy.json](aws/sqs/privilege-policy.json)
+
+-  Test trigger 
+
+```bash
+cd $SmirrorRoot
+cd deployment/mirror/aws/rule
+endly test_sqs.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
+```
+
+where:
+- [@test_sqs.yaml](aws/rule/test_sqs.yaml)
+- [@rule.json](aws/rule/rule.json)
+
 
 
 ###### StorageMirror SNS Proxy
@@ -222,3 +263,10 @@ _where:_
 - [@privilege-policy.json](aws/sns/privilege-policy.json)
 
 
+###### StorageMirror Cron
+
+
+###### StorageMonitor
+
+
+###### StorageReplay

@@ -1,10 +1,12 @@
 init:
 
   '!awsCredentials': $params.authWith
-  appPath: /tmp/smirrorsqs
-  appLocation: ${appPath}/aws/sqs/smirrorsqs.zip
+  handler: smirrorsqs
+  appPath: /tmp/${handler}
+  appLocation: ${appPath}/aws/sqs/${handler}.zip
   functionName: StorageMirrorSqs
   privilegePolicy: privilege-policy.json
+
 
   bucketPrefix: ms-dataflow
   triggerBucket: ${bucketPrefix}-sqs-trigger
@@ -36,18 +38,19 @@ pipeline:
         - cd ${appPath}
         - unset GOPATH
         - export GO111MODULE=on
-        - rm -rf vendor
+        - export GOOS=linux
+        - export GOARCH=amd64
         - go mod vendor
         - cd aws/sqs
-        - go build -o smirrorsqs
-        - zip -j smirrorsqs.zip smirrorsqs
+        - go build -o ${handler}
+        - zip -j ${handler}.zip ${handler}
 
     deployLambda:
       action: aws/lambda:deploy
       credentials: $awsCredentials
       functionname: $functionName
       runtime:  go1.x
-      handler: smirrorsqs
+      handler: ${handler}
       timeout: 360
       environment:
         variables:
@@ -56,7 +59,7 @@ pipeline:
         zipfile: $LoadBinary(${appLocation})
       rolename: lambda-${functionName}-executor
       define:
-        - policyname: lambda-${functionName}-rolesmirrorsqs.go
+        - policyname: lambda-${functionName}-role.go
           policydocument: $Cat('${privilegePolicy}')
       attach:
         - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole

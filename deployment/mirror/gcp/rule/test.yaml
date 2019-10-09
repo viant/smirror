@@ -2,7 +2,7 @@ init:
   '!gcpCredentials': $params.authWith
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
-  bucketPrefix: $gcp.ProjectID
+  bucketPrefix: $Replace('$gcp.ProjectID','-','_')
   configBucket: ${bucketPrefix}_config
   triggerBucket: ${bucketPrefix}_trigger
   opsBucket: ${bucketPrefix}_operation

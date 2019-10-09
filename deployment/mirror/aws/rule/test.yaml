@@ -1,0 +1,55 @@
+init:
+  '!awsCredentials': $params.authWith
+  '!gcpCredentials': $params.gcpSecrets
+
+  gcp: ${secrets.$gcpCredentials}
+  gcpProject: $gcp.ProjectID
+  destBucketPrefix: $Replace('$gcp.ProjectID','-','_')
+
+  bucketPrefix: ms-dataflow
+  configBucket: ${bucketPrefix}-config
+  triggerBucket: ${bucketPrefix}-trigger
+  opsBucket: ${bucketPrefix}-operations
+  destBucket: ${destBucketPrefix}_mirrored
+
+
+pipeline:
+
+  setupRoute:
+    action: storage:copy
+    expand: true
+    source:
+      URL: rule.json
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${configBucket}/StorageMirror/dataflow/test-rule.json
+
+
+  cleanupDest:
+    action: storage:remove
+    assets:
+      - URL: gs://${destBucket}/testdata/data/test/events.csv.gz
+        credentials: $gcpCredentials
+
+  checkDest:
+    action: storage:exists
+    assets:
+      - URL: gs://${destBucket}/testdata/data/test/events.csv.gz
+        credentials: $gcpCredentials
+
+
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 20000
+    source:
+      URL: events.csv.gz
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${triggerBucket}/data/test/events.csv.gz
+
+
+  verify:
+    action: storage:exists
+    assets:
+      - URL: gs://${destBucket}/testdata/data/test/events.csv.gz
+        credentials: $gcpCredentials

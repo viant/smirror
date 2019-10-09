@@ -5,6 +5,7 @@ init:
   gcp: ${secrets.$gcpCredentials}
   secret: $gcp.Data
 
+
 pipeline:
   secure:
     credentials: $awsCredentials
@@ -16,9 +17,10 @@ pipeline:
     action: print
     message: 'encrypting: $secret'
 
+
   encryptGcpSecrets:
     action: aws/ssm:setParameter
-    name: StorrageMirror.GCP.${gcp.ProjectID}
+    name: StorrageMirror.GCP.Test
     '@description': Google Storage ${gcp.ProjectID} credentials
     overwrite: true
     type: SecureString
