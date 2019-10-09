@@ -70,8 +70,6 @@ pipeline:
     attach:
       - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
-
-
   setTrigger:
     action: aws/s3:setupBucketNotification
     sleepTimeMs: 20000
@@ -106,7 +104,6 @@ pipeline:
         enabled: true
         batchSize: 2
 
-
   deployCronLambad:
     action: aws/lambda:deploy
     credentials: $awsCredentials
@@ -128,3 +125,4 @@ pipeline:
         policydocument: $Cat('${privilegePolicyCron}')
     attach:
       - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
