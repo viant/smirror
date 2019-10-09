@@ -31,7 +31,6 @@ func handleRequest(ctx context.Context, s3Event events.S3Event) error {
 	if err != nil {
 		return err
 	}
-
 	for _, resource := range s3Event.Records {
 		URL := resourceURL(resource)
 		if base.IsLoggingEnabled() {

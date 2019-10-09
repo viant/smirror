@@ -3,9 +3,10 @@ init:
   '!awsCredentials': $params.authWith
 
   functionName: StorageMirror
-  appPath: /tmp/smirror
+
   handler: smirror
-  appLocation: ${appPath}/aws/$Phandler}.zip
+  appPath: /tmp/${handler}
+  appLocation: ${appPath}/aws/${handler}.zip
   privilegePolicy: privilege-policy.json
   configLocation: config/config.json
   configText: $Cat('$configLocation')
