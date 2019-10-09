@@ -401,6 +401,10 @@ _where:_
 
 ## Replay
 
+Sometimes during regular operation cloud function or lambda may terminate with error, leaving unprocess file. 
+Replay function will move data back and forth between trigger and replay bucket triggering another event.
+Each replayed file leaves trace in replay bucket  to control no more then one replay per file.
+
 
 ```bash
 curl -d @replay.json -X POST  -H "Content-Type: application/json"  $replayEndpoint
