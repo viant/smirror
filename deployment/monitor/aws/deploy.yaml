@@ -1,5 +1,6 @@
 init:
   '!awsCredentials': $params.authWith
+
   appPath: /tmp/smonitor
   privilegePolicy: privilege-policy.json
   functionName: StorageMonitor
@@ -40,7 +41,8 @@ pipeline:
       functionname: $functionName
       runtime:  go1.x
       handler: $handler
-      timeout: 360
+      timeout: 900
+      memorySize: 256
       environment:
         variables:
           LOGGING: 'true'
