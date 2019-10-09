@@ -12,6 +12,9 @@ import (
 	"time"
 )
 
+
+const replayExtension = ".replay"
+
 //Service represents replay service
 type Service interface {
 	Replay(context.Context, *Request) *Response
@@ -49,7 +52,13 @@ func (s *service) replay(ctx context.Context, request *Request, response *Respon
 		}
 		sourceURL := objects[i].URL()
 		sourceBucket := url.Host(sourceURL)
+
 		destURL := strings.Replace(sourceURL, sourceBucket, request.ReplayBucket, 1)
+		replayedURL := destURL + replayExtension
+		if exists, _ := s.fs.Exists(ctx, replayedURL);exists {
+				continue
+		}
+
 		if err := s.fs.Move(ctx, sourceURL, destURL); err != nil {
 			return err
 		}
@@ -57,6 +66,9 @@ func (s *service) replay(ctx context.Context, request *Request, response *Respon
 			return err
 		}
 		response.Replayed = append(response.Replayed, sourceURL)
+		if err := s.fs.Upload(ctx, replayedURL, 0644, strings.NewReader(sourceURL)); err != nil {
+			return err
+		}
 	}
 	return nil
 }
