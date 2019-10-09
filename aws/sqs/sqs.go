@@ -48,7 +48,7 @@ func notify(destination string, payload []byte) error {
 	input := &flambda.InvokeInput{
 		FunctionName:   &destination,
 		Payload:        payload,
-		InvocationType: aws.String(flambda.InvocationTypeEvent),
+		InvocationType: aws.String(flambda.InvocationTypeRequestResponse),
 	}
 	output, err := service.Invoke(input)
 	fmt.Printf("notified: %v, %v %v\n", input, output, err)
