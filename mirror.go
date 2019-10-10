@@ -8,7 +8,6 @@ import (
 	"log"
 	"smirror/base"
 	"smirror/event"
-	"smirror/gs"
 )
 
 //StorageMirror cloud function entry point
