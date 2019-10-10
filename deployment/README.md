@@ -152,7 +152,7 @@ _where:_
 - [@deploy.yaml](mirror/gcp/deploy.yaml)
 
 
-To deploy with gcloud cli use the followig commands:
+To deploy with gcloud cli use the following commands:
 
 ```bash
 git chckout https://github.com/viant/smirror.git
@@ -172,6 +172,37 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point StorageMirror \
 
 
 Testing deployment:
+
+```bash
+endly deploy.yaml authWith=myGCPSecretFile
+```
+
+_where:_
+- [@deploy.yaml](mirror/gcp/deploy.yaml)
+
+
+To deploy with gcloud cli use the following commands:
+
+```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror
+unset GOPATH
+export GO111MODULE=on
+go mod vendor
+
+gcloud functions deploy MyGsBucketToS3Mirror --entry-point StorageMirror \ 
+    --trigger-resource ${triggerBucket} 
+    --trigger-event google.storage.object.finalize \
+    --set-env-vars=LOGGING=true,CONFIG=gs://triggerBucket/mirror/config/gs.json \
+    --memory=512M \
+    --timeout=540s \
+    --runtime=go111 
+```
+
+
+
+###### StorageMirror Subscriber
+
 
 
 

@@ -1,0 +1,80 @@
+init:
+
+  '!gcpCredentials': $params.authWith
+  '!topic': $params.topic
+
+
+  gcp: ${secrets.$gcpCredentials}
+  bucketPrefix: viant_dataflow
+
+  serviceAccount: $gcp.ClientEmail
+
+  appPath: /tmp/smirror
+  functionName: StorageMirror
+  
+  
+  configBucket: ${bucketPrefix}_config
+  triggerBucket: ${bucketPrefix}_trigger
+  opsBucket: ${bucketPrefix}_operation
+  destBucket: ${bucketPrefix}_mirrored
+  
+  configLocation: config/config.json
+  configText: $Cat('$configLocation')
+
+
+pipeline:
+
+#  info:
+#    action: print
+#    init:
+#      configJSON: $AsJSON($configText)
+#    message: $configJSON
+#
+#  setup:
+#    action: storage:upload
+#    init:
+#      configJSON: $AsJSON($configText)
+#    sourceKey: configJSON
+#    expand: true
+#    dest:
+#      credentials: $gcpCredentials
+#      URL: gs://${configBucket}/StorageMirror/config.json
+
+
+  deploy:
+    checkOut:
+      action: vc/git:checkout
+      Origin:
+        URL: https://github.com/viant/smirror.git
+      Dest:
+        URL: ${appPath}
+
+    package:
+      action: exec:run
+      target: $target
+      checkError: true
+      commands:
+        - cd ${appPath}
+        - unset GOPATH
+        - export GO111MODULE=on
+        - rm -rf vendor
+        - go mod vendor
+
+    upload:
+      action: gcp/cloudfunctions:deploy
+      credentials: $gcpCredentials
+      '@name': StorageMirrorSubscriber
+      entryPoint: StorageMirrorSubscriber
+      runtime: go111
+      availableMemoryMb: 2048
+      timeout: 540s
+      serviceAccountEmail: $serviceAccount
+      eventTrigger:
+      eventType: google.pubsub.topic.publish
+      resource: projects/${gcp.projectID}/topics/$topic
+      environmentVariables:
+        LOGGING: 'true'
+        CONFIG: gs://${configBucket}/StorageMirror/config.json
+      source:
+        URL: ${appPath}/
+      sleepTimeMs: 5000

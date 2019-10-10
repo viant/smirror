@@ -28,7 +28,7 @@ pipeline:
   cleanupDest:
     action: storage:remove
     assets:
-      - URL: gs://${destBucket}/testdata/data/test/events.csv.gz
+      - URL: gs://${destBucket}/testdata/data/test/events_sns.csv.gz
         credentials: $gcpCredentials
 
   checkDest:
