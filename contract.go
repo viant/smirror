@@ -18,7 +18,7 @@ type Response struct {
 	DestURLs    []string `json:",omitempty"`
 	MessageIDs  []string `json:",omitempty"`
 	TimeTakenMs int
-	Rule        *config.Route `json:",omitempty"`
+	Rule        *config.Rule `json:",omitempty"`
 	TotalRules  int
 	Status      string
 	Error       string `json:",omitempty"`

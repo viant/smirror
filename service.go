@@ -96,7 +96,7 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 	return err
 }
 
-func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL string, response *Response) error {
+func (s *service) mirrorAsset(ctx context.Context, route *config.Rule, URL string, response *Response) error {
 	options, err := s.secret.StorageOpts(ctx, route.Source)
 	if err != nil {
 		return err
@@ -136,7 +136,7 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Route, URL stri
 	return s.transfer(ctx, dataCopy, response)
 }
 
-func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Route, request *Request, response *Response) error {
+func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Rule, request *Request, response *Response) error {
 	options, err := s.secret.StorageOpts(ctx, route.Source)
 	if err != nil {
 		return err
@@ -267,7 +267,7 @@ func (s *service) UpdateResources(ctx context.Context) error {
 	return nil
 }
 
-func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Route, counter *int32, waitGroup *sync.WaitGroup, response *Response) func() io.WriteCloser {
+func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rule, counter *int32, waitGroup *sync.WaitGroup, response *Response) func() io.WriteCloser {
 	return func() io.WriteCloser {
 		splitCount := atomic.AddInt32(counter, 1)
 		destName := route.Split.Name(route, URL, splitCount)

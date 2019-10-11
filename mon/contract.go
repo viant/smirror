@@ -52,7 +52,7 @@ func (r *Response) AddError(object storage.Object, message string) {
 	r.ErrorCount++
 }
 
-func (r *Response) AddUnprocessed(now time.Time, route *config.Route, file storage.Object) {
+func (r *Response) AddUnprocessed(now time.Time, route *config.Rule, file storage.Object) {
 	info := config.Info{
 		Workflow: base.UnclassifiedDataflow,
 	}
@@ -76,7 +76,7 @@ func (r *Response) AddUnprocessed(now time.Time, route *config.Route, file stora
 	})
 }
 
-func (r *Response) AddProcessed(route *config.Route, object storage.Object) {
+func (r *Response) AddProcessed(route *config.Rule, object storage.Object) {
 	info := config.Info{
 		Workflow: base.UnclassifiedDataflow,
 	}

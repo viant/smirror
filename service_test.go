@@ -11,6 +11,7 @@ import (
 	"github.com/viant/assertly"
 	"io"
 	"io/ioutil"
+	"smirror/base"
 	"smirror/config"
 	"smirror/job"
 	"strings"
@@ -47,8 +48,9 @@ line9
 `,
 			config: &Config{
 				Mirrors: config.Routes{
-					Rules: []*config.Route{
+					Rules: []*config.Rule{
 						{
+							PreserveDepth:base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -85,8 +87,9 @@ line3,
 line4`,
 			config: &Config{
 				Mirrors: config.Routes{
-					Rules: []*config.Route{
+					Rules: []*config.Rule{
 						{
+							PreserveDepth:base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -118,9 +121,9 @@ line3,
 line4`,
 			config: &Config{
 				Mirrors: config.Routes{
-					Rules: []*config.Route{
+					Rules: []*config.Rule{
 						{
-							PreserveDepth: 2,
+							PreserveDepth: base.IntPtr(2),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -152,8 +155,9 @@ line3,
 line4`,
 			config: &Config{
 				Mirrors: config.Routes{
-					Rules: []*config.Route{
+					Rules: []*config.Rule{
 						{
+							PreserveDepth:base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -201,8 +205,9 @@ line11
 `,
 			config: &Config{
 				Mirrors: config.Routes{
-					Rules: []*config.Route{
+					Rules: []*config.Rule{
 						{
+							PreserveDepth:base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -253,8 +258,9 @@ line11
 `,
 			config: &Config{
 				Mirrors: config.Routes{
-					Rules: []*config.Route{
+					Rules: []*config.Rule{
 						{
+							PreserveDepth:base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt.gz",
@@ -297,8 +303,9 @@ line3,
 line4`,
 			config: &Config{
 				Mirrors: config.Routes{
-					Rules: []*config.Route{
+					Rules: []*config.Rule{
 						{
+							PreserveDepth:base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -336,9 +343,11 @@ line3,
 line4`,
 			config: &Config{
 				Mirrors: config.Routes{
-					Rules: []*config.Route{
+					Rules: []*config.Rule{
 						{
+							PreserveDepth:base.IntPtr(0),
 							Source: &config.Resource{
+
 								Basic: matcher.Basic{
 									Suffix: ".txt",
 								},

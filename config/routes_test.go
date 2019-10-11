@@ -16,7 +16,7 @@ func TestRoutes_HasMatch(t *testing.T) {
 		{
 			description: "suffix match",
 			Routes: Routes{
-				Rules: []*Route{
+				Rules: []*Rule{
 					{
 						Source: &Resource{
 							Basic: matcher.Basic{
@@ -45,7 +45,7 @@ func TestRoutes_HasMatch(t *testing.T) {
 		{
 			description: "prefix np match",
 			Routes: Routes{
-				Rules: []*Route{
+				Rules: []*Rule{
 					{
 						Source: &Resource{
 							Basic: matcher.Basic{

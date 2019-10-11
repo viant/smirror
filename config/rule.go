@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-//Route represent matching resource route rule
-type Route struct {
+//Rule represent matching resource route rule
+type Rule struct {
 	Info    Info
 	Dest    *Resource
 	Source  *Resource
@@ -21,11 +21,26 @@ type Route struct {
 	job.Actions
 	*Compression
 	//PreserveDepth  - preserves specified folder depth in dest URL
-	PreserveDepth int `json:",omitempty"`
+	PreserveDepth *int `json:",omitempty"`
 }
 
+//HasPreserveDepth returns true if property has been specified
+func (r *Rule) HasPreserveDepth() bool {
+	return r.PreserveDepth != nil
+}
+
+
+//GetPreserveDepth returns PreservceDepth
+func (r *Rule) GetPreserveDepth() int {
+	if  r.PreserveDepth != nil {
+		return *r.PreserveDepth
+	}
+	return 0
+}
+
+
 //Validate checks if route is valid
-func (r *Route) Validate() error {
+func (r *Rule) Validate() error {
 	if r.Source == nil {
 		return fmt.Errorf("source was empty")
 	}
@@ -35,15 +50,23 @@ func (r *Route) Validate() error {
 	return nil
 }
 
+
 //HasMatch returns true if URL matches prefix or suffix
-func (r *Route) HasMatch(URL string) bool {
+func (r *Rule) HasMatch(URL string) bool {
+	if r.Source.Bucket != "" {
+		bucket := url.Host(URL)
+		if bucket != r.Source.Bucket {
+			return false
+		}
+	}
+
 	location := url.Path(URL)
 	parent, name := path.Split(location)
 	return r.Source.Match(parent, file.NewInfo(name, 0, 0644, time.Now(), false))
 }
 
 //Name return route dest asset name
-func (r *Route) Name(URL string) string {
+func (r *Rule) Name(URL string) string {
 	_, location := url.Base(URL, file.Scheme)
 	parent, name := path.Split(location)
 	ext := path.Ext(name)
@@ -60,14 +83,18 @@ func (r *Route) Name(URL string) string {
 		}
 	}
 
-	if r.PreserveDepth == 0 {
+	depth := r.GetPreserveDepth()
+	if depth == 0 && r.HasPreserveDepth() {
 		return name
 	}
 
 	folderPath := strings.Trim(parent, "/")
 	fragments := strings.Split(folderPath, "/")
-	if r.PreserveDepth < len(fragments) {
-		folderPath = strings.Join(fragments[len(fragments)-r.PreserveDepth:], "/")
+	if ! r.HasPreserveDepth() {
+		depth = len(fragments)
+	}
+	if depth < len(fragments) {
+		folderPath = strings.Join(fragments[len(fragments)-depth:], "/")
 	} else if strings.HasPrefix(folderPath, "/") {
 		folderPath = string(folderPath[1:])
 	}

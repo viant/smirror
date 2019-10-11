@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/stretchr/testify/assert"
+	"smirror/base"
 	"testing"
 )
 
@@ -12,12 +13,12 @@ func TestSplit_Name(t *testing.T) {
 		counter     int32
 		URL         string
 		split       *Split
-		route       *Route
+		route       *Rule
 		expect      string
 	}{
 		{
 			description: "prefix template",
-			route:       &Route{},
+			route:       &Rule{},
 			split: &Split{
 				Template: "%03d_%v",
 			},
@@ -26,7 +27,7 @@ func TestSplit_Name(t *testing.T) {
 		},
 		{
 			description: "suffix template",
-			route:       &Route{},
+			route:       &Rule{},
 			counter:     2,
 			split: &Split{
 				Template: "%v_abc_%03d",
@@ -36,8 +37,8 @@ func TestSplit_Name(t *testing.T) {
 		},
 		{
 			description: "suffix template with 2 depth",
-			route: &Route{
-				PreserveDepth: 2,
+			route: &Rule{
+				PreserveDepth: base.IntPtr(2),
 			},
 			counter: 32,
 			split: &Split{

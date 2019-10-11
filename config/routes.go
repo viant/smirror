@@ -18,18 +18,21 @@ import (
 type Routes struct {
 	BaseURL      string
 	CheckInMs    int
-	Rules        []*Route
+	Rules        []*Rule
 	meta         *base.Meta
-	initialRules []*Route
+	initialRules []*Rule
 	inited       int32
 }
 
 //HasMatch returns the first match route
-func (r Routes) HasMatch(URL string) *Route {
+func (r Routes) HasMatch(URL string) *Rule {
 	if len(r.Rules) == 0 {
 		return nil
 	}
 	for i := range r.Rules {
+
+
+
 		if r.Rules[i].HasMatch(URL) {
 			return r.Rules[i]
 		}
@@ -104,7 +107,7 @@ func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object 
 	defer func() {
 		_ = reader.Close()
 	}()
-	routes := make([]*Route, 0)
+	routes := make([]*Rule, 0)
 	err = json.NewDecoder(reader).Decode(&routes)
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
@@ -137,7 +140,7 @@ func (r *Routes) initRules() error {
 			}
 			r.initialRules = r.Rules
 		} else {
-			r.initialRules = make([]*Route, 0)
+			r.initialRules = make([]*Rule, 0)
 		}
 	}
 	return nil

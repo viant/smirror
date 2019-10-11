@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/lambda"
 	"log"
-	"smirror"
+	"smirror/base"
 	"smirror/cron"
 )
 
@@ -19,7 +19,7 @@ func main() {
 }
 
 func handleRequest(ctx context.Context) error {
-	service, err := cron.NewFromEnv(ctx, smirror.ConfigEnvKey)
+	service, err := cron.NewFromEnv(ctx, base.ConfigEnvKey)
 	if err != nil {
 		return err
 	}

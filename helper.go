@@ -14,3 +14,4 @@ func IsNotFound(message string) bool {
 	message = strings.Replace(strings.ToLower(message), " ", "", len(message))
 	return strings.Contains(message, notFoundMessage)
 }
+

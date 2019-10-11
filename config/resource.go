@@ -10,6 +10,7 @@ import (
 //Represents a destination
 type Resource struct {
 	matcher.Basic
+	Bucket      string
 	URL         string            `json:",omitempty"`
 	Region      string            `json:",omitempty"`
 	CustomKey   *CustomKey        `json:",omitempty"`

@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/afs/matcher"
+	"smirror/base"
 	"testing"
 )
 
@@ -10,13 +11,13 @@ func TestRoute_HasMatch(t *testing.T) {
 
 	var useCases = []struct {
 		description string
-		Route
+		Rule
 		URL    string
 		expect bool
 	}{
 		{
 			description: "prefix match",
-			Route: Route{
+			Rule: Rule{
 				Source: &Resource{
 					Basic: matcher.Basic{
 						Prefix: "/folder/",
@@ -28,7 +29,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		},
 		{
 			description: "prefix no match",
-			Route: Route{
+			Rule: Rule{
 				Source: &Resource{
 					Basic: matcher.Basic{
 						Prefix: "folder/",
@@ -40,7 +41,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		},
 		{
 			description: "suffix match",
-			Route: Route{
+			Rule: Rule{
 				Source: &Resource{
 					Basic: matcher.Basic{
 						Suffix: ".csv",
@@ -52,7 +53,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		},
 		{
 			description: "suffix no match",
-			Route: Route{
+			Rule: Rule{
 				Source: &Resource{
 					Basic: matcher.Basic{
 						Suffix: ".tsv",
@@ -64,7 +65,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		},
 		{
 			description: "filter no match",
-			Route: Route{
+			Rule: Rule{
 				Source: &Resource{
 					Basic: matcher.Basic{
 						Suffix: ".tsv",
@@ -77,7 +78,7 @@ func TestRoute_HasMatch(t *testing.T) {
 		},
 		{
 			description: "filter match",
-			Route: Route{
+			Rule: Rule{
 				Source: &Resource{
 					Basic: matcher.Basic{
 						Suffix: ".tsv",
@@ -101,7 +102,7 @@ func TestRoute_Name(t *testing.T) {
 
 	var useCases = []struct {
 		description string
-		Route
+		Rule
 		URL    string
 		expect string
 	}{
@@ -112,31 +113,31 @@ func TestRoute_Name(t *testing.T) {
 		},
 		{
 			description: "folder depth = 1",
-			Route: Route{
-				PreserveDepth: 1,
+			Rule: Rule{
+				PreserveDepth: base.IntPtr(1),
 			},
 			URL:    "s3://myducket/folder/sub/asset1.txt",
 			expect: "sub/asset1.txt",
 		},
 		{
 			description: "folder depth = 2",
-			Route: Route{
-				PreserveDepth: 2,
+			Rule: Rule{
+				PreserveDepth: base.IntPtr(2),
 			},
 			URL:    "s3://myducket/folder/sub/asset1.txt",
 			expect: "folder/sub/asset1.txt",
 		},
 		{
 			description: "folder depth exceeded path",
-			Route: Route{
-				PreserveDepth: 4,
+			Rule: Rule{
+				PreserveDepth: base.IntPtr(4),
 			},
 			URL:    "s3://myducket/folder/sub/asset1.txt",
 			expect: "folder/sub/asset1.txt",
 		},
 		{
 			description: "gzip compression",
-			Route: Route{
+			Rule: Rule{
 				Compression: &Compression{Codec: GZipCodec},
 			},
 			URL:    "s3://myducket/folder/sub/asset1.txt",

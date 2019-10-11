@@ -70,8 +70,8 @@ pipeline:
       timeout: 540s
       serviceAccountEmail: $serviceAccount
       eventTrigger:
-        - eventType: google.pubsub.topic.publish
-          resource: projects/${gcp.projectID}/topics/$topic
+        eventType: google.pubsub.topic.publish
+        resource: projects/${gcp.projectID}/topics/$topic
       environmentVariables:
         LOGGING: 'true'
         CONFIG: gs://${configBucket}/StorageMirror/config.json

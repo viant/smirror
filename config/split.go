@@ -18,7 +18,7 @@ type Split struct {
 }
 
 //Name returns a chunk name for supplied URL and mirrorChunkeddAsset number
-func (s *Split) Name(router *Route, URL string, counter int32) string {
+func (s *Split) Name(router *Rule, URL string, counter int32) string {
 	name := router.Name(URL)
 	destName := ""
 	ext := ""
