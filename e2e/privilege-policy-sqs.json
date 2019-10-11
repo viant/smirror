@@ -6,7 +6,7 @@
       "Action": [
         "sqs:*"
       ],
-      "Resource": "arn:aws:sqs:*:${aws.accountID}:StorageMirror"
+      "Resource": "arn:aws:sqs:*:${aws.accountID}:${s3Queue}"
     },
     {
       "Effect": "Allow",

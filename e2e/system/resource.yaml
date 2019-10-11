@@ -1,5 +1,6 @@
 pipeline:
-  deployPubsubTopic:
+  
+  setupMessageBus:
     action: msg:setupResource
     resources:
       - URL: smirrorTopic
@@ -14,3 +15,8 @@ pipeline:
         config:
           topic:
             URL: /projects/${gcp.projectID}/topics/smirrorTopic
+
+      - URL: ${s3Queue}
+        type: queue
+        vendor: aws
+        credentials: $awsCredentials

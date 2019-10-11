@@ -10,7 +10,7 @@ init:
   s3TriggerBucket: ms-e2e-storagemirror-inbound
   s3OpsBucket: ms-e2e-ops
   s3DestBucket: ms-e2e-storagemirror-outbound
-
+  s3Queue: ms-e2e-queue
 
   s3ExternalBucket: ms-e2e-storagemirror-ext
   customer001CustomKey: this is secret :3rd party phrase
