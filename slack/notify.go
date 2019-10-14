@@ -29,7 +29,8 @@ func (s *service) notify(ctx context.Context, request *job.NotifyRequest) error 
 	if err != nil {
 		return err
 	}
-	if request.Credentials.Token == "" {
+
+	if request.Credentials.RawToken == "" {
 		data, err := s.Secret.Decrypt(ctx, &request.Credentials.Secret)
 		if err != nil {
 			return err
@@ -37,8 +38,10 @@ func (s *service) notify(ctx context.Context, request *job.NotifyRequest) error 
 		if err = json.Unmarshal(data, &request.OAuthToken); err != nil {
 			return errors.Wrapf(err, "failed to unmarshal token: %s", data)
 		}
+		request.RawToken  = request.Token
+		request.Token = ""
 	}
-	client := slack.New(request.Token)
+	client := slack.New(request.RawToken)
 	return s.postMessage(ctx, client, request)
 }
 

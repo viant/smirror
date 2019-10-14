@@ -52,7 +52,7 @@ func (a Action) Do(context *Context, service afs.Service, notify Notify, info *b
 		err = service.Delete(context.Context, URL)
 	case ActionNotify:
 		body := a.Body
-		if a.Body == "$Response" {
+		if textBody, ok := a.Body.(string);ok && textBody == "$Response" {
 			body =  response
 		}
 		title := strings.Replace(a.Title, "$SourceURL", context.SourceURL, 1)
