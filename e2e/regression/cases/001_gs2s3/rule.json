@@ -20,7 +20,8 @@
         "Action": "notify",
         "Title": "Transfer $SourceURL done",
         "Message": "success !!",
-        "Channels": ["#e2e"]
+        "Channels": ["#e2e"],
+        "Body": "$Response"
       }
     ],
     "OnFailure": [

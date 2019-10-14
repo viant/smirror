@@ -21,13 +21,13 @@ const (
 
 //Action represents an action
 type Action struct {
-	Action      string //empty Delete,Move
-	URL         string
-	Message     string
-	Title       string
-	Body        interface{}
-	Channels    []string
-	Credentials *auth.Credentials
+	Action          string //empty Delete,Move
+	URL             string
+	Message         string
+	Title           string
+	Body			interface{}
+	Channels        []string
+	Credentials     *auth.Credentials
 }
 
 //DestURL returns destination URL
@@ -45,14 +45,15 @@ func (a Action) WriteError(context *Context, service afs.Service) error {
 }
 
 //Do perform an action
-func (a Action) Do(context *Context, service afs.Service, notify Notify, info *base.Info, body interface{}) (err error) {
+func (a Action) Do(context *Context, service afs.Service, notify Notify, info *base.Info, response interface{}) (err error) {
 	URL := context.SourceURL
 	switch a.Action {
 	case ActionDelete:
 		err = service.Delete(context.Context, URL)
 	case ActionNotify:
-		if a.Body != nil {
-			body = a.Body
+		body := a.Body
+		if a.Body == "$Response" {
+			body =  response
 		}
 		title := strings.Replace(a.Title, "$SourceURL", context.SourceURL, 1)
 		message := strings.Replace(a.Message, "$SourceURL", context.SourceURL, 1)
