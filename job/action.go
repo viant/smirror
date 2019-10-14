@@ -22,12 +22,12 @@ const (
 //Action represents an action
 type Action struct {
 	Action          string //empty Delete,Move
-	URL             string
-	Message         string
-	Title           string
-	Body			interface{}
-	Channels        []string
-	Credentials     *auth.Credentials
+	URL             string `json:",omitempty"`
+	Message         string `json:",omitempty"`
+	Title           string `json:",omitempty"`
+	Body			interface{} `json:",omitempty"`
+	Channels        []string `json:",omitempty"`
+	Credentials     *auth.Credentials `json:",omitempty"`
 }
 
 //DestURL returns destination URL
