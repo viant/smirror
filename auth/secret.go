@@ -2,7 +2,7 @@ package auth
 
 //Secret represents a secret config
 type Secret struct {
-	URL       string
-	Parameter string
-	Key       string
+	URL       string `json:",omitempty"`
+	Parameter string `json:",omitempty"`
+	Key       string `json:",omitempty"`
 }
