@@ -4,5 +4,5 @@ package auth
 type Credentials struct {
 	Secret
 	OAuthToken
-	Auth []byte
+	Auth []byte `json:"-"`
 }
