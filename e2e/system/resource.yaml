@@ -1,5 +1,5 @@
 pipeline:
-  
+
   setupMessageBus:
     action: msg:setupResource
     resources:

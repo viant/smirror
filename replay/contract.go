@@ -30,7 +30,7 @@ func (r *Request) Init() (err error) {
 	if r.UnprocessedDuration == "" {
 		r.UnprocessedDuration = defaultTriggerAge
 	}
-	if ! (strings.Contains(strings.ToLower(r.UnprocessedDuration), "ago") || strings.Contains(strings.ToLower(r.UnprocessedDuration), "past")) {
+	if !(strings.Contains(strings.ToLower(r.UnprocessedDuration), "ago") || strings.Contains(strings.ToLower(r.UnprocessedDuration), "past")) {
 		r.UnprocessedDuration += agoKeyword
 	}
 	if r.unprocessedModifiedBefore, err = toolbox.TimeAt(r.UnprocessedDuration); err != nil {
@@ -38,7 +38,6 @@ func (r *Request) Init() (err error) {
 	}
 	return nil
 }
-
 
 func (r *Request) Validate() error {
 	if r.ReplayBucket == "" {

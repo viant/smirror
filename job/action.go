@@ -1,10 +1,12 @@
 package job
 
 import (
+	"fmt"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
 	"smirror/auth"
+	"smirror/base"
 	"strings"
 )
 
@@ -13,13 +15,18 @@ const (
 	ActionDelete = "delete"
 	//ActionMove move action
 	ActionMove = "move"
+	//Action notify
+	ActionNotify = "notify"
 )
 
 //Action represents an action
 type Action struct {
 	Action      string //empty Delete,Move
 	URL         string
-	Message     interface{}
+	Message     string
+	Title       string
+	Body        interface{}
+	Channels    []string
 	Credentials *auth.Credentials
 }
 
@@ -38,14 +45,33 @@ func (a Action) WriteError(context *Context, service afs.Service) error {
 }
 
 //Do perform an action
-func (a Action) Do(context *Context, service afs.Service) error {
+func (a Action) Do(context *Context, service afs.Service, notify Notify, info *base.Info, body interface{}) (err error) {
 	URL := context.SourceURL
 	switch a.Action {
 	case ActionDelete:
-		return service.Delete(context.Context, URL)
+		err = service.Delete(context.Context, URL)
+	case ActionNotify:
+		if a.Body != nil {
+			body = a.Body
+		}
+		title := strings.Replace(a.Title, "$SourceURL", context.SourceURL, 1)
+		message := strings.Replace(a.Message, "$SourceURL", context.SourceURL, 1)
+		if len(a.Channels) == 0 && info.SlackChannel != "" {
+			a.Channels = []string{info.SlackChannel}
+		}
+		err = notify(context.Context, &NotifyRequest{
+			From:        base.App,
+			Title:       title,
+			Channels:    a.Channels,
+			Credentials: a.Credentials,
+			Message:     message,
+			Body:        body,
+		})
 	case ActionMove:
 		targetURL := a.DestURL(context.RelativePath)
 		return service.Move(context.Context, URL, targetURL)
+	default:
+		err = fmt.Errorf("unsupported action: %v", a.Action)
 	}
-	return nil
+	return err
 }

@@ -11,6 +11,7 @@ import (
 	"runtime/debug"
 	"smirror"
 	"smirror/base"
+	"smirror/contract"
 )
 
 func main() {
@@ -33,7 +34,7 @@ func handleRequest(ctx context.Context, s3Event events.S3Event) error {
 	}
 	for _, resource := range s3Event.Records {
 		URL := resourceURL(resource)
-		response := service.Mirror(ctx, smirror.NewRequest(URL))
+		response := service.Mirror(ctx, contract.NewRequest(URL))
 		if data, err := json.Marshal(response); err == nil {
 			fmt.Printf("%s\n", string(data))
 		}

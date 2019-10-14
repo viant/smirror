@@ -7,16 +7,17 @@ import (
 	"github.com/viant/afs"
 	"github.com/viant/toolbox"
 	"os"
+	"smirror/auth"
 	"smirror/base"
 	"smirror/config"
 	"strings"
 )
 
-
 //Config represents routes
 type Config struct {
 	base.Config
-	Mirrors config.Routes
+	SlackCredentials *auth.Credentials
+	Mirrors          config.Routes
 }
 
 //Init initialises routes
@@ -39,21 +40,6 @@ func (c *Config) UseMessageDest() bool {
 		}
 	}
 	return false
-}
-
-//Resources returns
-func (c *Config) Resources(ctx context.Context, fs afs.Service) ([]*config.Resource, error) {
-	var result = make([]*config.Resource, 0)
-	for i := range c.Mirrors.Rules {
-		resource := c.Mirrors.Rules[i]
-		if resource.Source.Credentials != nil || resource.Source.CustomKey != nil {
-			result = append(result, resource.Source)
-		}
-		if resource.Dest.Credentials != nil || resource.Dest.CustomKey != nil {
-			result = append(result, resource.Dest)
-		}
-	}
-	return result, nil
 }
 
 //NewConfigFromEnv returns new config from env

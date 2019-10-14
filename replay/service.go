@@ -12,7 +12,6 @@ import (
 	"time"
 )
 
-
 const replayExtension = ".replay"
 
 //Service represents replay service
@@ -40,7 +39,7 @@ func (s *service) Replay(ctx context.Context, request *Request) *Response {
 func (s *service) replay(ctx context.Context, request *Request, response *Response) error {
 	err := request.Init()
 	if err == nil {
-		err = request.Validate();
+		err = request.Validate()
 	}
 	if err != nil {
 		return err
@@ -55,8 +54,8 @@ func (s *service) replay(ctx context.Context, request *Request, response *Respon
 
 		destURL := strings.Replace(sourceURL, sourceBucket, request.ReplayBucket, 1)
 		replayedURL := destURL + replayExtension
-		if exists, _ := s.fs.Exists(ctx, replayedURL);exists {
-				continue
+		if exists, _ := s.fs.Exists(ctx, replayedURL); exists {
+			continue
 		}
 
 		if err := s.fs.Move(ctx, sourceURL, destURL); err != nil {

@@ -2,5 +2,9 @@
   "Mirrors": {
     "BaseURL": "gs://${gsConfigBucket}/StorageMirror/dataflow",
     "CheckInMs": 100
+  },
+  "SlackCredentials": {
+    "URL": "gs://${gsConfigBucket}/Secrets/slack.json.enc",
+    "Key": "BqTailRing/BqTailKey"
   }
 }

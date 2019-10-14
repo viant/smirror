@@ -75,7 +75,12 @@ func TestRoutes_HasMatch(t *testing.T) {
 	}
 
 	for _, useCase := range useCases {
-		actual := useCase.HasMatch(useCase.URL)
+		matched := useCase.HasMatch(useCase.URL)
+		var actual *Rule
+		if len(matched) == 1 {
+			actual = matched[0]
+		}
+
 		if useCase.expectURL == "" {
 			assert.Nil(t, actual, useCase.description)
 			continue

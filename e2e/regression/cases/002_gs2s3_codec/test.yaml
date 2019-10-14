@@ -1,6 +1,6 @@
 pipeline:
 
-  setupRoute:
+  setupRule:
     action: storage:copy
     expand: true
     source:

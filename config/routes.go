@@ -25,19 +25,13 @@ type Routes struct {
 }
 
 //HasMatch returns the first match route
-func (r Routes) HasMatch(URL string) *Rule {
-	if len(r.Rules) == 0 {
-		return nil
-	}
+func (r Routes) HasMatch(URL string) (matched []*Rule) {
 	for i := range r.Rules {
-
-
-
 		if r.Rules[i].HasMatch(URL) {
-			return r.Rules[i]
+			matched = append(matched, r.Rules[i])
 		}
 	}
-	return nil
+	return matched
 }
 
 func (r Routes) Validate() error {

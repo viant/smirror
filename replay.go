@@ -27,7 +27,6 @@ func StorageReplay(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 func replayUnprocessed(writer http.ResponseWriter, httpRequest *http.Request) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -40,7 +39,7 @@ func replayUnprocessed(writer http.ResponseWriter, httpRequest *http.Request) (e
 	}
 	service := replay.Singleton()
 	response := service.Replay(context.Background(), request)
-	if err =  json.NewEncoder(writer).Encode(response);err != nil {
+	if err = json.NewEncoder(writer).Encode(response); err != nil {
 		return err
 	}
 	return err

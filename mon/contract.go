@@ -53,7 +53,7 @@ func (r *Response) AddError(object storage.Object, message string) {
 }
 
 func (r *Response) AddUnprocessed(now time.Time, route *config.Rule, file storage.Object) {
-	info := config.Info{
+	info := base.Info{
 		Workflow: base.UnclassifiedDataflow,
 	}
 	if route != nil {
@@ -77,7 +77,7 @@ func (r *Response) AddUnprocessed(now time.Time, route *config.Rule, file storag
 }
 
 func (r *Response) AddProcessed(route *config.Rule, object storage.Object) {
-	info := config.Info{
+	info := base.Info{
 		Workflow: base.UnclassifiedDataflow,
 	}
 	if route != nil {
@@ -106,7 +106,7 @@ func (r *Request) Init() (err error) {
 	if r.UnprocessedDuration == "" {
 		r.UnprocessedDuration = defaultTriggerAge
 	}
-	if ! (strings.Contains(strings.ToLower(r.UnprocessedDuration), "ago") || strings.Contains(strings.ToLower(r.UnprocessedDuration), "past")) {
+	if !(strings.Contains(strings.ToLower(r.UnprocessedDuration), "ago") || strings.Contains(strings.ToLower(r.UnprocessedDuration), "past")) {
 		r.UnprocessedDuration += agoKeyword
 	}
 	if r.unprocessedModifiedBefore, err = toolbox.TimeAt(r.UnprocessedDuration); err != nil {
@@ -116,7 +116,7 @@ func (r *Request) Init() (err error) {
 	if r.ProcessedRecency == "" {
 		r.ProcessedRecency = defaultTriggerAge
 	}
-	if ! (strings.Contains(strings.ToLower(r.ProcessedRecency), "ago") || strings.Contains(strings.ToLower(r.ProcessedRecency), "past")) {
+	if !(strings.Contains(strings.ToLower(r.ProcessedRecency), "ago") || strings.Contains(strings.ToLower(r.ProcessedRecency), "past")) {
 		r.ProcessedRecency += agoKeyword
 	}
 	if r.processedModifiedAfter, err = toolbox.TimeAt(r.ProcessedRecency); err != nil {
@@ -126,7 +126,7 @@ func (r *Request) Init() (err error) {
 	if r.ErrorRecency == "" {
 		r.ErrorRecency = defaultErrorRecency
 	}
-	if ! (strings.Contains(strings.ToLower(r.ErrorRecency), "ago") || strings.Contains(strings.ToLower(r.ErrorRecency), "past")) {
+	if !(strings.Contains(strings.ToLower(r.ErrorRecency), "ago") || strings.Contains(strings.ToLower(r.ErrorRecency), "past")) {
 		r.ErrorRecency += agoKeyword
 	}
 	if r.errorModifiedAfter, err = toolbox.TimeAt(r.ErrorRecency); err != nil {

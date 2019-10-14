@@ -1,16 +1,12 @@
-package smirror
+package contract
 
 import (
 	"smirror/base"
 	"smirror/config"
+
 	"sync"
 	"time"
 )
-
-//Request represents a mirror request
-type Request struct {
-	URL string
-}
 
 //Response represents a response
 type Response struct {
@@ -22,7 +18,7 @@ type Response struct {
 	TotalRules  int
 	Status      string
 	Error       string `json:",omitempty"`
-	startTime   time.Time
+	StartTime   time.Time
 	mutex       *sync.Mutex
 }
 
@@ -33,16 +29,11 @@ func (r *Response) AddURL(URL string) {
 	r.DestURLs = append(r.DestURLs, URL)
 }
 
-//NewRequest create a request
-func NewRequest(URL string) *Request {
-	return &Request{URL: URL}
-}
-
 //NewResponse returns a new response
 func NewResponse() *Response {
 	return &Response{
 		Status:     base.StatusOK,
-		startTime:  time.Now(),
+		StartTime:  time.Now(),
 		DestURLs:   make([]string, 0),
 		MessageIDs: make([]string, 0),
 		mutex:      &sync.Mutex{},

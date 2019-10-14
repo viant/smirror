@@ -6,6 +6,8 @@ require (
 	github.com/aws/aws-lambda-go v1.12.0
 	github.com/aws/aws-sdk-go v1.21.4
 	github.com/go-errors/errors v1.0.1 // indirect
+	github.com/lunixbochs/vtclean v1.0.0 // indirect
+	github.com/nlopes/slack v0.6.0
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.3.0
 	github.com/viant/afs v0.3.1

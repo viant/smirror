@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"smirror/base"
 	"smirror/config"
+	"smirror/contract"
 	"smirror/job"
 	"strings"
 	"testing"
@@ -50,7 +51,7 @@ line9
 				Mirrors: config.Routes{
 					Rules: []*config.Rule{
 						{
-							PreserveDepth:base.IntPtr(0),
+							PreserveDepth: base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -89,7 +90,7 @@ line4`,
 				Mirrors: config.Routes{
 					Rules: []*config.Rule{
 						{
-							PreserveDepth:base.IntPtr(0),
+							PreserveDepth: base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -157,7 +158,7 @@ line4`,
 				Mirrors: config.Routes{
 					Rules: []*config.Rule{
 						{
-							PreserveDepth:base.IntPtr(0),
+							PreserveDepth: base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -207,7 +208,7 @@ line11
 				Mirrors: config.Routes{
 					Rules: []*config.Rule{
 						{
-							PreserveDepth:base.IntPtr(0),
+							PreserveDepth: base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -260,7 +261,7 @@ line11
 				Mirrors: config.Routes{
 					Rules: []*config.Rule{
 						{
-							PreserveDepth:base.IntPtr(0),
+							PreserveDepth: base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt.gz",
@@ -305,7 +306,7 @@ line4`,
 				Mirrors: config.Routes{
 					Rules: []*config.Rule{
 						{
-							PreserveDepth:base.IntPtr(0),
+							PreserveDepth: base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
 									Suffix: ".txt",
@@ -345,7 +346,7 @@ line4`,
 				Mirrors: config.Routes{
 					Rules: []*config.Rule{
 						{
-							PreserveDepth:base.IntPtr(0),
+							PreserveDepth: base.IntPtr(0),
 							Source: &config.Resource{
 
 								Basic: matcher.Basic{
@@ -393,7 +394,7 @@ line4`,
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
-		response := service.Mirror(ctx, &Request{URL: useCase.sourceURL})
+		response := service.Mirror(ctx, &contract.Request{URL: useCase.sourceURL})
 		if !assertly.AssertValues(t, useCase.expectResponse, response, useCase.description) {
 
 		}

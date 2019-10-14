@@ -14,32 +14,35 @@ import (
 	"io/ioutil"
 	"smirror/base"
 	"smirror/config"
+	"smirror/contract"
 	"smirror/job"
 	"smirror/msgbus"
 	"smirror/msgbus/pubsub"
 	"smirror/msgbus/sqs"
 	"smirror/secret"
+	"smirror/slack"
 	"sync"
 	"sync/atomic"
 	"time"
 )
 
-//Service represents a mirror service
+//Slack represents a mirror service
 type Service interface {
 	//Mirror copies/split source to matched destination
-	Mirror(ctx context.Context, request *Request) *Response
+	Mirror(ctx context.Context, request *contract.Request) *contract.Response
 }
 
 type service struct {
-	mux    *sync.Mutex
-	config *Config
-	fs     afs.Service
-	secret secret.Service
-	msgbus msgbus.Service
+	mux      *sync.Mutex
+	config   *Config
+	fs       afs.Service
+	secret   secret.Service
+	msgbus   msgbus.Service
+	notifier slack.Slack
 }
 
-func (s *service) Mirror(ctx context.Context, request *Request) *Response {
-	response := NewResponse()
+func (s *service) Mirror(ctx context.Context, request *contract.Request) *contract.Response {
+	response := contract.NewResponse()
 	response.TriggeredBy = request.URL
 	err := s.mirror(ctx, request, response)
 
@@ -52,27 +55,35 @@ func (s *service) Mirror(ctx context.Context, request *Request) *Response {
 		response.Status = base.StatusNoFound
 		response.Error = ""
 	}
-	response.TotalRules = len(s.config.Mirrors.Rules)
-	response.TimeTakenMs = int(time.Now().Sub(response.startTime) / time.Millisecond)
 	return response
 }
 
-func (s *service) mirror(ctx context.Context, request *Request, response *Response) (err error) {
-	changed, err := s.config.Mirrors.ReloadIfNeeded(ctx, s.fs)
-	if changed && err == nil {
-		err = s.UpdateResources(ctx)
-	}
+func (s *service) mirror(ctx context.Context, request *contract.Request, response *contract.Response) (err error) {
+	_, err = s.config.Mirrors.ReloadIfNeeded(ctx, s.fs)
 	if err != nil {
 		return err
 	}
-	route := s.config.Mirrors.HasMatch(request.URL)
-	if route == nil {
+	var rule *config.Rule
+	matched := s.config.Mirrors.HasMatch(request.URL)
+	switch len(matched) {
+	case 0:
+	case 1:
+		rule = matched[0]
+	default:
+		JSON, _ := json.Marshal(matched)
+		return errors.Errorf("multi rule match currently not supported: %v", JSON)
+	}
+
+	if rule == nil {
 		response.Status = base.StatusNoMatch
 		return nil
 	}
 
-	response.Rule = route
-	options, err := s.secret.StorageOpts(ctx, route.Source)
+	if err := s.initRule(ctx, rule); err != nil {
+		return errors.Wrapf(err, "railed to initialise rule: %v", rule.Info.Workflow)
+	}
+	response.Rule = rule
+	options, err := s.secret.StorageOpts(ctx, rule.Source)
 	if err != nil {
 		return err
 	}
@@ -84,19 +95,21 @@ func (s *service) mirror(ctx context.Context, request *Request, response *Respon
 		response.Status = base.StatusNoFound
 		return nil
 	}
-	if route.Split != nil {
-		err = s.mirrorChunkedAsset(ctx, route, request, response)
+	if rule.Split != nil {
+		err = s.mirrorChunkedAsset(ctx, rule, request, response)
 	} else {
-		err = s.mirrorAsset(ctx, route, request.URL, response)
+		err = s.mirrorAsset(ctx, rule, request.URL, response)
 	}
-	jobContent := job.NewContext(ctx, err, request.URL, route.Name(request.URL))
-	if e := route.Actions.Run(jobContent, s.fs); e != nil && err == nil {
+	jobContent := job.NewContext(ctx, err, request.URL, response.Rule.Name(request.URL))
+	response.TotalRules = len(s.config.Mirrors.Rules)
+	response.TimeTakenMs = int(time.Now().Sub(response.StartTime) / time.Millisecond)
+	if e := rule.Actions.Run(jobContent, s.fs, s.notifier.Notify, &response.Rule.Info, response); e != nil && err == nil {
 		err = e
 	}
 	return err
 }
 
-func (s *service) mirrorAsset(ctx context.Context, route *config.Rule, URL string, response *Response) error {
+func (s *service) mirrorAsset(ctx context.Context, route *config.Rule, URL string, response *contract.Response) error {
 	options, err := s.secret.StorageOpts(ctx, route.Source)
 	if err != nil {
 		return err
@@ -136,7 +149,7 @@ func (s *service) mirrorAsset(ctx context.Context, route *config.Rule, URL strin
 	return s.transfer(ctx, dataCopy, response)
 }
 
-func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Rule, request *Request, response *Response) error {
+func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Rule, request *contract.Request, response *contract.Response) error {
 	options, err := s.secret.StorageOpts(ctx, route.Source)
 	if err != nil {
 		return err
@@ -163,7 +176,7 @@ func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Rule, re
 	return err
 }
 
-func (s *service) transfer(ctx context.Context, transfer *Transfer, response *Response) error {
+func (s *service) transfer(ctx context.Context, transfer *Transfer, response *contract.Response) error {
 	if transfer.Resource.Topic != "" {
 		return s.publish(ctx, transfer, response)
 	}
@@ -178,7 +191,7 @@ func (s *service) transfer(ctx context.Context, transfer *Transfer, response *Re
 	return fmt.Errorf("invalid transfer: %s", JSON)
 }
 
-func (s *service) publish(ctx context.Context, transfer *Transfer, response *Response) error {
+func (s *service) publish(ctx context.Context, transfer *Transfer, response *contract.Response) error {
 	reader, err := transfer.GetReader()
 	if err != nil {
 		return err
@@ -213,7 +226,7 @@ func (s *service) publish(ctx context.Context, transfer *Transfer, response *Res
 	return fmt.Errorf("unsupported message msgbus %v", s.config.SourceScheme)
 }
 
-func (s *service) upload(ctx context.Context, transfer *Transfer, response *Response) error {
+func (s *service) upload(ctx context.Context, transfer *Transfer, response *contract.Response) error {
 	reader, err := transfer.GetReader()
 	if err != nil {
 		return errors.Wrapf(err, "failed to get reader for: %v", transfer.Resource.URL)
@@ -231,19 +244,25 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *Resp
 
 //Init initialises this service
 func (s *service) Init(ctx context.Context) error {
-	err := s.config.Init(ctx, s.fs)
-	if err != nil {
-		return err
-	}
-	return s.UpdateResources(ctx)
+	return s.config.Init(ctx, s.fs)
 }
 
-//UpdateResources updates resources
-func (s *service) UpdateResources(ctx context.Context) error {
-	resources, err := s.config.Resources(ctx, s.fs)
-	if err != nil {
-		return err
+func (s *service) initActions(actions []*job.Action) {
+	if len(actions) == 0 {
+		return
 	}
+	for i := range actions {
+		if actions[i].Action == job.ActionNotify && actions[i].Credentials == nil {
+			actions[i].Credentials = s.config.SlackCredentials
+		}
+	}
+}
+
+//initRule updates resources
+func (s *service) initRule(ctx context.Context, rule *config.Rule) (err error) {
+	resources := rule.Resources()
+	s.initActions(rule.OnSuccess)
+	s.initActions(rule.OnFailure)
 	if len(resources) > 0 {
 		if err = s.secret.Init(ctx, s.fs, resources); err != nil {
 			return errors.Wrap(err, "failed to init resource secrets")
@@ -267,7 +286,7 @@ func (s *service) UpdateResources(ctx context.Context) error {
 	return nil
 }
 
-func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rule, counter *int32, waitGroup *sync.WaitGroup, response *Response) func() io.WriteCloser {
+func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rule, counter *int32, waitGroup *sync.WaitGroup, response *contract.Response) func() io.WriteCloser {
 	return func() io.WriteCloser {
 		splitCount := atomic.AddInt32(counter, 1)
 		destName := route.Split.Name(route, URL, splitCount)
@@ -288,18 +307,19 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rul
 	}
 }
 
-
-//New creates a new mirror service
+//NewSlack creates a new mirror service
 func New(ctx context.Context, config *Config) (Service, error) {
 	err := config.Init(ctx, afs.New())
 	if err != nil {
 		return nil, err
 	}
 	fs := afs.New()
+	secretService := secret.New(config.SourceScheme, fs)
 	result := &service{config: config,
-		fs:     fs,
-		mux:    &sync.Mutex{},
-		secret: secret.New(config.SourceScheme),
+		fs:       fs,
+		mux:      &sync.Mutex{},
+		secret:   secretService,
+		notifier: slack.NewSlack("", config.ProjectID, fs, secretService, config.SlackCredentials),
 	}
 	return result, result.Init(ctx)
 }

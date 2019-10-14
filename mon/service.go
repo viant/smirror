@@ -2,16 +2,17 @@ package mon
 
 import (
 	"context"
-	_ "github.com/viant/afsc/s3"
-	_ "github.com/viant/afsc/gs"
 	"encoding/json"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/option"
 	"github.com/viant/afs/storage"
+	_ "github.com/viant/afsc/gs"
+	_ "github.com/viant/afsc/s3"
 	"io/ioutil"
 	"smirror/base"
+	"smirror/config"
 	"strings"
 	"time"
 )
@@ -130,7 +131,11 @@ func (s *service) checkProcessed(ctx context.Context, request *Request, response
 		if object.IsDir() {
 			continue
 		}
-		route := routes.Mirrors.HasMatch(object.URL())
+		routes := routes.Mirrors.HasMatch(object.URL())
+		var route *config.Rule
+		if len(routes) == 1 {
+			route = routes[0]
+		}
 		response.AddProcessed(route, object)
 	}
 	return nil
@@ -153,8 +158,12 @@ func (s *service) checkUnprocessed(ctx context.Context, request *Request, respon
 		if object.IsDir() {
 			continue
 		}
-		route := routes.Mirrors.HasMatch(object.URL())
-		response.AddUnprocessed(now, route, object)
+		var rule *config.Rule
+		rules := routes.Mirrors.HasMatch(object.URL())
+		if len(rules) == 1 {
+			rule = rules[0]
+		}
+		response.AddUnprocessed(now, rule, object)
 	}
 	return nil
 }

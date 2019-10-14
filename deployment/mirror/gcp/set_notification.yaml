@@ -1,0 +1,14 @@
+init:
+  '!gcpCredentials': $params.authWith
+  '!triggerBucket': $params.bucket
+  '!topic': $params.topic
+
+pipeline:
+  setBucketNotificiation:
+    action: gcp/storage:setNotification
+    credentials: $gcpCredentials
+    bucket: $triggerBucket
+    topic: $topic
+    payloadFormat: JSON_API_V1
+    eventTypes:
+      - OBJECT_FINALIZE

@@ -76,5 +76,5 @@ pipeline:
       isDir: true
       dest:
         credentials: $awsCredentials
-        URL: s3://${gsDestBucket}/
+        URL: gs://${gsDestBucket}/
 

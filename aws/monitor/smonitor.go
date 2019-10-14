@@ -9,8 +9,6 @@ import (
 	"smirror/mon"
 )
 
-
-
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -20,7 +18,6 @@ func main() {
 	}()
 	lambda.Start(handleRequest)
 }
-
 
 func handleRequest(ctx context.Context, request *mon.Request) (*mon.Response, error) {
 	service, err := mon.NewFromEnv(base.ConfigEnvKey)

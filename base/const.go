@@ -21,4 +21,7 @@ const (
 
 	//ConfigEnvKey config eng key
 	ConfigEnvKey = "CONFIG"
+
+	//App
+	App = "StorageMirror"
 )

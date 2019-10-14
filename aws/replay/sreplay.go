@@ -18,10 +18,7 @@ func main() {
 	lambda.Start(handleRequest)
 }
 
-
-
 func handleRequest(ctx context.Context, request *replay.Request) (*replay.Response, error) {
 	service := replay.Singleton()
 	return service.Replay(ctx, request), nil
 }
-

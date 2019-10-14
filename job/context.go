@@ -14,7 +14,7 @@ type Context struct {
 }
 
 //NewContext creates a context
-func NewContext(ctx context.Context, err error, sourceURL string, relativePath string) *Context {
+func NewContext(ctx context.Context, err error, sourceURL, relativePath string) *Context {
 	return &Context{
 		Context:      ctx,
 		Error:        err,

@@ -15,14 +15,14 @@ init:
 
 pipeline:
 
-  setupRoute:
+  setupRule:
     action: storage:copy
     expand: true
     source:
       URL: rule.json
     dest:
       credentials: $awsCredentials
-      URL: s3://${configBucket}/StorageMirror/dataflow/test-rule.json
+      URL: s3://${configBucket}/StorageMirror/dataflow/test-rule_sqs.json
 
 
   cleanupDest:
@@ -45,7 +45,7 @@ pipeline:
       URL: events.csv.gz
     dest:
       credentials: $awsCredentials
-      URL: s3://${triggerBucket}/data/test/events_sqs.csv.gz
+      URL: s3://${triggerBucket}/data/sqs/test/events_sqs.csv.gz
 
 
   verify:

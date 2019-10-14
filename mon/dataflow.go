@@ -1,10 +1,12 @@
 package mon
 
-import "smirror/config"
+import (
+	"smirror/base"
+)
 
 //Dataflow represents workflow info with unprocessed files
 type Dataflow struct {
-	config.Info
+	base.Info
 	ProcessedCount   int
 	MaxProcessedSize int
 	MinProcessedSize int
@@ -14,7 +16,7 @@ type Dataflow struct {
 }
 
 //NewWorkflow create a workflow
-func NewWorkflow(info config.Info) *Dataflow {
+func NewWorkflow(info base.Info) *Dataflow {
 	return &Dataflow{
 		Info:        info,
 		Unprocessed: make([]*File, 0),

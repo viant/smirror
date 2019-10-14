@@ -5,6 +5,7 @@ import (
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
 	"path"
+	"smirror/base"
 	"smirror/job"
 	"strings"
 	"time"
@@ -12,7 +13,7 @@ import (
 
 //Rule represent matching resource route rule
 type Rule struct {
-	Info    Info
+	Info    base.Info
 	Dest    *Resource
 	Source  *Resource
 	Replace []*Replace `json:",omitempty"`
@@ -22,6 +23,9 @@ type Rule struct {
 	*Compression
 	//PreserveDepth  - preserves specified folder depth in dest URL
 	PreserveDepth *int `json:",omitempty"`
+
+	//Group defines group of rule to be matched, otherwise multi match is invalid
+	Group string `json:",omitempty"`
 }
 
 //HasPreserveDepth returns true if property has been specified
@@ -29,15 +33,13 @@ func (r *Rule) HasPreserveDepth() bool {
 	return r.PreserveDepth != nil
 }
 
-
 //GetPreserveDepth returns PreservceDepth
 func (r *Rule) GetPreserveDepth() int {
-	if  r.PreserveDepth != nil {
+	if r.PreserveDepth != nil {
 		return *r.PreserveDepth
 	}
 	return 0
 }
-
 
 //Validate checks if route is valid
 func (r *Rule) Validate() error {
@@ -50,7 +52,6 @@ func (r *Rule) Validate() error {
 	return nil
 }
 
-
 //HasMatch returns true if URL matches prefix or suffix
 func (r *Rule) HasMatch(URL string) bool {
 	if r.Source.Bucket != "" {
@@ -59,10 +60,21 @@ func (r *Rule) HasMatch(URL string) bool {
 			return false
 		}
 	}
-
 	location := url.Path(URL)
 	parent, name := path.Split(location)
 	return r.Source.Match(parent, file.NewInfo(name, 0, 0644, time.Now(), false))
+}
+
+//Resources returns rule resource
+func (r *Rule) Resources() []*Resource {
+	var result = make([]*Resource, 0)
+	if r.Source.Credentials != nil || r.Source.CustomKey != nil {
+		result = append(result, r.Source)
+	}
+	if r.Dest.Credentials != nil || r.Dest.CustomKey != nil {
+		result = append(result, r.Dest)
+	}
+	return result
 }
 
 //Name return route dest asset name
@@ -90,7 +102,7 @@ func (r *Rule) Name(URL string) string {
 
 	folderPath := strings.Trim(parent, "/")
 	fragments := strings.Split(folderPath, "/")
-	if ! r.HasPreserveDepth() {
+	if !r.HasPreserveDepth() {
 		depth = len(fragments)
 	}
 	if depth < len(fragments) {

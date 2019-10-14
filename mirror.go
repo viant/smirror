@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"log"
 	"smirror/base"
+	"smirror/contract"
 	"smirror/event"
 )
 
@@ -18,38 +19,30 @@ func StorageMirror(ctx context.Context, event event.StorageEvent) (err error) {
 		}
 	}()
 	_, err = storageMirror(ctx, event)
-	//elapsed := time.Since(start)
 	if err != nil {
 		err = errors.Wrap(err, "failed to mirror "+event.URL())
 		return err
 	}
-	//if base.IsLoggingEnabled() {
-	//	fmt.Printf("mirrored %v: %v in %v", response.Status, event.URL(), elapsed)
-	//}
 	return err
 }
 
-
-
 //StorageMirrorSubscriber cloud function entry point
 func StorageMirrorSubscriber(ctx context.Context, event event.PubsubBucketNotification) (err error) {
-	 storageEvent := event.StorageEvent()
-	 if storageEvent == nil {
-	 	JSON, _ := json.Marshal(event)
-	 	log.Printf("storage event was empty: %s", JSON)
-	 	return nil
-	 }
-	 return StorageMirror(ctx, *storageEvent)
+	storageEvent := event.StorageEvent()
+	if storageEvent == nil {
+		JSON, _ := json.Marshal(event)
+		log.Printf("storage event was empty: %s", JSON)
+		return nil
+	}
+	return StorageMirror(ctx, *storageEvent)
 }
 
-
-
-func storageMirror(ctx context.Context, event event.StorageEvent) (*Response, error) {
+func storageMirror(ctx context.Context, event event.StorageEvent) (*contract.Response, error) {
 	service, err := NewFromEnv(ctx, base.ConfigEnvKey)
 	if err != nil {
 		return nil, err
 	}
-	response := service.Mirror(ctx, NewRequest(event.URL()))
+	response := service.Mirror(ctx, contract.NewRequest(event.URL()))
 	if data, err := json.Marshal(response); err == nil {
 		fmt.Printf("%v\n", string(data))
 	}
@@ -58,5 +51,3 @@ func storageMirror(ctx context.Context, event event.StorageEvent) (*Response, er
 	}
 	return response, nil
 }
-
-

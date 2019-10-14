@@ -10,6 +10,7 @@ import (
 	"github.com/viant/afs/url"
 	"github.com/viant/afsc/gs"
 	"github.com/viant/afsc/s3"
+	"smirror/auth"
 	"smirror/config"
 	"smirror/secret/kms"
 	"smirror/secret/kms/aws"
@@ -18,7 +19,8 @@ import (
 
 //Service represents kms service
 type Service interface {
-
+	//Decrypt decrypts secrets
+	Decrypt(ctx context.Context, secret *auth.Secret) ([]byte, error)
 	//Init initialises resources
 	Init(ctx context.Context, service afs.Service, resources []*config.Resource) error
 
@@ -28,6 +30,20 @@ type Service interface {
 
 type service struct {
 	sourceScheme string
+	fs           afs.Service
+}
+
+func (s service) Decrypt(ctx context.Context, secret *auth.Secret) ([]byte, error) {
+	kmsService, err := s.Kms(s.fs)
+	if err != nil {
+		return nil, err
+	}
+	data, err := kmsService.Decrypt(ctx, secret)
+	if err != nil {
+		return nil, err
+	}
+	data = decodeBase64IfNeeded(data)
+	return data, err
 }
 
 //Kms returns kms service
@@ -52,6 +68,12 @@ func (s *service) Init(ctx context.Context, service afs.Service, resources []*co
 		if resource.Credentials == nil && resource.CustomKey == nil {
 			continue
 		}
+
+		if (resource.Credentials != nil && resources[i].Credentials.Auth != nil) ||
+			(resource.CustomKey != nil && resources[i].CustomKey.AES256Key != nil) {
+			continue
+		}
+
 		if kmsService == nil {
 			kmsService, err = s.Kms(service)
 			if err != nil {
@@ -119,8 +141,9 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 }
 
 //New creates a new secret service
-func New(sourceScheme string) Service {
+func New(sourceScheme string, fs afs.Service) Service {
 	return &service{
+		fs:           fs,
 		sourceScheme: sourceScheme,
 	}
 }

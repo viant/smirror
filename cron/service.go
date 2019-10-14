@@ -196,7 +196,7 @@ func New(ctx context.Context, config *Config, fs afs.Service) (Service, error) {
 	result := &service{
 		config:      config,
 		fs:          fs,
-		secret:      secret.New(config.SourceScheme),
+		secret:      secret.New(config.SourceScheme, fs),
 		metaService: meteService,
 	}
 
