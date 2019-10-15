@@ -9,7 +9,7 @@ init:
 
   serviceAccount: $gcp.ClientEmail
 
-  appPath: /tmp/smirror
+  appPath: /tmp/smirrorpubsub
   functionName: StorageMirror
   
   

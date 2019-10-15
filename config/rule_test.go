@@ -109,7 +109,7 @@ func TestRoute_Name(t *testing.T) {
 		{
 			description: "no folder depth",
 			URL:         "s3://myducket/folder/asset1.txt",
-			expect:      "asset1.txt",
+			expect:      "folder/asset1.txt",
 		},
 		{
 			description: "folder depth = 1",
@@ -138,10 +138,27 @@ func TestRoute_Name(t *testing.T) {
 		{
 			description: "gzip compression",
 			Rule: Rule{
+				PreserveDepth: base.IntPtr(0),
 				Compression: &Compression{Codec: GZipCodec},
 			},
 			URL:    "s3://myducket/folder/sub/asset1.txt",
 			expect: "asset1.txt.gz",
+		},
+		{
+			description: "folder root depth direction",
+			Rule: Rule{
+				PreserveDepth: base.IntPtr(-1),
+			},
+			URL:    "s3://myducket/folder/sub/dd/asset1.txt",
+			expect: "sub/dd/asset1.txt",
+		},
+		{
+			description: "folder root depth direction",
+			Rule: Rule{
+				PreserveDepth: base.IntPtr(-2),
+			},
+			URL:    "s3://myducket/folder/sub/dd/asset1.txt",
+			expect: "dd/asset1.txt",
 		},
 	}
 

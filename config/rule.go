@@ -105,8 +105,17 @@ func (r *Rule) Name(URL string) string {
 	if !r.HasPreserveDepth() {
 		depth = len(fragments)
 	}
+
+	fromRoot := false
+	if depth < 0 {
+		fromRoot = true
+	}
 	if depth < len(fragments) {
-		folderPath = strings.Join(fragments[len(fragments)-depth:], "/")
+		if fromRoot {
+			folderPath = strings.Join(fragments[depth*-1:], "/")
+		} else {
+			folderPath = strings.Join(fragments[len(fragments)-depth:], "/")
+		}
 	} else if strings.HasPrefix(folderPath, "/") {
 		folderPath = string(folderPath[1:])
 	}
