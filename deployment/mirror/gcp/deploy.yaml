@@ -8,8 +8,8 @@ init:
 
   appPath: /tmp/smirror
   functionName: StorageMirror
-  
-  
+
+
   configBucket: ${bucketPrefix}_config
   triggerBucket: ${bucketPrefix}_trigger
   opsBucket: ${bucketPrefix}_operation
@@ -40,9 +40,9 @@ pipeline:
   deploy:
     checkOut:
       action: vc/git:checkout
-      Origin:
+      origin:
         URL: https://github.com/viant/smirror.git
-      Dest:
+      dest:
         URL: ${appPath}
 
     package:

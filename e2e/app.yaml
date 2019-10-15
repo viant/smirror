@@ -84,25 +84,25 @@ pipeline:
             - data
 
 
-  deployStorageMirrorSqs:
-    action: aws/lambda:deploy
-    credentials: $awsCredentials
-    functionname: ${functionName}SQS
-    runtime:  go1.x
-    handler: smirrorsqs
-    code:
-      zipfile: $LoadBinary(${mirrorSqsZip})
-    rolename: lambda-${functionName}SQS-executor
-    define:
-      - policyname: sqs-my-queue-role
-        policydocument: $Cat('${privilegePolicySQS}')
-    attach:
-      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-    triggers:
-      - source: ${s3Queue}
-        type: sqs
-        enabled: true
-        batchSize: 2
+#  deployStorageMirrorSqs:
+#    action: aws/lambda:deploy
+#    credentials: $awsCredentials
+#    functionname: ${functionName}SQS
+#    runtime:  go1.x
+#    handler: smirrorsqs
+#    code:
+#      zipfile: $LoadBinary(${mirrorSqsZip})
+#    rolename: lambda-${functionName}SQS-executor
+#    define:
+#      - policyname: sqs-my-queue-role
+#        policydocument: $Cat('${privilegePolicySQS}')
+#    attach:
+#      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+#    triggers:
+#      - source: ${s3Queue}
+#        type: sqs
+#        enabled: true
+#        batchSize: 2
 
 
 

@@ -66,7 +66,7 @@ pipeline:
       '@name': StorageMirrorSubscriber
       entryPoint: StorageMirrorSubscriber
       runtime: go111
-      availableMemoryMb: 2048
+      availableMemoryMb: 256
       timeout: 540s
       serviceAccountEmail: $serviceAccount
       eventTrigger:
@@ -74,7 +74,8 @@ pipeline:
         resource: projects/${gcp.projectID}/topics/$topic
       environmentVariables:
         LOGGING: 'true'
-        CONFIG: gs://${configBucket}/StorageMirror/config.json
+        DEST: gs://${triggerBucket}/
+        #CONFIG: gs://${configBucket}/StorageMirror/config.json
       source:
         URL: ${appPath}/
       sleepTimeMs: 5000
