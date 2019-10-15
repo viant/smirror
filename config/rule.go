@@ -108,11 +108,12 @@ func (r *Rule) Name(URL string) string {
 
 	fromRoot := false
 	if depth < 0 {
+		depth = -1 * depth
 		fromRoot = true
 	}
 	if depth < len(fragments) {
 		if fromRoot {
-			folderPath = strings.Join(fragments[depth*-1:], "/")
+			folderPath = strings.Join(fragments[depth:], "/")
 		} else {
 			folderPath = strings.Join(fragments[len(fragments)-depth:], "/")
 		}
