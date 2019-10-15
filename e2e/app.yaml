@@ -83,46 +83,47 @@ pipeline:
           prefix:
             - data
 
-#
-#  deployStorageMirrorSqs:
-#    action: aws/lambda:deploy
-#    credentials: $awsCredentials
-#    functionname: ${functionName}SQS
-#    runtime:  go1.x
-#    handler: smirrorsqs
-#    code:
-#      zipfile: $LoadBinary(${mirrorSqsZip})
-#    rolename: lambda-${functionName}SQS-executor
-#    define:
-#      - policyname: sqs-my-queue-role
-#        policydocument: $Cat('${privilegePolicySQS}')
-#    attach:
-#      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-#    triggers:
-#      - source: ${s3Queue}
-#        type: sqs
-#        enabled: true
-#        batchSize: 2
 
-#
-#  deployCronLambad:
-#    action: aws/lambda:deploy
-#    credentials: $awsCredentials
-#    functionname: ${functionName}Cron
-#    runtime:  go1.x
-#    handler: smirrorcron
-#    timeout: 360
-#    environment:
-#      variables:
-#        LOGGING: 'true'
-#        CONFIG: s3://${s3ConfigBucket}/StorageMirrorCron/config.json
-#    code:
-#      zipfile: $LoadBinary(${mirrorCronZip})
-#    schedule:
-#      expression: rate(1 minute)
-#    rolename: ${functionName}Cron-executor
-#    define:
-#      - policyname: ${functionName}Cron-role
-#        policydocument: $Cat('${privilegePolicyCron}')
-#    attach:
-#      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  deployStorageMirrorSqs:
+    action: aws/lambda:deploy
+    credentials: $awsCredentials
+    functionname: ${functionName}SQS
+    runtime:  go1.x
+    handler: smirrorsqs
+    code:
+      zipfile: $LoadBinary(${mirrorSqsZip})
+    rolename: lambda-${functionName}SQS-executor
+    define:
+      - policyname: sqs-my-queue-role
+        policydocument: $Cat('${privilegePolicySQS}')
+    attach:
+      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    triggers:
+      - source: ${s3Queue}
+        type: sqs
+        enabled: true
+        batchSize: 2
+
+
+
+  deployCronLambad:
+    action: aws/lambda:deploy
+    credentials: $awsCredentials
+    functionname: ${functionName}Cron
+    runtime:  go1.x
+    handler: smirrorcron
+    timeout: 360
+    environment:
+      variables:
+        LOGGING: 'true'
+        CONFIG: s3://${s3ConfigBucket}/StorageMirrorCron/config.json
+    code:
+      zipfile: $LoadBinary(${mirrorCronZip})
+    schedule:
+      expression: rate(1 minute)
+    rolename: ${functionName}Cron-executor
+    define:
+      - policyname: ${functionName}Cron-role
+        policydocument: $Cat('${privilegePolicyCron}')
+    attach:
+      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole

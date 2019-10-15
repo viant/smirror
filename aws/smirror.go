@@ -24,7 +24,6 @@ func main() {
 	lambda.Start(handleRequest)
 }
 
-
 func handleRequest(ctx context.Context, s3Event events.S3Event) error {
 	if len(s3Event.Records) == 0 {
 		return nil

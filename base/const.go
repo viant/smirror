@@ -5,6 +5,8 @@ const (
 	StatusOK = "ok"
 	//StatusError status error
 	StatusError = "error"
+	//StatusProxy status error
+	StatusProxy = "proxy"
 	//StatusNoMatch status no match
 	StatusNoMatch = "noMatch"
 	//StatusNoFound status no found
@@ -19,8 +21,11 @@ const (
 	//UnclassifiedDataflow
 	UnclassifiedDataflow = "unclassified"
 
-	//ConfigEnvKey config eng key
+	//ConfigEnvKey config env key
 	ConfigEnvKey = "CONFIG"
+
+	//DestEnvKey destination env key
+	DestEnvKey = "DEST"
 
 	//App
 	App = "StorageMirror"

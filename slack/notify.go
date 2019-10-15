@@ -38,7 +38,7 @@ func (s *service) notify(ctx context.Context, request *job.NotifyRequest) error 
 		if err = json.Unmarshal(data, &request.OAuthToken); err != nil {
 			return errors.Wrapf(err, "failed to unmarshal token: %s", data)
 		}
-		request.RawToken  = request.Token
+		request.RawToken = request.Token
 		request.Token = ""
 	}
 	client := slack.New(request.RawToken)

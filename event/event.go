@@ -12,3 +12,8 @@ type StorageEvent struct {
 func (e StorageEvent) URL() string {
 	return fmt.Sprintf("gs://%v/%v", e.Bucket, e.Name)
 }
+
+//ProxyDestURL returns dest URL
+func (e StorageEvent) ProxyDestURL(destBucket string) string {
+	return fmt.Sprintf("gs://%v/%v/%v", destBucket, e.Bucket, e.Name)
+}

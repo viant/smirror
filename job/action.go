@@ -21,13 +21,13 @@ const (
 
 //Action represents an action
 type Action struct {
-	Action          string //empty Delete,Move
-	URL             string `json:",omitempty"`
-	Message         string `json:",omitempty"`
-	Title           string `json:",omitempty"`
-	Body			interface{} `json:",omitempty"`
-	Channels        []string `json:",omitempty"`
-	Credentials     *auth.Credentials `json:",omitempty"`
+	Action      string            //empty Delete,Move
+	URL         string            `json:",omitempty"`
+	Message     string            `json:",omitempty"`
+	Title       string            `json:",omitempty"`
+	Body        interface{}       `json:",omitempty"`
+	Channels    []string          `json:",omitempty"`
+	Credentials *auth.Credentials `json:",omitempty"`
 }
 
 //DestURL returns destination URL
@@ -52,8 +52,8 @@ func (a Action) Do(context *Context, service afs.Service, notify Notify, info *b
 		err = service.Delete(context.Context, URL)
 	case ActionNotify:
 		body := a.Body
-		if textBody, ok := a.Body.(string);ok && textBody == "$Response" {
-			body =  response
+		if textBody, ok := a.Body.(string); ok && textBody == "$Response" {
+			body = response
 		}
 		title := strings.Replace(a.Title, "$SourceURL", context.SourceURL, 1)
 		message := strings.Replace(a.Message, "$SourceURL", context.SourceURL, 1)

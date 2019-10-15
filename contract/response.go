@@ -30,12 +30,13 @@ func (r *Response) AddURL(URL string) {
 }
 
 //NewResponse returns a new response
-func NewResponse() *Response {
+func NewResponse(triggeredBy string) *Response {
 	return &Response{
-		Status:     base.StatusOK,
-		StartTime:  time.Now(),
-		DestURLs:   make([]string, 0),
-		MessageIDs: make([]string, 0),
-		mutex:      &sync.Mutex{},
+		Status:      base.StatusOK,
+		TriggeredBy: triggeredBy,
+		StartTime:   time.Now(),
+		DestURLs:    make([]string, 0),
+		MessageIDs:  make([]string, 0),
+		mutex:       &sync.Mutex{},
 	}
 }

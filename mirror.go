@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/viant/afs"
+	"github.com/viant/afs/url"
 	"log"
+	"os"
 	"smirror/base"
 	"smirror/contract"
 	"smirror/event"
@@ -26,6 +29,15 @@ func StorageMirror(ctx context.Context, event event.StorageEvent) (err error) {
 	return err
 }
 
+func outputResponse(response *contract.Response) {
+	if response == nil {
+		return
+	}
+	if data, err := json.Marshal(response); err == nil {
+		fmt.Printf("%v\n", string(data))
+	}
+}
+
 //StorageMirrorSubscriber cloud function entry point
 func StorageMirrorSubscriber(ctx context.Context, event event.PubsubBucketNotification) (err error) {
 	storageEvent := event.StorageEvent()
@@ -37,15 +49,33 @@ func StorageMirrorSubscriber(ctx context.Context, event event.PubsubBucketNotifi
 	return StorageMirror(ctx, *storageEvent)
 }
 
-func storageMirror(ctx context.Context, event event.StorageEvent) (*contract.Response, error) {
-	service, err := NewFromEnv(ctx, base.ConfigEnvKey)
-	if err != nil {
-		return nil, err
+var fs afs.Service
+
+func proxy(ctx context.Context, destination string, evnt event.StorageEvent) (*contract.Response, error) {
+	if fs == nil {
+		fs = afs.New()
 	}
-	response := service.Mirror(ctx, contract.NewRequest(event.URL()))
-	if data, err := json.Marshal(response); err == nil {
-		fmt.Printf("%v\n", string(data))
+	destBucket := url.Host(destination)
+	response := contract.NewResponse(evnt.URL())
+	response.DestURLs = []string{evnt.ProxyDestURL(destBucket)}
+	response.Status = base.StatusProxy
+	return response, fs.Copy(ctx, evnt.URL(), evnt.ProxyDestURL(destBucket))
+}
+
+func storageMirror(ctx context.Context, event event.StorageEvent) (response *contract.Response, err error) {
+	destination := os.Getenv(base.DestEnvKey)
+	if base.IsURL(destination) {
+		if response, err = proxy(ctx, destination, event); err != nil {
+			return response, err
+		}
+	} else {
+		service, err := NewFromEnv(ctx, base.ConfigEnvKey)
+		if err != nil {
+			return nil, err
+		}
+		response = service.Mirror(ctx, contract.NewRequest(event.URL()))
 	}
+	outputResponse(response)
 	if response.Error != "" {
 		return nil, fmt.Errorf(response.Error)
 	}
