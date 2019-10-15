@@ -111,11 +111,11 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 func (s *service) mirrorAsset(ctx context.Context, route *config.Rule, URL string, response *contract.Response) error {
 	options, err := s.secret.StorageOpts(ctx, route.Source)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to get storage option for %v", route.Source)
 	}
 	reader, err := s.fs.DownloadWithURL(ctx, URL, options...)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to download source: %v", URL)
 	}
 
 	sourceCompression := config.NewCompressionForURL(URL)

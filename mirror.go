@@ -71,7 +71,7 @@ func storageMirror(ctx context.Context, event event.StorageEvent) (response *con
 	} else {
 		service, err := NewFromEnv(ctx, base.ConfigEnvKey)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to create storage mirror: %v", err)
 		}
 		response = service.Mirror(ctx, contract.NewRequest(event.URL()))
 	}
