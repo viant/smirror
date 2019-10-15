@@ -59,7 +59,11 @@ func proxy(ctx context.Context, destination string, evnt event.StorageEvent) (*c
 	response := contract.NewResponse(evnt.URL())
 	response.DestURLs = []string{evnt.ProxyDestURL(destBucket)}
 	response.Status = base.StatusProxy
-	return response, fs.Copy(ctx, evnt.URL(), evnt.ProxyDestURL(destBucket))
+	err := fs.Copy(ctx, evnt.URL(), evnt.ProxyDestURL(destBucket))
+	if err != nil {
+		err = errors.Wrapf(err, "failed to copy: %v to %v", evnt.URL(), evnt.ProxyDestURL(destBucket))
+	}
+	return response, err
 }
 
 func storageMirror(ctx context.Context, event event.StorageEvent) (response *contract.Response, err error) {
