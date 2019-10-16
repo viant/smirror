@@ -1,8 +1,7 @@
 [
   {
     "Source": {
-      "Prefix": "/data/sqs/test",
-      "Suffix": ".csv.gz"
+      "Prefix": "/viant-e2e-sns-trigger/"
     },
     "Dest": {
       "URL": "gs://${destBucket}/testdata",

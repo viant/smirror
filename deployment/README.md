@@ -48,7 +48,7 @@ Where:
 ```json
 {
   "Mirrors": {
-    "BaseURL": "gs://${configBucket}/StorageMirror/dataflow",
+    "BaseURL": "gs://${configBucket}/StorageMirror/Rules",
     "CheckInMs": 60000
   }
 }

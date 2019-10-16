@@ -50,7 +50,7 @@ preserving parent folder (folderDepth:1) the following configuration can be used
 ```json
 {
   "Mirrors": {
-    "BaseURL": "gs://${gsConfigBucket}/StorageMirror/dataflow/",
+    "BaseURL": "gs://${gsConfigBucket}/StorageMirror/Rules/",
     "Rules": [
       {
         "Source": {
@@ -126,7 +126,7 @@ preserving parent folder (folderDepth:1) the following configuration can be used
 ```json
 {
   "Mirrors": {
-    "BaseURL": "gs://${gsConfigBucket}/StorageMirror/dataflow/",
+    "BaseURL": "gs://${gsConfigBucket}/StorageMirror/Rules/",
     "Rules": [
       {
         "Source": {

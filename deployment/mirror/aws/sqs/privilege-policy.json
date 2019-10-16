@@ -16,6 +16,20 @@
       "Resource": [
         "arn:aws:lambda:${aws.region}:${aws.accountID}:function:*"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*",
+        "arn:aws:s3:::*/*",
+        "arn:aws:s3:::${triggerBucket}",
+        "arn:aws:s3:::${triggerBucket}/*",
+        "arn:aws:s3:::${destBucket}",
+        "arn:aws:s3:::${destBucket}/*"
+      ]
     }
   ]
 }

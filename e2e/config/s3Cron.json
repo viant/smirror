@@ -5,6 +5,6 @@
   },
   "Resources": {
     "CheckInMs": 100,
-    "BaseURL": "s3://${s3ConfigBucket}/StorageMirrorCron/dataflow"
+    "BaseURL": "s3://${s3ConfigBucket}/StorageMirrorCron/Rules"
   }
 }

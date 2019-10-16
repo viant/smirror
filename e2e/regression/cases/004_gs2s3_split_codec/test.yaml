@@ -7,7 +7,7 @@ pipeline:
       URL: ${parent.path}/rule.json
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsConfigBucket}/StorageMirror/dataflow/case_${parent.index}.json
+      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}.json
 
 
 

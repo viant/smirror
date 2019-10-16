@@ -13,6 +13,7 @@ init:
   functionName: StorageMirrorSqs
   privilegePolicy: privilege-policy.json
   triggerBucket: ${prefix}-sqs-trigger
+  destBucket: s3://${prefix}-trigger
   queue: ${prefix}-storage-mirror-queue
   dest: s3://${prefix}-trigger
 

@@ -5,11 +5,10 @@ init:
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
   destBucketPrefix: $Replace('$gcp.ProjectID','-','_')
-
-  bucketPrefix: ms-dataflow
-  configBucket: ${bucketPrefix}-config
-  triggerBucket: ${bucketPrefix}-sns-trigger
-  opsBucket: ${bucketPrefix}-operations
+  sourcePrefix: $Replace('$gcp.ProjectID','_','-')
+  configBucket: ${sourcePrefix}-config
+  triggerBucket: ${sourcePrefix}-sns-trigger
+  opsBucket: ${sourcePrefix}-operations
   destBucket: ${destBucketPrefix}_mirrored
 
 
@@ -22,19 +21,19 @@ pipeline:
       URL: rule.json
     dest:
       credentials: $awsCredentials
-      URL: s3://${configBucket}/StorageMirror/dataflow/test-rule_sns.json
+      URL: s3://${configBucket}/StorageMirror/Rules/test-rule_sns.json
 
 
   cleanupDest:
     action: storage:remove
     assets:
-      - URL: gs://${destBucket}/testdata/data/test/events_sns.csv.gz
+      - URL: gs://${destBucket}/testdata/data/sns/test/events_sns.csv.gz
         credentials: $gcpCredentials
 
   checkDest:
     action: storage:exists
     assets:
-      - URL: gs://${destBucket}/testdata/data/test/events_sns.csv.gz
+      - URL: gs://${destBucket}/testdata/data/sns/test/events_sns.csv.gz
         credentials: $gcpCredentials
 
 
@@ -51,5 +50,5 @@ pipeline:
   verify:
     action: storage:exists
     assets:
-      - URL: gs://${destBucket}/testdata/data/test/events_sns.csv.gz
+      - URL: gs://${destBucket}/testdata/data/sns/test/events_sns.csv.gz
         credentials: $gcpCredentials

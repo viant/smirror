@@ -22,7 +22,7 @@ pipeline:
       URL: rule.json
     dest:
       credentials: $awsCredentials
-      URL: s3://${configBucket}/StorageMirror/dataflow/test-rule_sqs.json
+      URL: s3://${configBucket}/StorageMirror/Rules/test-rule_sqs.json
 
 
   cleanupDest:

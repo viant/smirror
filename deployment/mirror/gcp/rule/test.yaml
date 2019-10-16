@@ -16,7 +16,7 @@ pipeline:
       URL: rule.json
     dest:
       credentials: $gcpCredentials
-      URL: gs://${configBucket}/StorageMirror/dataflow/test-rule.json
+      URL: gs://${configBucket}/StorageMirror/Rules/test-rule.json
 
   trigger:
     action: storage:copy

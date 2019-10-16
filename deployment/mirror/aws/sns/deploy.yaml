@@ -1,6 +1,7 @@
 init:
 
   '!awsCredentials': $params.authWith
+  '!gcpCredentials': $params.gcpSecrets
   handler: smirrorsns
   appPath: /tmp/${handler}
   appLocation: ${appPath}/aws/sns/${handler}.zip
@@ -10,12 +11,17 @@ init:
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
   prefix: $Replace($gcpProject,'_','-')
-
   triggerBucket: ${prefix}-sns-trigger
-  topic: ${prefix}-storagemirror-topic
+  destBucket: ${prefix}-trigger
+  topic: ${prefix}-storagemirrir-topic
   dest: s3://${prefix}-trigger
 
 pipeline:
+
+  info:
+    action: print
+    message: "creating topic: $topic"
+
   setup:
     action: msg:setupResource
     credentials: $awsCredentials
@@ -56,7 +62,7 @@ pipeline:
       timeout: 360
       environment:
         variables:
-          DEST: StorageMirror
+          DEST: $dest
       code:
         zipfile: $LoadBinary(${appLocation})
       rolename: lambda-${functionName}-executor

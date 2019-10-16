@@ -107,6 +107,3 @@ pipeline:
         id: ObjectCreatedEvents
         events:
           - s3:ObjectCreated:*
-        filter:
-          prefix:
-            - data

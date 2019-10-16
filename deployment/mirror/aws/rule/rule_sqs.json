@@ -1,7 +1,7 @@
 [
   {
     "Source": {
-      "Prefix": "/data/sns/test",
+      "Prefix": "viant-e2e-sqs-trigger/",
       "Suffix": ".csv.gz"
     },
     "Dest": {
