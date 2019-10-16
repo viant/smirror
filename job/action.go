@@ -44,6 +44,8 @@ func (a Action) WriteError(context *Context, service afs.Service) error {
 	return service.Upload(context.Context, moveURL, file.DefaultFileOsMode, strings.NewReader(context.Error.Error()))
 }
 
+
+
 //Do perform an action
 func (a Action) Do(context *Context, service afs.Service, notify Notify, info *base.Info, response interface{}) (err error) {
 	URL := context.SourceURL
@@ -61,7 +63,6 @@ func (a Action) Do(context *Context, service afs.Service, notify Notify, info *b
 			a.Channels = []string{info.SlackChannel}
 		}
 		err = notify(context.Context, &NotifyRequest{
-			From:        base.App,
 			Title:       title,
 			Channels:    a.Channels,
 			Credentials: a.Credentials,

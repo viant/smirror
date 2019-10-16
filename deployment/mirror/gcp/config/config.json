@@ -1,6 +1,10 @@
 {
   "Mirrors": {
-    "BaseURL": "gs://${bucketPrefix}_config/StorageMirror/dataflow",
+    "BaseURL": "gs://${prefix}_config/StorageMirror/dataflow",
     "CheckInMs": 60000
+  },
+  "SlackCredentials": {
+    "URL": "gs://${prefix}_config/Secrets/slack.json.enc",
+    "Key": "${prefix}_ring/${prefix}_key"
   }
 }

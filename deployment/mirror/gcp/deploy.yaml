@@ -7,12 +7,12 @@ init:
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
   serviceAccount: $gcp.ClientEmail
-  bucketPrefix: $Replace($gcpProject,'-','_')
+  prefix: $Replace($gcpProject,'-','_')
 
-  configBucket: ${bucketPrefix}_config
-  triggerBucket: ${bucketPrefix}_trigger
-  opsBucket: ${bucketPrefix}_operation
-  destBucket: ${bucketPrefix}_mirrored
+  configBucket: ${prefix}_config
+  triggerBucket: ${prefix}_trigger
+  opsBucket: ${prefix}_operation
+  destBucket: ${prefix}_mirrored
   
   configLocation: config/config.json
   configText: $Cat('$configLocation')
