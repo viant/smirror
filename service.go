@@ -108,41 +108,50 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	return err
 }
 
-func (s *service) mirrorAsset(ctx context.Context, route *config.Rule, URL string, response *contract.Response) error {
-	options, err := s.secret.StorageOpts(ctx, route.Source)
+func getCompression(URL string, rule *config.Rule) (source, dest *config.Compression) {
+	source = config.NewCompressionForURL(URL)
+	dest = rule.Compression
+	shallTransform := rule.Split != nil || len(rule.Replace) > 0
+	if (dest != nil && dest.Uncompress) || shallTransform {
+		return source, dest
+	}
+	hasDestCompression := dest != nil && source != nil
+	if hasDestCompression && source.Equals(dest) {
+		return nil, nil
+	}
+	return source, dest
+}
+
+
+
+func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string, response *contract.Response) error {
+	options, err := s.secret.StorageOpts(ctx, rule.Source)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get storage option for %v", route.Source)
+		return errors.Wrapf(err, "failed to get storage option for %v", rule.Source)
 	}
 	reader, err := s.fs.DownloadWithURL(ctx, URL, options...)
 	if err != nil {
 		return errors.Wrapf(err, "failed to download source: %v", URL)
 	}
-
-	sourceCompression := config.NewCompressionForURL(URL)
-	destCompression := route.Compression
-	if sourceCompression.Equals(destCompression) && len(route.Replace) == 0 {
-		sourceCompression = nil
-		destCompression = nil
-	}
+	sourceCompression, destCompression := getCompression(URL, rule)
 	reader, err = NewReader(reader, sourceCompression)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
 	}
-
 	defer func() {
 		if reader != nil {
 			_ = reader.Close()
 		}
 	}()
 
-	destName := route.Name(URL)
-	destURL := url.Join(route.Dest.URL, destName)
+	destName := rule.Name(URL)
+	destURL := url.Join(rule.Dest.URL, destName)
 	if reader == nil {
 		return fmt.Errorf("reader was empty")
 	}
 	dataCopy := &Transfer{
-		rewriter: NewRewriter(route.Replace...),
-		Resource: route.Dest,
+		rewriter: NewRewriter(rule.Replace...),
+		Resource: rule.Dest,
 		Reader:   reader,
 		Dest:     NewDatafile(destURL, destCompression)}
 	return s.transfer(ctx, dataCopy, response)

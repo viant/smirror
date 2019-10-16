@@ -24,6 +24,7 @@ type Rule struct {
 	//PreserveDepth  - preserves specified folder depth in dest URL
 	PreserveDepth *int `json:",omitempty"`
 
+
 	//Group defines group of rule to be matched, otherwise multi match is invalid
 	Group string `json:",omitempty"`
 }

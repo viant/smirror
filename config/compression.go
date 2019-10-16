@@ -11,7 +11,8 @@ const (
 
 //Compression represents conversion strategy
 type Compression struct {
-	Codec string `json:",omitempty"`
+	Codec      string `json:",omitempty"`
+	Uncompress bool `json:",omitempty"`
 }
 
 //Equals returns true if compression is the same
