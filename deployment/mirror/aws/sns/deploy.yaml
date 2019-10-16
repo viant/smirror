@@ -7,9 +7,13 @@ init:
   functionName: StorageMirrorSns
   privilegePolicy: privilege-policy.json
 
-  bucketPrefix: ms-dataflow
-  triggerBucket: ${bucketPrefix}-sns-trigger
-  topic: ${bucketPrefix}StorageMirrorTopic
+  gcp: ${secrets.$gcpCredentials}
+  gcpProject: $gcp.ProjectID
+  prefix: $Replace($gcpProject,'_','-')
+
+  triggerBucket: ${prefix}-sns-trigger
+  topic: ${prefix}-storagemirror-topic
+  dest: s3://${prefix}-trigger
 
 pipeline:
   setup:
