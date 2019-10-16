@@ -66,12 +66,14 @@ pipeline:
       '@name': StorageMirrorSubscriber
       entryPoint: StorageMirrorSubscriber
       runtime: go111
-      availableMemoryMb: 256
+      availableMemoryMb: 2048
       timeout: 540s
       serviceAccountEmail: $serviceAccount
       eventTrigger:
         eventType: google.pubsub.topic.publish
         resource: projects/${gcp.projectID}/topics/$topic
+        failurePolicy:
+          retry: {}
       environmentVariables:
         LOGGING: 'true'
         DEST: gs://${triggerBucket}/

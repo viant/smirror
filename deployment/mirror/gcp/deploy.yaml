@@ -1,14 +1,13 @@
 init:
 
   '!gcpCredentials': $params.authWith
-  gcp: ${secrets.$gcpCredentials}
-  bucketPrefix: viant_dataflow
-
   serviceAccount: $gcp.ClientEmail
-
   appPath: /tmp/smirror
   functionName: StorageMirror
+  gcp: ${secrets.$gcpCredentials}
+  gcpProject: $gcp.ProjectID
 
+  gsbucketPrefix: $Replace($gcpProject,'-','_')
 
   configBucket: ${bucketPrefix}_config
   triggerBucket: ${bucketPrefix}_trigger
@@ -68,6 +67,8 @@ pipeline:
       eventTrigger:
         eventType: google.storage.object.finalize
         resource: projects/_/buckets/${triggerBucket}
+        failurePolicy:
+          retry: {}
       environmentVariables:
         LOGGING: 'true'
         CONFIG: gs://${configBucket}/StorageMirror/config.json

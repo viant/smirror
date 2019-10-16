@@ -18,7 +18,7 @@ func (a *Actions) Run(context *Context, service afs.Service, notify Notify, info
 	err := a.run(context, service, notify, info, body)
 	if err != nil {
 		JSON, _ := json.Marshal(a)
-		err = errors.Wrapf(err, "failed to run post actions: %v", JSON)
+		err = errors.Wrapf(err, "failed to run post actions: %s", JSON)
 	}
 	return err
 }
