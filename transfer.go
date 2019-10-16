@@ -31,6 +31,7 @@ func (t *Transfer) GetReader() (reader io.Reader, err error) {
 func (t *Transfer) getReader() (reader io.Reader, err error) {
 	reader = t.Reader
 	t.Reader = nil
+
 	if t.rewriter == nil {
 		t.rewriter = NewRewriter()
 	}
@@ -41,7 +42,6 @@ func (t *Transfer) getReader() (reader io.Reader, err error) {
 
 	buffer := new(bytes.Buffer)
 	var writer io.Writer = buffer
-
 	if t.Dest != nil && t.Dest.Compression != nil {
 		if t.Dest.Compression.Codec != "" {
 			if t.Dest.Codec == config.GZipCodec {

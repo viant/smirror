@@ -21,15 +21,16 @@ type Writer struct {
 }
 
 //NewWriter returns a route writer
-func NewWriter(route *config.Rule, listener OnClose) io.WriteCloser {
+func NewWriter(rule *config.Rule, listener OnClose) io.WriteCloser {
+	compression := rule.Compression
 	buffer := new(bytes.Buffer)
 	result := &Writer{
 		WriteCloser: WriteNopCloser(buffer),
 		buffer:      buffer,
 		listener:    listener,
 	}
-	if route.Compression != nil {
-		if route.Codec == config.GZipCodec {
+	if compression != nil {
+		if compression.Codec == config.GZipCodec {
 			result.gzipWriter = gzip.NewWriter(buffer)
 			result.WriteCloser = result.gzipWriter
 		}

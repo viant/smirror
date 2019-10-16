@@ -5,14 +5,12 @@ init:
 
 
   gcp: ${secrets.$gcpCredentials}
-  bucketPrefix: viant_dataflow
-
+  gcpProject: $gcp.ProjectID
   serviceAccount: $gcp.ClientEmail
-
+  bucketPrefix: $Replace($gcpProject,'-','_')
   appPath: /tmp/smirrorpubsub
   functionName: StorageMirror
-  
-  
+
   configBucket: ${bucketPrefix}_config
   triggerBucket: ${bucketPrefix}_trigger
   opsBucket: ${bucketPrefix}_operation
@@ -69,11 +67,10 @@ pipeline:
       availableMemoryMb: 2048
       timeout: 540s
       serviceAccountEmail: $serviceAccount
+      retry: true
       eventTrigger:
         eventType: google.pubsub.topic.publish
         resource: projects/${gcp.projectID}/topics/$topic
-        failurePolicy:
-          retry: {}
       environmentVariables:
         LOGGING: 'true'
         DEST: gs://${triggerBucket}/

@@ -1,13 +1,13 @@
 init:
 
   '!gcpCredentials': $params.authWith
-  serviceAccount: $gcp.ClientEmail
+
   appPath: /tmp/smirror
   functionName: StorageMirror
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
-
-  gsbucketPrefix: $Replace($gcpProject,'-','_')
+  serviceAccount: $gcp.ClientEmail
+  bucketPrefix: $Replace($gcpProject,'-','_')
 
   configBucket: ${bucketPrefix}_config
   triggerBucket: ${bucketPrefix}_trigger
@@ -64,11 +64,10 @@ pipeline:
       availableMemoryMb: 2048
       timeout: 540s
       serviceAccountEmail: $serviceAccount
+      retry: true
       eventTrigger:
         eventType: google.storage.object.finalize
         resource: projects/_/buckets/${triggerBucket}
-        failurePolicy:
-          retry: {}
       environmentVariables:
         LOGGING: 'true'
         CONFIG: gs://${configBucket}/StorageMirror/config.json

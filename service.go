@@ -108,19 +108,6 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	return err
 }
 
-func getCompression(URL string, rule *config.Rule) (source, dest *config.Compression) {
-	source = config.NewCompressionForURL(URL)
-	dest = rule.Compression
-	shallTransform := rule.Split != nil || len(rule.Replace) > 0
-	if (dest != nil && dest.Uncompress) || shallTransform {
-		return source, dest
-	}
-	hasDestCompression := dest != nil && source != nil
-	if hasDestCompression && source.Equals(dest) {
-		return nil, nil
-	}
-	return source, dest
-}
 
 
 
@@ -133,7 +120,8 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 	if err != nil {
 		return errors.Wrapf(err, "failed to download source: %v", URL)
 	}
-	sourceCompression, destCompression := getCompression(URL, rule)
+	sourceCompression := rule.SourceCompression(URL)
+
 	reader, err = NewReader(reader, sourceCompression)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
@@ -153,7 +141,7 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 		rewriter: NewRewriter(rule.Replace...),
 		Resource: rule.Dest,
 		Reader:   reader,
-		Dest:     NewDatafile(destURL, destCompression)}
+		Dest:     NewDatafile(destURL, rule.Compression)}
 	return s.transfer(ctx, dataCopy, response)
 }
 
@@ -299,7 +287,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rul
 		splitCount := atomic.AddInt32(counter, 1)
 		destName := route.Split.Name(route, URL, splitCount)
 		destURL := url.Join(route.Dest.URL, destName)
-		return NewWriter(route, func(writer *Writer) error {
+		return NewWriter(route,  func(writer *Writer) error {
 			if writer.Reader == nil {
 				return fmt.Errorf("Writer reader was empty")
 			}

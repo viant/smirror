@@ -24,7 +24,6 @@ type Rule struct {
 	//PreserveDepth  - preserves specified folder depth in dest URL
 	PreserveDepth *int `json:",omitempty"`
 
-
 	//Group defines group of rule to be matched, otherwise multi match is invalid
 	Group string `json:",omitempty"`
 }
@@ -51,6 +50,21 @@ func (r *Rule) Validate() error {
 		return fmt.Errorf("dest was empty")
 	}
 	return nil
+}
+
+//SourceCompression returns compression for URL
+func (r *Rule) SourceCompression(URL string) (source *Compression) {
+	source = NewCompressionForURL(URL)
+	dest := r.Compression
+	shallTransform := r.Split != nil || len(r.Replace) > 0
+	if (dest != nil && dest.Uncompress) || shallTransform {
+		return source
+	}
+	hasDestCompression := dest != nil && source != nil
+	if (hasDestCompression && source.Equals(dest)) || ! hasDestCompression {
+		return nil
+	}
+	return source
 }
 
 //HasMatch returns true if URL matches prefix or suffix
@@ -80,27 +94,26 @@ func (r *Rule) Resources() []*Resource {
 
 //Name return route dest asset name
 func (r *Rule) Name(URL string) string {
+	sourceCompression := r.SourceCompression(URL)
 	_, location := url.Base(URL, file.Scheme)
 	parent, name := path.Split(location)
 	ext := path.Ext(name)
-	if r.Compression != nil {
+	if r.Compression != nil && r.Compression.Codec != "" {
 		switch r.Compression.Codec {
 		case GZipCodec:
 			if ext != GZIPExtension {
 				name += GZIPExtension
 			}
 		}
-	} else {
+	} else if sourceCompression != nil {
 		if ext == GZIPExtension {
 			name = string(name[:len(name)-len(ext)])
 		}
 	}
-
 	depth := r.GetPreserveDepth()
 	if depth == 0 && r.HasPreserveDepth() {
 		return name
 	}
-
 	folderPath := strings.Trim(parent, "/")
 	fragments := strings.Split(folderPath, "/")
 	if !r.HasPreserveDepth() {

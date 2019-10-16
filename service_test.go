@@ -25,6 +25,7 @@ type serviceUseCase struct {
 	sourceContent   string
 	config          *Config
 	compress        bool
+
 	expectResponse  interface{}
 	expectedURLs    map[string]int
 	hasServiceError bool
@@ -228,6 +229,7 @@ line11
 					},
 				},
 			},
+			compress:true,
 			expectedURLs: map[string]int{
 				"mem://localhost/folder/subfolder/file1.txt": 77,
 				"mem://localhost/data/file1_00001.txt.gz":    62,
@@ -259,8 +261,10 @@ line11
 `,
 			config: &Config{
 				Mirrors: config.Routes{
+
 					Rules: []*config.Rule{
 						{
+
 							PreserveDepth: base.IntPtr(0),
 							Source: &config.Resource{
 								Basic: matcher.Basic{
@@ -281,6 +285,7 @@ line11
 					},
 				},
 			},
+			compress:true,
 			expectedURLs: map[string]int{
 				"mem://localhost/folder/subfolder/file1.txt.gz": 64,
 				"mem://localhost/data/file1_00001.txt.gz":       62,
@@ -378,12 +383,58 @@ line4`,
 	"Status": "ok"
 }`,
 		},
+
+
+		{
+			description: "seamless transfer",
+			sourceURL:   "mem://localhost/unzip/subfolder/file2.txt.gz",
+			sourceContent: `line1,
+line2,
+line3,
+line4`,
+			config: &Config{
+				Mirrors: config.Routes{
+					Rules: []*config.Rule{
+						{
+							PreserveDepth: base.IntPtr(0),
+							Source: &config.Resource{
+
+								Basic: matcher.Basic{
+									Suffix: ".txt.gz",
+									Prefix:"/unzip/",
+								},
+							},
+							Dest: &config.Resource{
+								URL: "mem://localhost/seamless/data",
+							},
+							Actions: job.Actions{
+								OnSuccess: []*job.Action{
+									{
+										Action: job.ActionMove,
+										URL:    "mem://localhost/processed",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedURLs: map[string]int{
+				"mem://localhost/seamless/data/file2.txt.gz":      26,
+				"mem://localhost/unzip/subfolder/file2.txt.gz": 0,
+				"mem://localhost/processed/file2.txt.gz":        26,
+			},
+			expectResponse: `{
+	"DestURLs": ["mem://localhost/seamless/data/file2.txt.gz"],
+	"Status": "ok"
+}`,
+		},
+
 	}
 
 	ctx := context.Background()
 	mgr := mem.Singleton()
 	for _, useCase := range useCases {
-
 		initUseCase(ctx, useCase, mgr, t)
 		service, err := New(ctx, useCase.config)
 
@@ -402,6 +453,7 @@ line4`,
 			continue
 		}
 
+
 		for URL, expectedSize := range useCase.expectedURLs {
 			reader, err := mgr.DownloadWithURL(ctx, URL)
 			if expectedSize == 0 { //DO NOT EXPECT ASSET IN THAT URL
@@ -414,7 +466,7 @@ line4`,
 			}
 			data, err := ioutil.ReadAll(reader)
 			assert.Nil(t, err, useCase.description)
-			assert.Equal(t, expectedSize, len(data), useCase.description)
+			assert.Equal(t, expectedSize, len(data), useCase.description + " on " + URL)
 		}
 	}
 
@@ -422,8 +474,7 @@ line4`,
 
 func initUseCase(ctx context.Context, useCase *serviceUseCase, memStorage storage.Manager, t *testing.T) {
 	var sourceReader io.Reader = strings.NewReader(useCase.sourceContent)
-
-	if strings.HasSuffix(useCase.sourceURL, config.GZIPExtension) {
+	if strings.HasSuffix(useCase.sourceURL, config.GZIPExtension) && useCase.compress {
 		buffer := new(bytes.Buffer)
 		writer := gzip.NewWriter(buffer)
 		_, _ = io.Copy(writer, sourceReader)
