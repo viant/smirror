@@ -58,7 +58,7 @@ func (p *proxy) do(ctx context.Context, destination string, payload []byte, resp
 		return err
 	}
 	response.ProxyType = ProxyTypeStorage
-	s3Event := events.S3Event{}
+	s3Event := &events.S3Event{}
 	if err = json.Unmarshal(payload, s3Event); err != nil {
 		return errors.Wrapf(err, "failed to decode %T, from %s", s3Event, payload)
 	}

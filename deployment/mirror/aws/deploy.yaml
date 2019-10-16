@@ -1,7 +1,11 @@
 init:
 
   '!awsCredentials': $params.authWith
+  '!gcpCredentials': $params.gcpSecrets
 
+  gcp: ${secrets.$gcpCredentials}
+  gcpProject: $gcp.ProjectID
+  prefix: $Replace($gcpProject,'_','-')
   functionName: StorageMirror
 
   handler: smirror
@@ -11,12 +15,12 @@ init:
   privilegePolicy: privilege-policy.json
   configLocation: config/config.json
   configText: $Cat('$configLocation')
-  bucketPrefix: ms-dataflow
-  configBucket: ${bucketPrefix}-config
-  triggerBucket: ${bucketPrefix}-trigger
-  opsBucket: ${bucketPrefix}-operations
-  triggerSqsBucket: ${bucketPrefix}-sqs-trigger
-  triggerSnsBucket: ${bucketPrefix}-sns-trigger
+
+  configBucket: ${prefix}-config
+  triggerBucket: ${prefix}-trigger
+  opsBucket: ${prefix}-operations
+  triggerSqsBucket: ${prefix}-sqs-trigger
+  triggerSnsBucket: ${prefix}-sns-trigger
 
 pipeline:
 

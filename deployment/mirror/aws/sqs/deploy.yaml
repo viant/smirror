@@ -1,16 +1,20 @@
 init:
 
   '!awsCredentials': $params.authWith
+  '!gcpCredentials': $params.gcpSecrets
+
+  gcp: ${secrets.$gcpCredentials}
+  gcpProject: $gcp.ProjectID
+  prefix: $Replace($gcpProject,'_','-')
+
   handler: smirrorsqs
   appPath: /tmp/${handler}
   appLocation: ${appPath}/aws/sqs/${handler}.zip
   functionName: StorageMirrorSqs
   privilegePolicy: privilege-policy.json
-
-
-  bucketPrefix: ms-dataflow
-  triggerBucket: ${bucketPrefix}-sqs-trigger
-  queue: ${bucketPrefix}StorageMirrorQueue
+  triggerBucket: ${prefix}-sqs-trigger
+  queue: ${prefix}-queue
+  dest: s3://${prefix}-trigger
 
 pipeline:
 
@@ -54,7 +58,7 @@ pipeline:
       timeout: 360
       environment:
         variables:
-          DEST: StorageMirror
+          DEST: $dest
       code:
         zipfile: $LoadBinary(${appLocation})
       rolename: lambda-${functionName}-executor

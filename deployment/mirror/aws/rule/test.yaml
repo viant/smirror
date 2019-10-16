@@ -4,13 +4,14 @@ init:
 
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
-  destBucketPrefix: $Replace('$gcp.ProjectID','-','_')
+  destPrefix: $Replace('$gcp.ProjectID','-','_')
+  sourcePrefix: $Replace('$gcp.ProjectID','_','-')
 
-  bucketPrefix: ms-dataflow
-  configBucket: ${bucketPrefix}-config
-  triggerBucket: ${bucketPrefix}-trigger
-  opsBucket: ${bucketPrefix}-operations
-  destBucket: ${destBucketPrefix}_mirrored
+
+  configBucket: ${sourcePrefix}-config
+  triggerBucket: ${sourcePrefix}-trigger
+  opsBucket: ${sourcePrefix}-operations
+  destBucket: ${destPrefix}_mirrored
 
 
 pipeline:
