@@ -161,12 +161,20 @@ func TestRoute_Name(t *testing.T) {
 			expect: "dd/asset1.txt",
 		},
 		{
-			description: "single asset",
+			description: "single asset from root",
 			Rule: Rule{
 				PreserveDepth: base.IntPtr(-1),
 			},
 			URL:    "s3://myducket/folder/asset1.txt",
 			expect: "asset1.txt",
+		},
+		{
+			description: "single asset from leaf",
+			Rule: Rule{
+				PreserveDepth: base.IntPtr(1),
+			},
+			URL:    "s3://myducket/folder/asset1.txt",
+			expect: "folder/asset1.txt",
 		},
 	}
 
