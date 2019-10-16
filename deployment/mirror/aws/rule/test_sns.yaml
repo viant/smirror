@@ -18,7 +18,7 @@ pipeline:
     action: storage:copy
     expand: true
     source:
-      URL: rule.json
+      URL: rule_sns.json
     dest:
       credentials: $awsCredentials
       URL: s3://${configBucket}/StorageMirror/Rules/test-rule_sns.json
@@ -27,13 +27,13 @@ pipeline:
   cleanupDest:
     action: storage:remove
     assets:
-      - URL: gs://${destBucket}/testdata/data/sns/test/events_sns.csv.gz
+      - URL: gs://${destBucket}/testdata/sns/test/events_sns.csv.gz
         credentials: $gcpCredentials
 
   checkDest:
     action: storage:exists
     assets:
-      - URL: gs://${destBucket}/testdata/data/sns/test/events_sns.csv.gz
+      - URL: gs://${destBucket}/testdata/sns/test/events_sns.csv.gz
         credentials: $gcpCredentials
 
 
@@ -50,5 +50,5 @@ pipeline:
   verify:
     action: storage:exists
     assets:
-      - URL: gs://${destBucket}/testdata/data/sns/test/events_sns.csv.gz
+      - URL: gs://${destBucket}/testdata/sns/test/events_sns.csv.gz
         credentials: $gcpCredentials

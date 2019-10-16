@@ -19,7 +19,7 @@ pipeline:
     action: storage:copy
     expand: true
     source:
-      URL: rule.json
+      URL: rule_sqs.json
     dest:
       credentials: $awsCredentials
       URL: s3://${configBucket}/StorageMirror/Rules/test-rule_sqs.json
@@ -28,13 +28,13 @@ pipeline:
   cleanupDest:
     action: storage:remove
     assets:
-      - URL: gs://${destBucket}/testdata/data/test/events_sqs.csv.gz
+      - URL: gs://${destBucket}/testdata//sqs/test/events_sqs.csv.gz
         credentials: $gcpCredentials
 
   checkDest:
     action: storage:exists
     assets:
-      - URL: gs://${destBucket}/testdata/data/test/events_sqs.csv.gz
+      - URL: gs://${destBucket}/testdata//sqs/test/events_sqs.csv.gz
         credentials: $gcpCredentials
 
 
@@ -51,5 +51,5 @@ pipeline:
   verify:
     action: storage:exists
     assets:
-      - URL: gs://${destBucket}/testdata/data/test/events_sqs.csv.gz
+      - URL: gs://${destBucket}/testdata//sqs/test/events_sqs.csv.gz
         credentials: $gcpCredentials

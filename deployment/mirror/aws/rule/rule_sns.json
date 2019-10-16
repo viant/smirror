@@ -1,7 +1,7 @@
 [
   {
     "Source": {
-      "Prefix": "/viant-e2e-sns-trigger/"
+      "Prefix": "/${triggerBucket}/"
     },
     "Dest": {
       "URL": "gs://${destBucket}/testdata",
