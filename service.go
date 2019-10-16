@@ -78,7 +78,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		response.Status = base.StatusNoMatch
 		return nil
 	}
-
+	response.TotalRules = len(s.config.Mirrors.Rules)
 	if err := s.initRule(ctx, rule); err != nil {
 		return errors.Wrapf(err, "railed to initialise rule: %v", rule.Info.Workflow)
 	}
@@ -101,7 +101,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		err = s.mirrorAsset(ctx, rule, request.URL, response)
 	}
 	jobContent := job.NewContext(ctx, err, request.URL, response.Rule.Name(request.URL))
-	response.TotalRules = len(s.config.Mirrors.Rules)
+
 	response.TimeTakenMs = int(time.Now().Sub(response.StartTime) / time.Millisecond)
 	if e := rule.Actions.Run(jobContent, s.fs, s.notifier.Notify, &response.Rule.Info, response); e != nil && err == nil {
 		err = e

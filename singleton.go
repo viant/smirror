@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/viant/toolbox"
 )
 
 var singleton Service
@@ -25,7 +24,6 @@ func NewFromEnv(ctx context.Context, envKey string) (Service, error) {
 		JSON, _ := json.Marshal(config)
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to create service from config %s", JSON))
 	}
-	toolbox.Dump(config)
 	singletonEnvKey = envKey
 	singleton = service
 	return singleton, nil
