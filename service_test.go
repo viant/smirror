@@ -36,6 +36,53 @@ func TestService_Mirror(t *testing.T) {
 	var useCases = []*serviceUseCase{
 
 		{
+			description: "compress unchanges",
+			compress:true,
+			sourceURL:   "mem://localhost/folder/subfolder/file1.txt.gz",
+			sourceContent: `line1,
+line2,
+line3,
+line4,
+line5,
+line6,
+line7,
+line8,
+line9
+`,
+			config: &Config{
+				Mirrors: config.Routes{
+					Rules: []*config.Rule{
+						{
+							PreserveDepth: base.IntPtr(0),
+							Source: &config.Resource{
+								Basic: matcher.Basic{
+									Suffix: ".txt.gz",
+								},
+							},
+							Dest: &config.Resource{
+								URL: "mem://localhost/data",
+							},
+							Compression: &config.Compression{
+								Codec: config.GZipCodec,
+							},
+						},
+					},
+				},
+			},
+			expectedURLs: map[string]int{
+				"mem://localhost/folder/subfolder/file1.txt.gz": 58,
+				"mem://localhost/data/file1.txt.gz":          58,
+			},
+			expectResponse: `{
+	"DestURLs": [
+		"mem://localhost/data/file1.txt.gz"
+	],
+	"Status": "ok"
+}`,
+		},
+
+
+		{
 			description: "compressed transfer",
 			sourceURL:   "mem://localhost/folder/subfolder/file1.txt",
 			sourceContent: `line1,

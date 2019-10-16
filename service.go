@@ -12,6 +12,7 @@ import (
 	"github.com/viant/afsc/s3"
 	"io"
 	"io/ioutil"
+	"path"
 	"smirror/base"
 	"smirror/config"
 	"smirror/contract"
@@ -137,11 +138,17 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 	if reader == nil {
 		return fmt.Errorf("reader was empty")
 	}
+	destCompression := rule.Compression
+	if path.Ext(URL) == path.Ext(destURL) && len(rule.Replace) == 0 {
+		sourceCompression = nil
+		destCompression = nil
+	}
+
 	dataCopy := &Transfer{
 		rewriter: NewRewriter(rule.Replace...),
 		Resource: rule.Dest,
 		Reader:   reader,
-		Dest:     NewDatafile(destURL, rule.Compression)}
+		Dest:     NewDatafile(destURL, destCompression)}
 	return s.transfer(ctx, dataCopy, response)
 }
 

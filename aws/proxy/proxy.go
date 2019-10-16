@@ -68,6 +68,10 @@ func (p *proxy) do(ctx context.Context, destination string, payload []byte, resp
 		destURL := destinationURL(record, destBucket)
 		response.Copy[sourceURL] = destURL
 		if err := p.fs.Copy(ctx, sourceURL, destURL); err != nil {
+			if exists, e := p.fs.Exists(ctx, sourceURL); e == nil && ! exists {
+				response.Status = base.StatusNoFound
+				return nil
+			}
 			return err
 		}
 	}
