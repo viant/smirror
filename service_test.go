@@ -477,6 +477,53 @@ line4`,
 }`,
 		},
 
+
+		{
+			description: "root direction folder cut",
+			compress:true,
+			sourceURL:   "mem://localhost/viant_dataflow_trigger/xxxxxxx/2019-10-06T00:00:00Z.gz",
+			sourceContent: `line1,
+line2,
+line3,
+line4,
+line5,
+line6,
+line7,
+line8,
+line9
+`,
+			config: &Config{
+				Mirrors: config.Routes{
+					Rules: []*config.Rule{
+						{
+							PreserveDepth: base.IntPtr(-1),
+							Source: &config.Resource{
+								Basic: matcher.Basic{
+									Suffix: ".gz",
+								},
+							},
+							Dest: &config.Resource{
+								URL: "mem://localhost/data",
+							},
+							Compression: &config.Compression{
+								Codec: config.GZipCodec,
+							},
+						},
+					},
+				},
+			},
+			expectedURLs: map[string]int{
+				"mem://localhost/viant_dataflow_trigger/xxxxxxx/2019-10-06T00:00:00Z.gz": 58,
+				"mem://localhost/data/xxxxxxx/2019-10-06T00:00:00Z.gz":          58,
+			},
+			expectResponse: `{
+	"DestURLs": [
+		"mem://localhost/data/xxxxxxx/2019-10-06T00:00:00Z.gz"
+	],
+	"Status": "ok"
+}`,
+		},
+
 	}
 
 	ctx := context.Background()

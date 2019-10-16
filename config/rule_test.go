@@ -160,6 +160,14 @@ func TestRoute_Name(t *testing.T) {
 			URL:    "s3://myducket/folder/sub/dd/asset1.txt",
 			expect: "dd/asset1.txt",
 		},
+		{
+			description: "single asset",
+			Rule: Rule{
+				PreserveDepth: base.IntPtr(-1),
+			},
+			URL:    "s3://myducket/folder/asset1.txt",
+			expect: "asset1.txt",
+		},
 	}
 
 	for _, useCase := range useCases {

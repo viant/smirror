@@ -131,7 +131,7 @@ func (s *service) checkProcessed(ctx context.Context, request *Request, response
 		if object.IsDir() {
 			continue
 		}
-		routes := routes.Mirrors.HasMatch(object.URL())
+		routes := routes.Mirrors.Match(object.URL())
 		var route *config.Rule
 		if len(routes) == 1 {
 			route = routes[0]
@@ -159,7 +159,7 @@ func (s *service) checkUnprocessed(ctx context.Context, request *Request, respon
 			continue
 		}
 		var rule *config.Rule
-		rules := routes.Mirrors.HasMatch(object.URL())
+		rules := routes.Mirrors.Match(object.URL())
 		if len(rules) == 1 {
 			rule = rules[0]
 		}

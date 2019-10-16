@@ -75,7 +75,7 @@ func TestRoutes_HasMatch(t *testing.T) {
 	}
 
 	for _, useCase := range useCases {
-		matched := useCase.HasMatch(useCase.URL)
+		matched := useCase.Match(useCase.URL)
 		var actual *Rule
 		if len(matched) == 1 {
 			actual = matched[0]

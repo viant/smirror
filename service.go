@@ -64,7 +64,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		return err
 	}
 	var rule *config.Rule
-	matched := s.config.Mirrors.HasMatch(request.URL)
+	matched := s.config.Mirrors.Match(request.URL)
 	switch len(matched) {
 	case 0:
 	case 1:

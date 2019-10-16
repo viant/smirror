@@ -24,8 +24,8 @@ type Routes struct {
 	inited       int32
 }
 
-//HasMatch returns the first match route
-func (r Routes) HasMatch(URL string) (matched []*Rule) {
+//Match returns the first match route
+func (r Routes) Match(URL string) (matched []*Rule) {
 	for i := range r.Rules {
 		if r.Rules[i].HasMatch(URL) {
 			matched = append(matched, r.Rules[i])
@@ -112,7 +112,9 @@ func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object 
 	}
 
 	for i := range routes {
+		routes[i].Info.URL = object.URL()
 		if routes[i].Info.Workflow == "" {
+
 			name := object.Name()
 			if strings.HasSuffix(name, ".json") {
 				name = string(name[:len(name)-5])

@@ -67,7 +67,7 @@ func (r *Rule) SourceCompression(URL string) (source *Compression) {
 	return source
 }
 
-//HasMatch returns true if URL matches prefix or suffix
+//Match returns true if URL matches prefix or suffix
 func (r *Rule) HasMatch(URL string) bool {
 	if r.Source.Bucket != "" {
 		bucket := url.Host(URL)
@@ -125,7 +125,7 @@ func (r *Rule) Name(URL string) string {
 		depth = -1 * depth
 		fromRoot = true
 	}
-	if depth < len(fragments) {
+	if depth <= len(fragments) {
 		if fromRoot {
 			folderPath = strings.Join(fragments[depth:], "/")
 		} else {
