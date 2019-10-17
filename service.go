@@ -71,7 +71,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		rule = matched[0]
 	default:
 		JSON, _ := json.Marshal(matched)
-		return errors.Errorf("multi rule match currently not supported: %v", JSON)
+		return errors.Errorf("multi rule match currently not supported: %s", JSON)
 	}
 
 	if rule == nil {
