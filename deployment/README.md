@@ -229,7 +229,7 @@ where:
 
 ```bash
 cd $SmirrorRoot
-cd deployment/mirror/aws/rule
+cd deployment/mirror/aws/test
 endly test.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
 ```
 
@@ -254,7 +254,7 @@ _where:_
 
 ```bash
 cd $SmirrorRoot
-cd deployment/mirror/aws/rule
+cd deployment/mirror/aws/tets
 endly test_sqs.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
 ```
 
@@ -280,7 +280,7 @@ _where:_
 
 ```bash
 cd $SmirrorRoot
-cd deployment/mirror/aws/rule
+cd deployment/mirror/aws/test
 endly test_sns.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
 ```
 
@@ -290,7 +290,6 @@ where:
 
 
 ###### StorageMirror Cron
-
 
 
 ###### StorageMonitor

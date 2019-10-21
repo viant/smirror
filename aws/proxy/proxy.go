@@ -26,12 +26,14 @@ type Proxy interface {
 
 type proxy struct {
 	*lambda.Lambda
-	fs afs.Service
+	method string
+	isMove bool
+	fs     afs.Service
 }
 
 //Do proxy payload to destination
 func (p *proxy) Do(ctx context.Context, destination string, payload []byte) *Response {
-	response := &Response{Status: base.StatusOK, Copy: make(map[string]string)}
+	response := &Response{Status: base.StatusOK, Triggered: make(map[string]string)}
 	err := p.do(ctx, destination, payload, response)
 	if err != nil {
 		response.Status = base.StatusError
@@ -58,6 +60,7 @@ func (p *proxy) do(ctx context.Context, destination string, payload []byte, resp
 		return err
 	}
 	response.ProxyType = ProxyTypeStorage
+	response.ProxyMethod = p.method
 	s3Event := &events.S3Event{}
 	if err = json.Unmarshal(payload, s3Event); err != nil {
 		return errors.Wrapf(err, "failed to decode %T, from %s", s3Event, payload)
@@ -66,12 +69,7 @@ func (p *proxy) do(ctx context.Context, destination string, payload []byte, resp
 	for _, record := range s3Event.Records {
 		sourceURL := sourceURL(record)
 		destURL := destinationURL(record, destBucket)
-		response.Copy[sourceURL] = destURL
-		if err := p.fs.Copy(ctx, sourceURL, destURL); err != nil {
-			if exists, e := p.fs.Exists(ctx, sourceURL); e == nil && ! exists {
-				response.Status = base.StatusNoFound
-				return nil
-			}
+		if err := base.Trigger(ctx, p.fs, p.isMove, sourceURL, destURL, response.Triggered); err != nil {
 			return err
 		}
 	}
@@ -89,7 +87,7 @@ func destinationURL(resource events.S3EventRecord, destBucket string) string {
 }
 
 //New returns new proxy
-func New() (Proxy, error) {
+func New(method string) (Proxy, error) {
 	sess, err := session.NewSession()
 	if err != nil {
 		return nil, err
@@ -97,5 +95,7 @@ func New() (Proxy, error) {
 	return &proxy{
 		Lambda: lambda.New(sess),
 		fs:     afs.New(),
+		method: method,
+		isMove: method == base.ProxyMethodMove,
 	}, nil
 }

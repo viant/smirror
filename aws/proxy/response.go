@@ -4,7 +4,8 @@ package proxy
 type Response struct {
 	Source      string
 	Destination string
-	Copy        map[string]string `json:",omitempty"`
+	Triggered   map[string]string `json:",omitempty"`
+	ProxyMethod   string
 	ProxyType   string
 	Status      string
 	Error       string
