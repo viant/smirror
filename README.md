@@ -390,7 +390,7 @@ curl -d @monitor.json -X POST  -H "Content-Type: application/json"  $monitorEndp
   "ConfigURL":    "gs://${configBucket}/StorageMirror/config.json",
   "TriggerURL":   "gs://${triggerBucket}",
   "UnprocessedDuration": "2hours",
-  "ErrorURL":     "gs://${opsBucket}/StorageMirror/errors/",
+  "ErrorURL":     "gs://${opsBucket}/StorageMirror/Errors/",
   "ErrorRecency": "3hours"
 }
 ```

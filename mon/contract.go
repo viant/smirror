@@ -39,11 +39,11 @@ type Response struct {
 	ProcessCount     int `json:",omitempty"`
 	ProcessedBytes   int `json:",omitempty"`
 	ErrorCount       int
-	Dataflows        []*Dataflow `json:",omitempty"`
+	Rules            []*RuleInfo `json:",omitempty"`
 	Errors           []*Error    `json:",omitempty"`
 	Status           string
 	Error            string `json:",omitempty"`
-	workflowMap      map[string]*Dataflow
+	rulesMap         map[string]*RuleInfo
 }
 
 func (r *Response) AddError(object storage.Object, message string) {
@@ -54,16 +54,16 @@ func (r *Response) AddError(object storage.Object, message string) {
 
 func (r *Response) AddUnprocessed(now time.Time, route *config.Rule, file storage.Object) {
 	info := base.Info{
-		Workflow: base.UnclassifiedDataflow,
+		Workflow: base.UnclassifiedStatus,
 	}
 	if route != nil {
 		info = route.Info
 	}
-	workflow, ok := r.workflowMap[info.Workflow]
+	workflow, ok := r.rulesMap[info.Workflow]
 	if !ok {
 		workflow = NewWorkflow(info)
-		r.Dataflows = append(r.Dataflows, workflow)
-		r.workflowMap[info.Workflow] = workflow
+		r.Rules = append(r.Rules, workflow)
+		r.rulesMap[info.Workflow] = workflow
 	}
 	workflow.UnprocessedCount++
 	r.UnprocessedCount++
@@ -78,16 +78,16 @@ func (r *Response) AddUnprocessed(now time.Time, route *config.Rule, file storag
 
 func (r *Response) AddProcessed(route *config.Rule, object storage.Object) {
 	info := base.Info{
-		Workflow: base.UnclassifiedDataflow,
+		Workflow: base.UnclassifiedStatus,
 	}
 	if route != nil {
 		info = route.Info
 	}
-	workflow, ok := r.workflowMap[info.Workflow]
+	workflow, ok := r.rulesMap[info.Workflow]
 	if !ok {
 		workflow = NewWorkflow(info)
-		r.Dataflows = append(r.Dataflows, workflow)
-		r.workflowMap[info.Workflow] = workflow
+		r.Rules = append(r.Rules, workflow)
+		r.rulesMap[info.Workflow] = workflow
 	}
 	workflow.ProcessedCount++
 	r.ProcessCount++
@@ -149,9 +149,9 @@ func (r *Request) Validate() (err error) {
 //NewResponse create a response
 func NewResponse() *Response {
 	return &Response{
-		Status:      base.StatusOK,
-		workflowMap: make(map[string]*Dataflow),
-		Dataflows:   make([]*Dataflow, 0),
-		Errors:      make([]*Error, 0),
+		Status:   base.StatusOK,
+		rulesMap: make(map[string]*RuleInfo),
+		Rules:    make([]*RuleInfo, 0),
+		Errors:   make([]*Error, 0),
 	}
 }

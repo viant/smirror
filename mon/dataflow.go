@@ -4,8 +4,8 @@ import (
 	"smirror/base"
 )
 
-//Dataflow represents workflow info with unprocessed files
-type Dataflow struct {
+//RuleInfo represents workflow info with unprocessed files
+type RuleInfo struct {
 	base.Info
 	ProcessedCount   int
 	MaxProcessedSize int
@@ -16,8 +16,8 @@ type Dataflow struct {
 }
 
 //NewWorkflow create a workflow
-func NewWorkflow(info base.Info) *Dataflow {
-	return &Dataflow{
+func NewWorkflow(info base.Info) *RuleInfo {
+	return &RuleInfo{
 		Info:        info,
 		Unprocessed: make([]*File, 0),
 	}

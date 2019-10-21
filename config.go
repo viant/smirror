@@ -17,7 +17,7 @@ import (
 type Config struct {
 	base.Config
 	SlackCredentials *auth.Credentials
-	Mirrors          config.Routes
+	Mirrors          config.Ruleset
 }
 
 //Init initialises routes

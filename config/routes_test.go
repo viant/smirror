@@ -9,13 +9,13 @@ import (
 func TestRoutes_HasMatch(t *testing.T) {
 	var useCases = []struct {
 		description string
-		Routes
+		Ruleset
 		URL       string
 		expectURL string
 	}{
 		{
 			description: "suffix match",
-			Routes: Routes{
+			Ruleset: Ruleset{
 				Rules: []*Rule{
 					{
 						Source: &Resource{
@@ -44,7 +44,7 @@ func TestRoutes_HasMatch(t *testing.T) {
 		},
 		{
 			description: "prefix np match",
-			Routes: Routes{
+			Ruleset: Ruleset{
 				Rules: []*Rule{
 					{
 						Source: &Resource{

@@ -14,8 +14,8 @@ import (
 	"time"
 )
 
-//Routes represents route slice
-type Routes struct {
+//Ruleset represents route slice
+type Ruleset struct {
 	BaseURL      string
 	CheckInMs    int
 	Rules        []*Rule
@@ -25,7 +25,7 @@ type Routes struct {
 }
 
 //Match returns the first match route
-func (r Routes) Match(URL string) (matched []*Rule) {
+func (r Ruleset) Match(URL string) (matched []*Rule) {
 	for i := range r.Rules {
 		if r.Rules[i].HasMatch(URL) {
 			matched = append(matched, r.Rules[i])
@@ -34,7 +34,7 @@ func (r Routes) Match(URL string) (matched []*Rule) {
 	return matched
 }
 
-func (r Routes) Validate() error {
+func (r Ruleset) Validate() error {
 	if len(r.Rules) == 0 {
 		return nil
 	}
@@ -47,7 +47,7 @@ func (r Routes) Validate() error {
 }
 
 //Init initialises resources
-func (r *Routes) Init(ctx context.Context, fs afs.Service, projectID string) error {
+func (r *Ruleset) Init(ctx context.Context, fs afs.Service, projectID string) error {
 	if err := r.initRules(); err != nil {
 		return err
 	}
@@ -55,14 +55,14 @@ func (r *Routes) Init(ctx context.Context, fs afs.Service, projectID string) err
 	return r.load(ctx, fs)
 }
 
-func (r *Routes) load(ctx context.Context, fs afs.Service) (err error) {
+func (r *Ruleset) load(ctx context.Context, fs afs.Service) (err error) {
 	if err = r.loadAllResources(ctx, fs); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *Routes) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, error) {
+func (r *Ruleset) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, error) {
 	changed, err := r.meta.HasChanged(ctx, fs)
 	if err != nil || !changed {
 		return changed, err
@@ -70,7 +70,7 @@ func (r *Routes) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, erro
 	return true, r.load(ctx, fs)
 }
 
-func (c *Routes) loadAllResources(ctx context.Context, fs afs.Service) error {
+func (c *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 	if c.BaseURL == "" {
 		return nil
 	}
@@ -96,7 +96,7 @@ func (c *Routes) loadAllResources(ctx context.Context, fs afs.Service) error {
 	return nil
 }
 
-func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
+func (c *Ruleset) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
 	reader, err := storage.Download(ctx, object)
 	defer func() {
 		_ = reader.Close()
@@ -106,7 +106,7 @@ func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object 
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
 	}
-	transientRoutes := Routes{Rules: routes}
+	transientRoutes := Ruleset{Rules: routes}
 	if err := transientRoutes.Validate(); err != nil {
 		return errors.Wrapf(err, "invalid rule: %v", object.URL())
 	}
@@ -128,7 +128,7 @@ func (c *Routes) loadResources(ctx context.Context, storage afs.Service, object 
 	return nil
 }
 
-func (r *Routes) initRules() error {
+func (r *Ruleset) initRules() error {
 	if atomic.CompareAndSwapInt32(&r.inited, 0, 1) {
 		if len(r.Rules) > 0 {
 			if err := r.Validate(); err != nil {

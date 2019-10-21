@@ -2,7 +2,7 @@ package mon
 
 import "smirror/config"
 
-//Routes represents route config
+//Ruleset represents route config
 type Routes struct {
-	Mirrors config.Routes
+	Mirrors config.Ruleset
 }

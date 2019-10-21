@@ -168,7 +168,7 @@ func (s *service) checkUnprocessed(ctx context.Context, request *Request, respon
 	return nil
 }
 
-//New creates new service
+//New creates monitoring service
 func New(config *Config) Service {
 	config.Init()
 	return &service{

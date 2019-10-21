@@ -50,7 +50,7 @@ line8,
 line9
 `,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 					Rules: []*config.Rule{
 						{
 							PreserveDepth: base.IntPtr(0),
@@ -96,7 +96,7 @@ line8,
 line9
 `,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 					Rules: []*config.Rule{
 						{
 							PreserveDepth: base.IntPtr(0),
@@ -135,7 +135,7 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 					Rules: []*config.Rule{
 						{
 							PreserveDepth: base.IntPtr(0),
@@ -169,7 +169,7 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 					Rules: []*config.Rule{
 						{
 							PreserveDepth: base.IntPtr(2),
@@ -203,7 +203,7 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 					Rules: []*config.Rule{
 						{
 							PreserveDepth: base.IntPtr(0),
@@ -253,7 +253,7 @@ line10,
 line11
 `,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 					Rules: []*config.Rule{
 						{
 							PreserveDepth: base.IntPtr(0),
@@ -307,7 +307,7 @@ line10,
 line11
 `,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 
 					Rules: []*config.Rule{
 						{
@@ -355,7 +355,7 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 					Rules: []*config.Rule{
 						{
 							PreserveDepth: base.IntPtr(0),
@@ -395,7 +395,7 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 					Rules: []*config.Rule{
 						{
 							PreserveDepth: base.IntPtr(0),
@@ -440,7 +440,7 @@ line2,
 line3,
 line4`,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 					Rules: []*config.Rule{
 						{
 							PreserveDepth: base.IntPtr(0),
@@ -493,7 +493,7 @@ line8,
 line9
 `,
 			config: &Config{
-				Mirrors: config.Routes{
+				Mirrors: config.Ruleset{
 					Rules: []*config.Rule{
 						{
 							PreserveDepth: base.IntPtr(-1),

@@ -12,14 +12,14 @@ const (
 	//StatusNoFound status no found
 	StatusNoFound = "notFound"
 
-	//StatusUnProcess status un processed file
+	//StatusUnProcess status for unprocessed file
 	StatusUnProcess = "unprocessed"
 
 	//DestAttribute dest attribute
 	DestAttribute = "Dest"
 
-	//UnclassifiedDataflow
-	UnclassifiedDataflow = "unclassified"
+	//UnclassifiedStatus
+	UnclassifiedStatus = "unclassified"
 
 	//ConfigEnvKey config env key
 	ConfigEnvKey = "CONFIG"
