@@ -11,7 +11,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.3.0
 	github.com/viant/afs v0.4.2
-	github.com/viant/afsc v0.3.2
+	github.com/viant/afsc v0.3.4
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.28.0
 	google.golang.org/api v0.7.0
