@@ -113,7 +113,7 @@ This bucket stores all data that needs to be mirror
 ```bash
     /
     | - data
-    |      |- idfa
+    |      |- xxxxx
                 |- dataXXX.csv.gz 
 ```    
 
@@ -129,7 +129,7 @@ This bucket stores all data that was mirrored from other cloud storage
 ```bash
     /
     | - data
-    |      |- idfa
+    |      |- xxxxx
                 |- dataXXX.csv.gz 
 ```    
 
@@ -170,10 +170,10 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point StorageMirror \
     --runtime=go111 
 ```
 
-
-
-
 Testing deployment:
+
+
+
 
 
 ###### StorageMirror Subscriber
@@ -191,6 +191,8 @@ _where:_
 
 ###### StorageMonitor
 
+
+
 ###### StorageReplay
 
 
@@ -198,7 +200,7 @@ _where:_
 ### AWS Lambda function 
 
 
-###### StorageMirror
+##### StorageMirror
 
 To deploy with endly automation runner use the following workflow:
 
@@ -211,9 +213,10 @@ _where:_
 - [@privilege-policy.json](mirror/aws/privilege-policy.json)
 
 
-**Testing deployment:**
+###### Post deployment
 
--  Secure google storage credentials (google secrets)
+
+######  Secure google storage credentials (google secrets)
 
 
 ```bash
@@ -225,7 +228,7 @@ endly secure.yaml authWith=aws-e2e gcpSecrets=gcp-e2e
 where:
 [@secure.yaml](mirror/aws/secure.yaml)
 
--  **Test Mirror Rule** 
+###### Test Mirror Rule 
 
 ```bash
 cd $SmirrorRoot
@@ -239,7 +242,8 @@ where:
 
 
 
-###### StorageMirror SQS Proxy
+
+##### StorageMirror SQS Proxy
 
 To deploy with endly automation runner use the following workflow:
 
@@ -250,7 +254,7 @@ _where:_
 - [@deploy.yaml](mirror/aws/sqs/deploy.yaml)
 - [@privilege-policy.json](mirror/aws/sqs/privilege-policy.json)
 
--  **Test Mirror Rule** 
+###### Test Mirror Rule 
 
 ```bash
 cd $SmirrorRoot
@@ -263,9 +267,7 @@ where:
 - [@rule.json](mirror/aws/rule/rule.json)
 
 
-
-###### StorageMirror SNS Proxy
-
+##### StorageMirror SNS Proxy
 
 To deploy with endly automation runner use the following workflow:
 
@@ -276,7 +278,8 @@ _where:_
 - [@deploy.yaml](mirror/aws/sns/deploy.yaml)
 - [@privilege-policy.json](mirror/aws/sns/privilege-policy.json)
 
-**Test Mirror Rule**
+
+##### Test Mirror Rule
 
 ```bash
 cd $SmirrorRoot
@@ -289,11 +292,14 @@ where:
 - [@rule.json](mirror/aws/rule/rule.json)
 
 
-###### StorageMirror Cron
 
 
-###### StorageMonitor
+##### StorageMirror Cron
 
+
+
+
+##### StorageMonitor
 
 To deploy with endly automation runner use the following workflow:
 
@@ -305,7 +311,9 @@ _where:_
 - [@privilege-policy.json](monitor/aws/privilege-policy.json)
 
 
-###### StorageReplay
+
+
+##### StorageReplay
 
 
 To deploy with endly automation runner use the following workflow:
