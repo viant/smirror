@@ -8,5 +8,5 @@ import (
 //CustomKey represents custom key
 type CustomKey struct {
 	auth.Secret `json:",omitempty"`
-	AES256Key   *option.AES256Key `json:"_"`
+	AES256Key   *option.AES256Key `json:"-"`
 }
