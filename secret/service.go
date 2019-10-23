@@ -2,6 +2,8 @@ package secret
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/pkg/errors"
 	"fmt"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
@@ -116,18 +118,29 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 		return result, nil
 	}
 	scheme := url.Scheme(resource.URL, file.Scheme)
-	if resource.Credentials != nil {
+	if resource.Credentials != nil && len(resource.Credentials.Auth) > 0 {
+		if ! json.Valid(resource.Credentials.Auth) {
+			return nil, errors.Errorf("invalid credentials format expeced json but had: %s", resource.Credentials.Auth)
+		}
+		var secrets = make(map[string]interface{})
+		if err := json.Unmarshal(resource.Credentials.Auth, &secrets); err == nil {
+			if secrets["Secret"] != nil && secrets["Key"] != "" {
+				scheme = s3.Scheme
+			} else if secrets["private_key"] != nil && secrets["private_key_id"] != "" {
+				scheme = gs.Scheme
+			}
+		}
 		switch scheme {
 		case gs.Scheme:
 			auth, err := gs.NewJwtConfig(resource.Credentials.Auth)
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrapf(err, "failed to create goolge secrets: %s", resource.Credentials.Auth)
 			}
 			result = append(result, auth)
 		case s3.Scheme:
 			auth, err := s3.NewAuthConfig(resource.Credentials.Auth)
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrapf(err, "failed to create aws secrets: %s", resource.Credentials.Auth)
 			}
 			result = append(result, auth)
 			if resource.Region != "" {
