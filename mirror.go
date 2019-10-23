@@ -64,6 +64,7 @@ func proxy(ctx context.Context, destination string, evnt event.StorageEvent) (*c
 	if err != nil {
 		if exists, e := fs.Exists(ctx, evnt.URL()); e == nil && ! exists {
 			response.Status = base.StatusNoFound
+			response.Error = ""
 			response.NotFoundError = err.Error()
 			return response, nil
 		}
