@@ -46,6 +46,7 @@ To mirror data from google storage that match /data/ prefix and '.csv.gz' suffix
 preserving parent folder (folderDepth:1) the following configuration can be used with Mirror cloud function
 
 
+
 [@gs://sourceBucket/config/config.json](usage/gs_to_s3/config.json)
 ```json
 {
@@ -241,7 +242,7 @@ The following are used by storage mirror services:
 
 - _$configBucket_: bucket storing storage mirror configuration and mirror rules
 - _$triggerBucket_: bucket storing data that needs to be mirror, event triggered by GCP
-- _$operationBucket_: bucker string error, processed mirrors
+- _$operationBucket_: bucket string error, processed mirrors
 -  config:Mirrors.BaseURL: location storing routes rules as JSON Array
 
 The following [Deployment](deployment/mirror/README.md) details storage mirror generic deployment.
@@ -412,7 +413,7 @@ init:
   bucketPrefix: ms-dataflow
   configBucket: ${bucketPrefix}-config
   triggerBucket: ${bucketPrefix}-trigger
-  opsBucket: ${bucketPrefix}-operations
+  opsBucket: ${bucketPrefix}-operation
 
   monitor:
     ConfigURL: s3://${configBucket}/StorageMirror/config.json

@@ -8,7 +8,7 @@ init:
   sourcePrefix: $Replace('$gcp.ProjectID','_','-')
   configBucket: ${sourcePrefix}-config
   triggerBucket: ${sourcePrefix}-sns-trigger
-  opsBucket: ${sourcePrefix}-operations
+  opsBucket: ${sourcePrefix}-operation
   destBucket: ${destBucketPrefix}_mirrored
 
 
@@ -52,3 +52,5 @@ pipeline:
     assets:
       - URL: gs://${destBucket}/testdata/sns/test/events_sns.csv.gz
         credentials: $gcpCredentials
+    expect:
+      'gs://${destBucket}/testdata/sns/test/events_sns.csv.gz': true

@@ -28,7 +28,7 @@ pipeline:
     action: msg:pull
     timeoutMs: 10000
     source:
-      URL: smirrorSubscription
+      URL: ${gsPrefix}_storage_mirror
       type: subscription
       vendor: gcp
       credentials: $gcpCredentials

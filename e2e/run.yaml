@@ -7,16 +7,16 @@ init:
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
 
-  gsbucketPrefix: $Replace($gcpProject,'-','_')
-  gsConfigBucket: ${gsbucketPrefix}_config
-  gsTriggerBucket: ${gsbucketPrefix}_trigger
-  gsOpsBucket: ${gsbucketPrefix}_operations
-  gsDestBucket: ${gsbucketPrefix}_mirrored
+  gsPrefix: $Replace($gcpProject,'-','_')
+  gsConfigBucket: ${gsPrefix}_config
+  gsTriggerBucket: ${gsPrefix}_trigger
+  gsOpsBucket: ${gsPrefix}_operation
+  gsDestBucket: ${gsPrefix}_mirrored
 
   s3bucketPrefix: $Replace($gcpProject,'_','-')
   s3ConfigBucket: ${s3bucketPrefix}-config
   s3TriggerBucket: ${s3bucketPrefix}-trigger
-  s3OpsBucket: ${s3bucketPrefix}-operations
+  s3OpsBucket: ${s3bucketPrefix}-operation
   s3DestBucket:  ${s3bucketPrefix}-mirrored
   s3Queue: ${s3bucketPrefix}-queue
 

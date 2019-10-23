@@ -1,0 +1,9 @@
+{
+  "@indexBy@": "Attributes.Dest",
+  "/testdata/pubsub/test/0001_events.csv": {
+    "Data": "$part1"
+  },
+  "/testdata/pubsub/test/0002_events.csv": {
+    "Data": "$part2"
+  }
+}

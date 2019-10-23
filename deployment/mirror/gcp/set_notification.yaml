@@ -4,6 +4,22 @@ init:
   '!topic': $params.topic
 
 pipeline:
+
+  createbBucket:
+    action: storage:create
+    isDir: true
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${triggerBucket}
+
+  createTopix:
+    action: msg:setupResource
+    resources:
+      - URL: $topic
+        type: topic
+        vendor: gcp
+        credentials: $gcpCredentials
+
   setBucketNotificiation:
     action: gcp/storage:setNotification
     credentials: $gcpCredentials

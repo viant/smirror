@@ -7,8 +7,8 @@ pipeline:
     deployGCPKey:
       action: gcp/kms:deployKey
       credentials: $gcpCredentials
-      ring: gs_mirror_ring
-      key: gs_mirror_key
+      ring: ${gsPrefix}_ring
+      key: ${gsPrefix}_key
       purpose: ENCRYPT_DECRYPT
       logging: false
       bindings:
@@ -18,8 +18,8 @@ pipeline:
 
     encryptS3Credentials:
       action: gcp/kms:encrypt
-      ring: gs_mirror_ring
-      key: gs_mirror_key
+      ring: ${gsPrefix}_ring
+      key: ${gsPrefix}_key
       plainData: $AsJSON($s3Secrets)
       dest:
         URL: gs://${gsConfigBucket}/Secrets/s3-mirror.json.enc

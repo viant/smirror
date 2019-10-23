@@ -1,12 +1,12 @@
 [
   {
     "Source": {
-      "Prefix": "/data/p6",
+      "Prefix": "/testdata/pubsub/",
       "Suffix": ".csv"
     },
     "Dest": {
 
-      "Topic": "${gsPrefix}_storage_mirror"
+      "Topic": "${prefix}_storage_mirror"
     },
     "Split": {
       "MaxLines": 10
@@ -19,9 +19,9 @@
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs:///${gsTriggerBucket}/StorageMirror/errors/"
+        "URL": "gs:///${opsBucket}/StorageMirror/errors/"
       }
     ],
-    "PreserveDepth": 1
+    "PreserveDepth": 3
   }
 ]

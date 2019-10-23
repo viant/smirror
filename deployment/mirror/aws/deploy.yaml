@@ -18,7 +18,7 @@ init:
 
   configBucket: ${prefix}-config
   triggerBucket: ${prefix}-trigger
-  opsBucket: ${prefix}-operations
+  opsBucket: ${prefix}-operation
   triggerSqsBucket: ${prefix}-sqs-trigger
   triggerSnsBucket: ${prefix}-sns-trigger
 

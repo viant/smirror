@@ -9,7 +9,7 @@ init:
   serviceAccount: $gcp.ClientEmail
   bucketPrefix: $Replace($gcpProject,'-','_')
   appPath: /tmp/smirrorpubsub
-  functionName: StorageMirror
+  functionName: StorageMirrorSubscriber
 
   configBucket: ${bucketPrefix}_config
   triggerBucket: ${bucketPrefix}_trigger
@@ -21,22 +21,6 @@ init:
 
 
 pipeline:
-
-#  info:
-#    action: print
-#    init:
-#      configJSON: $AsJSON($configText)
-#    message: $configJSON
-#
-#  setup:
-#    action: storage:upload
-#    init:
-#      configJSON: $AsJSON($configText)
-#    sourceKey: configJSON
-#    expand: true
-#    dest:
-#      credentials: $gcpCredentials
-#      URL: gs://${configBucket}/StorageMirror/config.json
 
 
   deploy:
@@ -58,11 +42,12 @@ pipeline:
         - rm -rf vendor
         - go mod vendor
 
+
     upload:
       action: gcp/cloudfunctions:deploy
       credentials: $gcpCredentials
-      '@name': StorageMirrorSubscriber
-      entryPoint: StorageMirrorSubscriber
+      '@name': $functionName
+      entryPoint: $functionName
       runtime: go111
       availableMemoryMb: 2048
       timeout: 540s

@@ -137,22 +137,25 @@ This bucket stores all data that was mirrored from other cloud storage
 ## Deployment
 
 
-
-### Google Cloud Function 
+### Google Cloud Platform 
 
 ###### StorageMirror
 
-To deploy with endly automation runner use the following workflow:
+To deploy StorageMirror cloud function with **endly** automation runner use the following workflow:
 
 ```bash
-endly deploy.yaml authWith=myGCPSecretFile
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/smirror/gcp
+endly deploy.yaml authWith=myGCPSecretFile.json
 ```
 
 _where:_
 - [@deploy.yaml](mirror/gcp/deploy.yaml)
 
 
-To deploy with gcloud cli use the following commands:
+
+
+To deploy StorageMirror cloud function with **gcloud** cli use the following commands:
 
 ```bash
 git chckout https://github.com/viant/smirror.git
@@ -170,22 +173,103 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point StorageMirror \
     --runtime=go111 
 ```
 
-Testing deployment:
+###### Post deployment
 
 
+######  Securing AWS credentials
 
-
-
-###### StorageMirror Subscriber
-
+To deploy StorageMirror cloud function with **endly** automation runner use the following workflow:
 
 ```bash
- endly deploy_subscriber.yaml authWith=myGCPSecretFile topic=myTopic
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/smirror/gcp
+endly secure.yaml authWith=myGCPSecretFile.json awsSecrets=awsSecret.json
+```
+_where:_
+- [@secure.yaml](mirror/gcp/secure.yaml)
+- [@awsSecret.json](mirror/gcp/awsSecrets.json)
+
+
+
+To deploy secret aws secrets with **gcloud** cli use the following commands:
+
+```bash
+
+gcloud kms keyrings create my_ring --location us-central1
+gcloud kms keys create my_key --location us-central1 \
+  --keyring my_ring --purpose encryption
+
+## Encrypt s3-cred.json
+
+gcloud kms encrypt \
+  --location=us-central1  \
+  --keyring=my_ring \
+  --key=my_key \
+  --version=1 \
+  --plaintext-file=s3-cred.json \
+  --ciphertext-file=s3-cred.json.enc
+
+## Upload encrypted version to google storage
+
+gsutil cp s3-cred.json.enc gs://sourceBucket/secret/s3-cred.json.enc
+
+```
+
+######  Securing Slack credentials
+
+To deploy StorageMirror cloud function with **endly** automation runner use the following workflow:
+
+```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/smirror/gcp
+endly secure_slack.yaml authWith=myGCPSecretFile.json slackSecrets=slackSecrets.json
+```
+_where:_
+- [@secure_slack.yaml](mirror/gcp/secure_slack.yaml)
+- [@slackSecrets.json](mirror/gcp/slackSecrets.json)
+
+
+
+###### Test Rule With s3 destination 
+
+```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/smirror/test
+endly test.yaml authWith=myGCPSecrets.json awsCredentials=myAWSSecrets.json
 ```
 
 _where:_
-- [@deploy_subscriber.yaml](mirror/gcp/deploy_subscriber.yaml)
+- [@rule.yaml](mirror/gcp/test/rule.json)
+- [@test.yaml](mirror/gcp/test/test.yaml)
 
+
+###### Test Rule With pubsub destination
+
+```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/smirror/test
+endly test_pubsub authWith=myGoogleSecrets.json
+```
+_where:_
+- [@rule_pubsub.yaml](mirror/gcp/test/rule_pubsub.json)
+- [@test_pubsub.yaml](mirror/gcp/test/test_pubsub.yaml)
+ 
+
+###### StorageMirror Subscriber
+
+```bash
+## Set topic to bucket event notification
+endly set_notification.yaml authWith=myGCPSecretFile bucket=${prefix}_pubsub_trigger topic=${prefix}_storage_mirror_trigger
+
+## Deploy cloud function 
+endly deploy_subscriber.yaml authWith=myGCPSecretFile topic=${prefix}_storage_mirror_trigger
+```
+
+
+_where:_
+- [@set_notification.yaml](mirror/gcp/set_notification.yaml)
+- [@deploy_subscriber.yaml](mirror/gcp/deploy_subscriber.yaml)
+- _prefix_:  project name
 
 
 
@@ -197,7 +281,8 @@ _where:_
 
 
 
-### AWS Lambda function 
+
+### Amazon Web Service 
 
 
 ##### StorageMirror
@@ -213,11 +298,13 @@ _where:_
 - [@privilege-policy.json](mirror/aws/privilege-policy.json)
 
 
-###### Post deployment
+##### Post deployment
 
 
-######  Secure google storage credentials (google secrets)
+#####  Secure GCP credentials (google secrets)
 
+
+ 
 
 ```bash
 cd $SmirrorRoot
@@ -227,6 +314,13 @@ endly secure.yaml authWith=aws-e2e gcpSecrets=gcp-e2e
 
 where:
 [@secure.yaml](mirror/aws/secure.yaml)
+
+
+
+
+
+
+
 
 ###### Test Mirror Rule 
 

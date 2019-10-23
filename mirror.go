@@ -59,11 +59,12 @@ func proxy(ctx context.Context, destination string, evnt event.StorageEvent) (*c
 	response := contract.NewResponse(evnt.URL())
 	response.DestURLs = []string{evnt.ProxyDestURL(destBucket)}
 	response.Status = base.StatusProxy
-
-	err := fs.Copy(ctx, evnt.URL(), evnt.ProxyDestURL(destBucket))
+	isMove := os.Getenv(base.ProxyMethod) == base.ProxyMethodMove
+	err := base.Trigger(ctx, fs, isMove, evnt.URL(), evnt.ProxyDestURL(destBucket), response.Triggered)
 	if err != nil {
 		if exists, e := fs.Exists(ctx, evnt.URL()); e == nil && ! exists {
 			response.Status = base.StatusNoFound
+			response.NotFoundError = err.Error()
 			return response, nil
 		}
 		err = errors.Wrapf(err, "failed to copy: %v to %v", evnt.URL(), evnt.ProxyDestURL(destBucket))

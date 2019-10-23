@@ -1,0 +1,64 @@
+init:
+  '!gcpCredentials': $params.authWith
+  gcp: ${secrets.$gcpCredentials}
+  gcpProject: $gcp.ProjectID
+  prefix: $Replace('$gcp.ProjectID','-','_')
+  configBucket: ${prefix}_config
+  triggerBucket: ${prefix}_trigger
+  opsBucket: ${prefix}_operation
+
+
+  part1: $Cat('pubsub/events_00001.csv')
+  part2: $Cat('pubsub/events_00002.csv')
+  events: $Cat('pubsub/events.json')
+  exepct: $AsData($events)
+
+pipeline:
+
+
+  setupMessageBus:
+    action: msg:setupResource
+    resources:
+      - URL: ${prefix}_storage_mirror
+        type: topic
+        vendor: gcp
+        credentials: $gcpCredentials
+
+      - URL: ${prefix}_storage_mirror
+        type: subscription
+        vendor: gcp
+        credentials: $gcpCredentials
+        config:
+          topic:
+            URL: /projects/${gcpProject}/topics/${prefix}_storage_mirror
+
+  setupRule:
+    action: storage:copy
+    expand: true
+    source:
+      URL: rule_pubsub.json
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${configBucket}/StorageMirror/Rules/test-pubsub-rule.json
+
+
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 25000
+    source:
+      URL: events.csv
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${triggerBucket}/testdata/pubsub/test/events.csv
+
+
+  validate:
+    action: msg:pull
+    timeoutMs: 10000
+    source:
+      URL: ${prefix}_storage_mirror
+      type: subscription
+      vendor: gcp
+      credentials: $gcpCredentials
+    count: 2
+    expect: $exepct

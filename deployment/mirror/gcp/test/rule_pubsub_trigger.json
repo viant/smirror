@@ -1,8 +1,7 @@
 [
   {
     "Source": {
-      "Prefix": "/testdata/s3/",
-      "Suffix": ".csv.gz"
+      "Prefix": "/${triggerBucket}/"
     },
     "Dest": {
       "URL": "s3://${destBucket}",
@@ -11,12 +10,7 @@
         "Key": "projects/${gcpProject}/locations/us-central1/keyRings/${prefix}_ring/cryptoKeys/${prefix}_key"
       }
     },
-    "Replace": [
-      {
-        "From": "10",
-        "To": "33333333"
-      }
-    ],
+    "PreserveDepth": -1,
     "Codec": "gzip",
     "OnSuccess": [
       {

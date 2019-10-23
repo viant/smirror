@@ -3,9 +3,9 @@ init:
   '!awsCredentials': $params.awsSecrets
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
+  prefix: $Replace($gcpProject,'-','_')
   serviceAccount: $gcp.ClientEmail
-  configBucket: ${gcpProject}_config
-  awsCredentials: aws-e2e
+  configBucket: ${prefix}_config
   secrets: ${secrets.$awsCredentials}
 
 
@@ -14,8 +14,8 @@ pipeline:
   deployGCPKey:
     action: gcp/kms:deployKey
     credentials: $gcpCredentials
-    ring: storagemirror_ring
-    key: storagemirror
+    ring: ${prefix}_ring
+    key: ${prefix}_key
     purpose: ENCRYPT_DECRYPT
     logging: false
     bindings:
@@ -29,8 +29,8 @@ pipeline:
 
   encryptS3Credentials:
     action: gcp/kms:encrypt
-    ring: storagemirror_ring
-    key: storagemirror
+    ring: ${prefix}_ring
+    key: ${prefix}_key
     plainData: $AsJSON($secrets)
     dest:
       URL: gs://${configBucket}/Secrets/s3-ms.json.enc

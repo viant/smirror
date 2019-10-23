@@ -19,7 +19,7 @@ Configuration:
         "URL": "s3://${s3TriggerBucket}/data",
         "Credentials": {
           "URL": "gs://${gsConfigBucket}/Secrets/s3-mirror.json.enc",
-           "Key": "projects/${gcpProject}/locations/us-central1/keyRings/gs_mirror_ring/cryptoKeys/gs_mirror_key"
+           "Key": "projects/${gcpProject}/locations/us-central1/keyRings/${gsPrefix}_ring/cryptoKeys/${gsPrefix}_key"
         }
       },
       "Split": {

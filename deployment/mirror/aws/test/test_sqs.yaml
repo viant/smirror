@@ -9,7 +9,7 @@ init:
 
   configBucket: ${sourcePrefix}-config
   triggerBucket: ${sourcePrefix}-sqs-trigger
-  opsBucket: ${sourcePrefix}-operations
+  opsBucket: ${sourcePrefix}-operation
   destBucket: ${destPrefix}_mirrored
 
 
@@ -53,3 +53,5 @@ pipeline:
     assets:
       - URL: gs://${destBucket}/testdata//sqs/test/events_sqs.csv.gz
         credentials: $gcpCredentials
+    expect:
+      'gs://${destBucket}/testdata//sqs/test/events_sqs.csv.gz': true

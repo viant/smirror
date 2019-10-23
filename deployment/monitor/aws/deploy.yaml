@@ -9,7 +9,7 @@ init:
   bucketPrefix: ms-dataflow
   configBucket: ${bucketPrefix}-config
   triggerBucket: ${bucketPrefix}-trigger
-  opsBucket: ${bucketPrefix}-operations
+  opsBucket: ${bucketPrefix}-operation
 
 pipeline:
 

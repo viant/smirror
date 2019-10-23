@@ -78,6 +78,7 @@ func (s *service) reportMatched(matched []storage.Object, err error) {
 	fmt.Println(message)
 }
 
+
 func (s *service) processResource(ctx context.Context, resource *config.Resource) ([]storage.Object, error) {
 	objects, err := s.getResourceCandidates(ctx, resource)
 	if err != nil {
@@ -95,6 +96,9 @@ func (s *service) processResource(ctx context.Context, resource *config.Resource
 }
 
 func (s *service) notify(ctx context.Context, resource *config.Resource, object storage.Object) error {
+
+
+
 	return s.dest.Trigger(ctx, resource, object)
 }
 
@@ -185,6 +189,7 @@ func (s *service) UpdateSecrets(ctx context.Context) error {
 	}
 	return s.secret.Init(ctx, s.fs, resources)
 }
+
 
 //New returns new cron service
 func New(ctx context.Context, config *Config, fs afs.Service) (Service, error) {

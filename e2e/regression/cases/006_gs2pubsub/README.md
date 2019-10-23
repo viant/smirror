@@ -16,7 +16,7 @@ Configuration:
     "Prefix": "/data/p6",
     "Suffix": ".csv",
     "Dest": {
-      "Topic": "smirrorTopic"
+      "Topic": "${gsPrefix}_storage_mirror"
     },
     "Split": {
       "MaxLines": 10

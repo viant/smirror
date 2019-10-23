@@ -53,7 +53,7 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 
 	if IsNotFound(response.Error) {
 		response.Status = base.StatusNoFound
-		response.Error = ""
+		response.NotFoundError = response.Error
 	}
 	return response
 }
@@ -93,6 +93,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	}
 	if !exists {
 		response.Status = base.StatusNoFound
+		response.NotFoundError = fmt.Sprintf("does not exist: %v", err)
 		return nil
 	}
 	if rule.Split != nil {
@@ -108,9 +109,6 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	}
 	return err
 }
-
-
-
 
 func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string, response *contract.Response) error {
 	options, err := s.secret.StorageOpts(ctx, rule.Source)
@@ -294,7 +292,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rul
 		splitCount := atomic.AddInt32(counter, 1)
 		destName := route.Split.Name(route, URL, splitCount)
 		destURL := url.Join(route.Dest.URL, destName)
-		return NewWriter(route,  func(writer *Writer) error {
+		return NewWriter(route, func(writer *Writer) error {
 			if writer.Reader == nil {
 				return fmt.Errorf("Writer reader was empty")
 			}

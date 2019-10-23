@@ -53,6 +53,7 @@ pipeline:
     name: Replay
     schedule: 0 * * * *
     body: $body
+    timeZone: UTC
     httpTarget:
       headers:
         User-Agent: Google-Cloud-Scheduler

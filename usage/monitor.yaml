@@ -3,7 +3,7 @@ init:
   bucketPrefix: ms-dataflow
   configBucket: ${bucketPrefix}-config
   triggerBucket: ${bucketPrefix}-trigger
-  opsBucket: ${bucketPrefix}-operations
+  opsBucket: ${bucketPrefix}-operation
 
   monitor:
     ConfigURL: s3://${configBucket}/StorageMirror/config.json

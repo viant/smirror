@@ -3,18 +3,18 @@ pipeline:
   setupMessageBus:
     action: msg:setupResource
     resources:
-      - URL: smirrorTopic
+      - URL: ${gsPrefix}_storage_mirror
         type: topic
         vendor: gcp
         credentials: $gcpCredentials
 
-      - URL: smirrorSubscription
+      - URL: ${gsPrefix}_storage_mirror
         type: subscription
         vendor: gcp
         credentials: $gcpCredentials
         config:
           topic:
-            URL: /projects/${gcp.projectID}/topics/smirrorTopic
+            URL: /projects/${gcp.projectID}/topics/${gsPrefix}_storage_mirror
 
       - URL: ${s3Queue}
         type: queue

@@ -10,7 +10,7 @@ init:
   configBucket: ${bucketPrefix}-config
   triggerBucket: ${bucketPrefix}-trigger
   replayBucket: ${bucketPrefix}-replay
-  opsBucket: ${bucketPrefix}-operations
+  opsBucket: ${bucketPrefix}-operation
 
 pipeline:
 

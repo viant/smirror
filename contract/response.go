@@ -10,16 +10,18 @@ import (
 
 //Response represents a response
 type Response struct {
-	TriggeredBy string
-	DestURLs    []string `json:",omitempty"`
-	MessageIDs  []string `json:",omitempty"`
-	TimeTakenMs int
-	Rule        *config.Rule `json:",omitempty"`
-	TotalRules  int
-	Status      string
-	Error       string `json:",omitempty"`
-	StartTime   time.Time
-	mutex       *sync.Mutex
+	TriggeredBy   string
+	DestURLs      []string `json:",omitempty"`
+	MessageIDs    []string `json:",omitempty"`
+	TimeTakenMs   int
+	Rule          *config.Rule `json:",omitempty"`
+	TotalRules    int
+	Status        string
+	Error         string `json:",omitempty"`
+	NotFoundError string `json:",omitempty"`
+	StartTime     time.Time
+	Triggered     map[string]string `json:",omitempty"`
+	mutex         *sync.Mutex
 }
 
 //AddURL adds url to dest urls
@@ -35,6 +37,7 @@ func NewResponse(triggeredBy string) *Response {
 		Status:      base.StatusOK,
 		TriggeredBy: triggeredBy,
 		StartTime:   time.Now(),
+		Triggered:   make(map[string]string),
 		DestURLs:    make([]string, 0),
 		MessageIDs:  make([]string, 0),
 		mutex:       &sync.Mutex{},

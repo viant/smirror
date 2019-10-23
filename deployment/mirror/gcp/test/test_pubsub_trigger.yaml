@@ -6,46 +6,46 @@ init:
   destPrefix: $Replace('$gcp.ProjectID','_','-')
   prefix: $Replace('$gcp.ProjectID','-','_')
   configBucket: ${prefix}_config
-  triggerBucket: ${prefix}_trigger
+  triggerBucket: ${prefix}_pubsub_trigger
   opsBucket: ${prefix}_operation
   destBucket: ${destPrefix}-mirrored
-
 
 pipeline:
   setupRule:
     action: storage:copy
     expand: true
     source:
-      URL: rule.json
+      URL: rule_pubsub_trigger.json
     dest:
       credentials: $gcpCredentials
-      URL: gs://${configBucket}/StorageMirror/Rules/test-rule.json
+      URL: gs://${configBucket}/StorageMirror/Rules/rule_pubsub_trigger.json
+
 
   cleanupDest:
     action: storage:remove
     assets:
-      - URL: s3://${destBucket}/testdata/s3/test/events.csv.gz
+      - URL: s3://${destBucket}/testdata/pubsub_trigger/test/events.csv.gz
         credentials: $awsCredentials
 
   checkDest:
     action: storage:exists
     assets:
-      - URL: s3://${destBucket}/testdata/s3/test/events.csv.gz
+      - URL: s3://${destBucket}/testdata/pubsub_trigger/test/events.csv.gz
         credentials: $gcpCredentials
 
   trigger:
     action: storage:copy
-    sleepTimeMs: 25000
+    sleepTimeMs: 35000
     source:
       URL: events.csv.gz
     dest:
       credentials: $gcpCredentials
-      URL: gs://${triggerBucket}/testdata/s3/test/events.csv.gz
+      URL: gs://${triggerBucket}/testdata/pubsub_trigger/test/events.csv.gz
 
   validate:
     action: storage:exists
     assets:
-      - URL: s3://${destBucket}/testdata/s3/test/events.csv.gz
+      - URL: s3://${destBucket}/testdata/pubsub_trigger/test/events.csv.gz
         credentials: $gcpCredentials
     expect:
-      's3://${destBucket}/testdata/s3/test/events.csv.gz': true
+      's3://${destBucket}/testdata/pubsub_trigger/test/events.csv.gz': true
