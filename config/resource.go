@@ -21,6 +21,21 @@ type Resource struct {
 	ProjectID string `json:",omitempty"`
 }
 
+
+//CloneWithURL clone resource with URL
+func (r Resource) CloneWithURL(URL string) *Resource {
+	return &Resource{
+		Basic:r.Basic,
+		URL: URL,
+		Region:r.Region,
+		CustomKey:r.CustomKey,
+		Credentials:r.Credentials,
+		Topic:r.Topic,
+		Queue:r.Queue,
+		ProjectID:r.ProjectID,
+	}
+}
+
 func (r *Resource) Init(projectID string) {
 	if r.Topic == "" {
 		return
