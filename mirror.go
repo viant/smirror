@@ -73,6 +73,7 @@ func proxy(ctx context.Context, destination string, evnt event.StorageEvent) (*c
 	return response, err
 }
 
+
 func storageMirror(ctx context.Context, event event.StorageEvent) (response *contract.Response, err error) {
 	destination := os.Getenv(base.DestEnvKey)
 	if base.IsURL(destination) {

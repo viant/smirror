@@ -90,7 +90,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	}
 	exists, err := s.fs.Exists(ctx, request.URL, options...)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to check exists :%v", request.URL)
 	}
 	if !exists {
 		response.Status = base.StatusNoFound
