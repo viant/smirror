@@ -18,14 +18,16 @@ func main() {
 	lambda.Start(handleRequest)
 }
 
-func handleRequest(ctx context.Context) error {
+func handleRequest(ctx context.Context) (*cron.Response, error) {
 	service, err := cron.NewFromEnv(ctx, base.ConfigEnvKey)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	response := service.Tick(ctx)
 	if data, err := json.Marshal(response); err != nil {
 		fmt.Printf("%s\n", data)
+	} else{
+		fmt.Printf("ERR: %s\n", err)
 	}
-	return nil
+	return response, nil
 }

@@ -114,6 +114,7 @@ func (s *service) notifyAll(ctx context.Context, resource *config.Rule, objects 
 	return nil
 }
 
+
 func (s *service) getResourceCandidates(ctx context.Context, resource *config.Rule) ([]storage.Object, error) {
 	var result = make([]storage.Object, 0)
 	options, err := s.secret.StorageOpts(ctx, &resource.Resource)
@@ -169,6 +170,7 @@ func (s *service) Init(ctx context.Context, fs afs.Service) error {
 	}
 	return err
 }
+
 
 func (s *service) UpdateSecrets(ctx context.Context) error {
 	if s.secret == nil {
