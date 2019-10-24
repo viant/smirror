@@ -12,6 +12,7 @@ import (
 	"github.com/viant/afs/url"
 	"smirror/cron/config"
 	"smirror/cron/trigger"
+	"strings"
 	"time"
 )
 
@@ -34,7 +35,7 @@ func (s *service) Trigger(ctx context.Context, resource *config.Rule, eventSourc
 				Name: bucket,
 			},
 			Object: events.S3Object{
-				Key:  URLPath,
+				Key:  strings.Trim(URLPath, "/"),
 				Size: eventSource.Size(),
 			},
 		},
