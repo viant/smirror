@@ -26,6 +26,6 @@ func handleRequest(ctx context.Context) (*cron.Response, error) {
 	response := service.Tick(ctx)
 	if data, err := json.Marshal(response); err == nil {
 		fmt.Printf("%s\n", data)
-	} 
+	}
 	return response, nil
 }
