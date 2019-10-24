@@ -2,6 +2,7 @@
   {
     "Source": {
       "Bucket": "${triggerBucket}",
+      "Suffix": ".csv",
       "Credentials": {
         "Parameter": "StorrageMirror.Integration",
         "Key": "alias/storagemirror"

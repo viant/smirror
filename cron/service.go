@@ -121,6 +121,7 @@ func (s *service) getResourceCandidates(ctx context.Context, resource *config.Ru
 	if err != nil {
 		return nil, err
 	}
+	options = s.addLastModifiedTimeMatcher(options)
 	return result, s.appendResources(ctx, resource.URL, &result, options)
 }
 
