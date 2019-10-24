@@ -36,8 +36,8 @@ func (s *service) Trigger(ctx context.Context, resource *config.Rule, eventSourc
 				Name: bucket,
 			},
 			Object: events.S3Object{
-				Key:URLPath,
-				Size:eventSource.Size(),
+				Key:  URLPath,
+				Size: eventSource.Size(),
 			},
 		},
 	})
@@ -47,14 +47,14 @@ func (s *service) Trigger(ctx context.Context, resource *config.Rule, eventSourc
 	}
 
 	input := &lambda.InvokeInput{
-		FunctionName:&resource.DestFunction,
-		Payload:payload,
-		InvocationType:aws.String(lambda.InvocationTypeEvent),
-	}
-	if base.IsLoggingEnabled() {
-		fmt.Printf("calling lambda: %v\n", input)
+		FunctionName:   &resource.DestFunction,
+		Payload:        payload,
+		InvocationType: aws.String(lambda.InvocationTypeEvent),
 	}
 	_, err = s.Invoke(input)
+	if base.IsLoggingEnabled() {
+		fmt.Printf("calling lambda: %v, %v\n", input, err)
+	}
 	return err
 
 }
