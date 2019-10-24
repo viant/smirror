@@ -117,32 +117,26 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 	if resource.URL == "" {
 		return result, nil
 	}
+	var err error
 	scheme := url.Scheme(resource.URL, file.Scheme)
 	if resource.Credentials != nil && len(resource.Credentials.Auth) > 0 {
 		if ! json.Valid(resource.Credentials.Auth) {
-			return nil, errors.Errorf("invalid credentials format expeced json but had: %s", resource.Credentials.Auth)
+			return nil, errors.Errorf("invalid credentials format, expected JSON but had: %s", resource.Credentials.Auth)
 		}
-		var secrets = make(map[string]interface{})
-		if err := json.Unmarshal(resource.Credentials.Auth, &secrets); err == nil {
-			if secrets["Secret"] != nil && secrets["Key"] != "" {
-				scheme = s3.Scheme
-			} else if secrets["private_key"] != nil && secrets["private_key_id"] != "" {
-				scheme = gs.Scheme
-			}
-		}
+		var authOpt interface{}
 		switch scheme {
 		case gs.Scheme:
-			auth, err := gs.NewJwtConfig(resource.Credentials.Auth)
+			authOpt, err = gs.NewJwtConfig(resource.Credentials.Auth)
 			if err != nil {
 				return nil, errors.Wrapf(err, "failed to create goolge secrets: %s", resource.Credentials.Auth)
 			}
-			result = append(result, auth)
+			result = append(result, authOpt)
 		case s3.Scheme:
-			auth, err := s3.NewAuthConfig(resource.Credentials.Auth)
+			authOpt, err = s3.NewAuthConfig(resource.Credentials.Auth)
 			if err != nil {
 				return nil, errors.Wrapf(err, "failed to create aws secrets: %s", resource.Credentials.Auth)
 			}
-			result = append(result, auth)
+			result = append(result, authOpt)
 			if resource.Region != "" {
 				result = append(result, &s3.Region{Name: resource.Region})
 			}

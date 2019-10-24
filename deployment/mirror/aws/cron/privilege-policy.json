@@ -1,0 +1,63 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:DescribeParameters"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "Stmt14828419040002",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters",
+        "ssm:GetParameter"
+      ],
+      "Resource": [
+        "arn:aws:ssm:${aws.region}:${aws.accountID}:parameter/*",
+        "arn:aws:ssm:${aws.region}:${aws.accountID}:parameter/storagemirror.*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Sid": "Stmt1482841232304002",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": [
+        "arn:aws:lambda:${aws.region}:${aws.accountID}:function:*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*",
+        "arn:aws:s3:::*/*",
+        "arn:aws:s3:::viant-integration",
+        "arn:aws:s3:::viant-integration/*",
+        "arn:aws:s3:::${configBucket}",
+        "arn:aws:s3:::${configBucket}/*",
+        "arn:aws:s3:::${opsBucket}",
+        "arn:aws:s3:::${opsBucket}/*",
+        "arn:aws:s3:::${triggerBucket}",
+        "arn:aws:s3:::${triggerBucket}/*"
+      ]
+    },
+    {
+      "Sid": "Stmt14828419480002",
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt"
+      ],
+      "Resource": [
+        "arn:aws:kms:${aws.region}:${aws.accountID}:alias/storagemirror",
+        "arn:aws:kms:${aws.region}:${aws.accountID}:key/*"
+      ]
+    }
+  ]
+}

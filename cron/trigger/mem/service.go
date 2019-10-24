@@ -20,7 +20,7 @@ type service struct {
 }
 
 //Trigger triggers lambda execution
-func (s *service) Trigger(ctx context.Context, resource *config.Resource, eventSource storage.Object) error {
+func (s *service) Trigger(ctx context.Context, resource *config.Rule, eventSource storage.Object) error {
 	URL := fmt.Sprintf("%v://localhost/%v", mem.Scheme, resource.DestFunction)
 	event := Event{URL: eventSource.URL(), Size: eventSource.Size()}
 	payload, err := json.Marshal(event)

@@ -1,0 +1,30 @@
+init:
+
+  '!awsCredentials': $params.authWith
+  '!externalCred': $params.externalCred
+  external: ${secrets.$externalCred}
+  secret: $external.Data
+
+
+pipeline:
+  secure:
+    credentials: $awsCredentials
+    action: aws/kms:setupKey
+    aliasName: alias/storagemirror
+
+
+  info:
+    action: print
+    message: 'encrypting: $secret'
+
+
+  encryptGcpSecrets:
+    action: aws/ssm:setParameter
+    name: StorrageMirror.Integration
+    '@description': Google Storage ${gcp.ProjectID} credentials
+    overwrite: true
+    type: SecureString
+    keyId: alias/storagemirror
+    value: $secret
+
+

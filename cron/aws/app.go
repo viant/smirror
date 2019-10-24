@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/lambda"
-	"log"
 	"smirror/base"
 	"smirror/cron"
 )
@@ -23,9 +23,9 @@ func handleRequest(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	err = service.Tick(ctx)
-	if err != nil {
-		log.Print(err)
+	response := service.Tick(ctx)
+	if data, err := json.Marshal(response); err != nil {
+		fmt.Printf("%s\n", data)
 	}
 	return nil
 }

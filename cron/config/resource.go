@@ -4,8 +4,8 @@ import (
 	"smirror/config"
 )
 
-//Resource represents a cron resource
-type Resource struct {
+//Rule represents a cron resource
+type Rule struct {
 	config.Resource
 	DestFunction string
 }

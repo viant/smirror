@@ -17,7 +17,7 @@ type Config struct {
 	base.Config
 	MetaURL    string
 	TimeWindow config.TimeWindow
-	Resources  config.Resources
+	Resources  config.Ruleset
 }
 
 //Init initialises routes

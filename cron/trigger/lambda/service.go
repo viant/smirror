@@ -3,6 +3,7 @@ package lambda
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -10,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/viant/afs/storage"
 	"github.com/viant/afs/url"
+	"smirror/base"
 	"smirror/cron/config"
 	"smirror/cron/trigger"
 	"time"
@@ -20,7 +22,7 @@ type service struct {
 }
 
 //Trigger triggers lambda execution
-func (s *service) Trigger(ctx context.Context, resource *config.Resource, eventSource storage.Object) error {
+func (s *service) Trigger(ctx context.Context, resource *config.Rule, eventSource storage.Object) error {
 	URL := eventSource.URL()
 	bucket := url.Host(URL)
 	URLPath := url.Path(URL)
@@ -43,11 +45,16 @@ func (s *service) Trigger(ctx context.Context, resource *config.Resource, eventS
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode s3 event for %v", eventSource.URL())
 	}
-	_, err = s.Invoke(&lambda.InvokeInput{
+
+	input := &lambda.InvokeInput{
 		FunctionName:&resource.DestFunction,
 		Payload:payload,
 		InvocationType:aws.String(lambda.InvocationTypeEvent),
-	})
+	}
+	if base.IsLoggingEnabled() {
+		fmt.Printf("calling lambda: %v\n", input)
+	}
+	_, err = s.Invoke(input)
 	return err
 
 }

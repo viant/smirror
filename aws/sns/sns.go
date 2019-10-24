@@ -16,7 +16,7 @@ const DestEnvKey = "DEST"
 func handleMessages(ctx context.Context, sqsEvent events.SNSEvent) (err error) {
 	dest := os.Getenv(DestEnvKey)
 	if dest == "" {
-		log.Print("env.%v key was empty", DestEnvKey)
+		log.Printf("env.%v key was empty", DestEnvKey)
 	}
 	if len(sqsEvent.Records) == 0 {
 		return err

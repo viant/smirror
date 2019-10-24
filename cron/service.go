@@ -16,14 +16,13 @@ import (
 	"smirror/cron/trigger/lambda"
 	"smirror/cron/trigger/mem"
 	"smirror/secret"
-	"strings"
 	"sync"
 	"time"
 )
 
 //Service represents a cron service
 type Service interface {
-	Tick(ctx context.Context) error
+	Tick(ctx context.Context) (*Response)
 }
 
 type service struct {
@@ -35,51 +34,46 @@ type service struct {
 }
 
 //Tick run cron service
-func (s *service) Tick(ctx context.Context) error {
-	matched, err := s.tick(ctx)
-	s.reportMatched(matched, err)
-	return err
+func (s *service) Tick(ctx context.Context) (*Response) {
+	response := NewResponse()
+	err := s.tick(ctx, response)
+	if err != nil {
+		response.Status = base.StatusError
+		response.Error = err.Error()
+	}
+	return response
 }
 
-func (s *service) tick(ctx context.Context) ([]storage.Object, error) {
+func (s *service) tick(ctx context.Context, response *Response) (error) {
 	changed, err := s.config.Resources.ReloadIfNeeded(ctx, s.fs)
 	if changed && err == nil {
 		err = s.UpdateSecrets(ctx)
 	}
 	if err != nil {
-		return nil, err
+		return  err
 	}
 	var matched = make([]storage.Object, 0)
 	for _, resource := range s.config.Resources.Rules {
 		processed, err := s.processResource(ctx, resource)
 		if err != nil {
-			return matched, err
+			return err
 		}
+
 		if len(processed) > 0 {
 			matched = append(matched, processed...)
+			matched := &Matched{
+				Resource: resource,
+				URLs:make([]string, 0),
+			}
+			matched.Add(processed...)
+			response.Matched = append(response.Matched, matched)
 		}
 	}
-	return matched, err
-}
-
-func (s *service) reportMatched(matched []storage.Object, err error) {
-	if !base.IsLoggingEnabled() {
-		return
-	}
-	var URLs = make([]string, 0)
-	for i := range matched {
-		URLs = append(URLs, fmt.Sprintf(`"%v"`, matched[i].URL()))
-	}
-	status := "ok"
-	if err != nil {
-		status = "error"
-	}
-	message := fmt.Sprintf(`{"status":"%v", matched":[%v]}`, status, strings.Join(URLs, ", "))
-	fmt.Println(message)
+	return err
 }
 
 
-func (s *service) processResource(ctx context.Context, resource *config.Resource) ([]storage.Object, error) {
+func (s *service) processResource(ctx context.Context, resource *config.Rule) ([]storage.Object, error) {
 	objects, err := s.getResourceCandidates(ctx, resource)
 	if err != nil {
 		return nil, err
@@ -95,14 +89,11 @@ func (s *service) processResource(ctx context.Context, resource *config.Resource
 	return pendings, s.metaService.AddProcessed(ctx, pendings)
 }
 
-func (s *service) notify(ctx context.Context, resource *config.Resource, object storage.Object) error {
-
-
-
+func (s *service) notify(ctx context.Context, resource *config.Rule, object storage.Object) error {
 	return s.dest.Trigger(ctx, resource, object)
 }
 
-func (s *service) notifyAll(ctx context.Context, resource *config.Resource, objects []storage.Object) error {
+func (s *service) notifyAll(ctx context.Context, resource *config.Rule, objects []storage.Object) error {
 	if len(objects) == 0 {
 		return nil
 	}
@@ -123,7 +114,7 @@ func (s *service) notifyAll(ctx context.Context, resource *config.Resource, obje
 	return nil
 }
 
-func (s *service) getResourceCandidates(ctx context.Context, resource *config.Resource) ([]storage.Object, error) {
+func (s *service) getResourceCandidates(ctx context.Context, resource *config.Rule) ([]storage.Object, error) {
 	var result = make([]storage.Object, 0)
 	options, err := s.secret.StorageOpts(ctx, &resource.Resource)
 	if err != nil {
@@ -189,7 +180,6 @@ func (s *service) UpdateSecrets(ctx context.Context) error {
 	}
 	return s.secret.Init(ctx, s.fs, resources)
 }
-
 
 //New returns new cron service
 func New(ctx context.Context, config *Config, fs afs.Service) (Service, error) {

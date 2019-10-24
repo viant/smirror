@@ -12,26 +12,26 @@ import (
 	"time"
 )
 
-//Resources represents resources rules to check for changes to trigger storage event
-type Resources struct {
+//Ruleset represents resources rules to check for changes to trigger storage event
+type Ruleset struct {
 	BaseURL      string
 	CheckInMs    int
-	Rules        []*Resource
-	initialRules []*Resource
+	Rules        []*Rule
+	initialRules []*Rule
 	inited       int32
 	projectID    string
 	meta         *base.Meta
 }
 
 //Init initialises resources
-func (r *Resources) Init(ctx context.Context, fs afs.Service, projectID string) error {
+func (r *Ruleset) Init(ctx context.Context, fs afs.Service, projectID string) error {
 	r.initRules()
 	r.projectID = projectID
 	r.meta = base.NewMeta(r.BaseURL, time.Duration(r.CheckInMs)*time.Millisecond)
 	return r.loadAndInit(ctx, fs)
 }
 
-func (r *Resources) loadAndInit(ctx context.Context, fs afs.Service) (err error) {
+func (r *Ruleset) loadAndInit(ctx context.Context, fs afs.Service) (err error) {
 	if err = r.loadAllResources(ctx, fs); err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func (r *Resources) loadAndInit(ctx context.Context, fs afs.Service) (err error)
 	return nil
 }
 
-func (r *Resources) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, error) {
+func (r *Ruleset) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, error) {
 	changed, err := r.meta.HasChanged(ctx, fs)
 	if err != nil || !changed {
 		return changed, err
@@ -49,7 +49,7 @@ func (r *Resources) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, e
 	return true, r.loadAndInit(ctx, fs)
 }
 
-func (r *Resources) loadAllResources(ctx context.Context, fs afs.Service) error {
+func (r *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 	if r.BaseURL == "" {
 		return nil
 	}
@@ -75,7 +75,7 @@ func (r *Resources) loadAllResources(ctx context.Context, fs afs.Service) error 
 	return nil
 }
 
-func (r *Resources) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
+func (r *Ruleset) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
 	reader, err := storage.Download(ctx, object)
 	if err != nil {
 		return err
@@ -83,7 +83,7 @@ func (r *Resources) loadResources(ctx context.Context, storage afs.Service, obje
 	defer func() {
 		_ = reader.Close()
 	}()
-	resources := make([]*Resource, 0)
+	resources := make([]*Rule, 0)
 	err = json.NewDecoder(reader).Decode(&resources)
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
@@ -92,12 +92,12 @@ func (r *Resources) loadResources(ctx context.Context, storage afs.Service, obje
 	return err
 }
 
-func (r *Resources) initRules() {
+func (r *Ruleset) initRules() {
 	if atomic.CompareAndSwapInt32(&r.inited, 0, 1) {
 		if len(r.Rules) > 0 {
 			r.initialRules = r.Rules
 		} else {
-			r.initialRules = make([]*Resource, 0)
+			r.initialRules = make([]*Rule, 0)
 		}
 	}
 }

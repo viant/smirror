@@ -1,0 +1,75 @@
+init:
+  '!awsCredentials': $params.authWith
+  '!gcpCredentials': $params.gcpSecrets
+
+  gcp: ${secrets.$gcpCredentials}
+  gcpProject: $gcp.ProjectID
+  destPrefix: $Replace('$gcp.ProjectID','-','_')
+  sourcePrefix: $Replace('$gcp.ProjectID','_','-')
+
+
+  configBucket: ${sourcePrefix}-config
+  triggerBucket: viant-e2e-integration
+  opsBucket: ${sourcePrefix}-operation
+  destBucket: ${destPrefix}_mirrored
+
+
+pipeline:
+
+
+  setupCronRuleClenup:
+    action: storage:remove
+    assets:
+      - URL: s3://${configBucket}/StorageMirrorCron/Rules/
+        credentials: $awsCredentials
+
+  setupCronRule:
+    action: storage:copy
+    expand: true
+    source:
+      URL: cron.json
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${configBucket}/StorageMirrorCron/Rules/external_test.json
+
+
+  setupRule:
+    action: storage:copy
+    expand: true
+    source:
+      URL: rule_cron.json
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${configBucket}/StorageMirror/Rules/test-cron-rule.json
+
+
+  cleanupDest:
+    action: storage:remove
+    assets:
+      - URL: gs://${destBucket}/testdata/cron/data/test/events.csv.gz
+        credentials: $gcpCredentials
+
+  checkDest:
+    action: storage:exists
+    assets:
+      - URL: gs://${destBucket}/testdata/cron/data/test/events.csv.gz
+        credentials: $gcpCredentials
+
+
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 20000
+    source:
+      URL: events.csv.gz
+    dest:
+      credentials: viant-integration
+      URL: s3://${triggerBucket}/data/test/events.csv.gz
+
+
+  verify:
+    action: storage:exists
+    assets:
+      - URL: gs://${destBucket}/testdata/cron/data/test/events.csv.gz
+        credentials: $gcpCredentials
+    expect:
+      'gs://${destBucket}/testdata/cron/data/test/events.csv.gz': true

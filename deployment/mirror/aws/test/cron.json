@@ -1,0 +1,10 @@
+[
+  {
+    "URL": "s3://${triggerBucket}",
+    "DestFunction": "StorageMirror",
+    "Credentials": {
+      "Parameter": "StorrageMirror.Integration",
+      "Key": "alias/storagemirror"
+    }
+  }
+]

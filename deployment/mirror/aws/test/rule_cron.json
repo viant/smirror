@@ -1,0 +1,37 @@
+[
+  {
+    "Source": {
+      "Bucket": "${triggerBucket}",
+      "Credentials": {
+        "Parameter": "StorrageMirror.Integration",
+        "Key": "alias/storagemirror"
+      }
+    },
+
+    "Dest": {
+      "URL": "gs://${destBucket}/testdata/cron/",
+      "Credentials": {
+        "Parameter": "StorrageMirror.GCP.Test",
+        "Key": "alias/storagemirror"
+      }
+    },
+    "OnSuccess": [
+      {
+        "Action": "move",
+        "URL": "s3://${opsBucket}/StorageMirror/processed/"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "s3://${opsBucket}/StorageMirror/errors/"
+      }
+    ],
+    "Info": {
+      "Workflow": "My workflow name here",
+      "Description": "quick desciption",
+      "ProjectURL": "JIRA/WIKi or any link referece",
+      "LeadEngineer": "data flow requestor"
+    }
+  }
+]
