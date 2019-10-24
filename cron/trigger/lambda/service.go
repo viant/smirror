@@ -53,7 +53,7 @@ func (s *service) Trigger(ctx context.Context, resource *config.Rule, eventSourc
 	}
 	_, err = s.Invoke(input)
 	if base.IsLoggingEnabled() {
-		fmt.Printf("calling lambda: %v, %v\n", input, err)
+		fmt.Printf("calling lambda: %v, %v: %v\n", URLPath, input, err)
 	}
 	return err
 
