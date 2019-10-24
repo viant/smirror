@@ -3,7 +3,6 @@ package lambda
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -11,7 +10,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/viant/afs/storage"
 	"github.com/viant/afs/url"
-	"smirror/base"
 	"smirror/cron/config"
 	"smirror/cron/trigger"
 	"time"
@@ -52,9 +50,6 @@ func (s *service) Trigger(ctx context.Context, resource *config.Rule, eventSourc
 		InvocationType: aws.String(lambda.InvocationTypeEvent),
 	}
 	_, err = s.Invoke(input)
-	if base.IsLoggingEnabled() {
-		fmt.Printf("calling lambda: %v, %v: %v\n", URLPath, input, err)
-	}
 	return err
 
 }

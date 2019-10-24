@@ -78,15 +78,15 @@ func (s *service) processResource(ctx context.Context, resource *config.Rule) ([
 	if err != nil {
 		return nil, err
 	}
-	pendings, err := s.metaService.PendingResources(ctx, objects)
-	if err != nil || len(pendings) == 0 {
+	pending, err := s.metaService.PendingResources(ctx, objects)
+	if err != nil || len(pending) == 0 {
 		return nil, err
 	}
 
-	if err = s.notifyAll(ctx, resource, pendings); err != nil {
+	if err = s.notifyAll(ctx, resource, pending); err != nil {
 		return nil, err
 	}
-	return pendings, s.metaService.AddProcessed(ctx, pendings)
+	return pending, s.metaService.AddProcessed(ctx, pending)
 }
 
 func (s *service) notify(ctx context.Context, resource *config.Rule, object storage.Object) error {

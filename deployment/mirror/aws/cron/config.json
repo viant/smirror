@@ -1,7 +1,7 @@
 {
   "MetaURL": "s3://${opsBucket}/StorageMirrorCron/meta.json",
   "TimeWindow": {
-    "DurationInSec": 240
+    "DurationInSec": 86400
   },
   "Resources": {
     "CheckInMs": 100,

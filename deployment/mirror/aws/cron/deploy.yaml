@@ -69,8 +69,8 @@ pipeline:
           CONFIG: s3://${configBucket}/StorageMirrorCron/config.json
       code:
         zipfile: $LoadBinary(${appLocation})
-#      schedule:
-#        expression: rate(1 minute)
+      schedule:
+        expression: rate(1 minute)
       rolename: ${functionName}-executor
       define:
         - policyname: ${functionName}-role
