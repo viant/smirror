@@ -79,12 +79,14 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		response.Status = base.StatusNoMatch
 		return nil
 	}
+
 	response.TotalRules = len(s.config.Mirrors.Rules)
 	if err := s.initRule(ctx, rule); err != nil {
 		return errors.Wrapf(err, "railed to initialise rule: %v", rule.Info.Workflow)
 	}
+
 	response.Rule = rule
-	options, err := s.secret.StorageOpts(ctx, rule.Source)
+	options, err := s.secret.StorageOpts(ctx, rule.Source.CloneWithURL(request.URL))
 	if err != nil {
 		return err
 	}
@@ -112,7 +114,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 }
 
 func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string, response *contract.Response) error {
-	options, err := s.secret.StorageOpts(ctx, rule.Source)
+	options, err := s.secret.StorageOpts(ctx, rule.Source.CloneWithURL(URL))
 	if err != nil {
 		return errors.Wrapf(err, "failed to get storage option for %v", rule.Source)
 	}
@@ -121,7 +123,6 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 		return errors.Wrapf(err, "failed to download source: %v", URL)
 	}
 	sourceCompression := rule.SourceCompression(URL)
-
 	reader, err = NewReader(reader, sourceCompression)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
@@ -131,7 +132,6 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 			_ = reader.Close()
 		}
 	}()
-
 	destName := rule.Name(URL)
 	destURL := url.Join(rule.Dest.URL, destName)
 	if reader == nil {
@@ -148,11 +148,12 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 		Resource: rule.Dest,
 		Reader:   reader,
 		Dest:     NewDatafile(destURL, destCompression)}
+
 	return s.transfer(ctx, dataCopy, response)
 }
 
 func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Rule, request *contract.Request, response *contract.Response) error {
-	options, err := s.secret.StorageOpts(ctx, route.Source)
+	options, err := s.secret.StorageOpts(ctx, route.Source.CloneWithURL(request.URL))
 	if err != nil {
 		return err
 	}
