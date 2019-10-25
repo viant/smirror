@@ -1,0 +1,20 @@
+[
+  {
+    "Source": {
+      "Prefix": "/myprefix/",
+      "Suffix": ".csv.gz"
+    },
+    "Dest": {
+      "URL": "gs://${destBucket}",
+      "Credentials": {
+        "Parameter": "StorageMirror.GCP-DestProject",
+        "Key": "smirror"
+      }
+    },
+    "Split": {
+      "MaxSize": 8388608,
+      "Template": "%s_%05d"
+    },
+    "Codec": "gzip"
+  }
+]

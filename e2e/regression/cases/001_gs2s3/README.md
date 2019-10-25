@@ -29,7 +29,7 @@ Mirror data from gs://${gsTriggerBucket}/data/p1 and suffixed *.csv to s3://${s3
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
+        "URL": "gs:///${gsOpsBucket}/StorageMirror/Errors/"
       }
     ],
     "PreserveDepth": 1

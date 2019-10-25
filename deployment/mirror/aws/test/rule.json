@@ -21,7 +21,7 @@
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "s3://${opsBucket}/StorageMirror/errors/"
+        "URL": "s3://${opsBucket}/StorageMirror/Errors/"
       }
     ],
     "PreserveDepth": 2,

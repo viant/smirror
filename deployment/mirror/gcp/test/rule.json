@@ -27,7 +27,7 @@
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs://${opsBucket}/StorageMirror/errors/"
+        "URL": "gs://${opsBucket}/StorageMirror/Errors/"
       }
     ],
     "Info": {

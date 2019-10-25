@@ -78,7 +78,7 @@ and routes files store JSON array with process routes.
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs://${opsBucket}/errors/"
+        "URL": "gs://${opsBucket}/Errors/"
       }
     ],
     "Codec": "gzip",
@@ -303,36 +303,42 @@ _where:_
 
 #####  Secure GCP credentials (google secrets)
 
-
- 
+To secure google secrets with endly runner use the following workflow:
 
 ```bash
-cd $SmirrorRoot
-cd deployment/mirror/aws
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/mirror/aws
 endly secure.yaml authWith=aws-e2e gcpSecrets=gcp-e2e
 ```
 
 where:
 [@secure.yaml](mirror/aws/secure.yaml)
 
+To secure google secrets with aws cli  use following commands:
 
+```bash
+- aws kms create-key  
+- aws kms create-alias --alias-name=smirror --target-key-id=KEY_ID
+- aws ssm put-parameter \
+    --name "storagemirror.gcp" \
+    --value 'CONTENT OF GOOGLE SECRET HERE' \
+    --type SecureString \
+    --key-id alias/storagemirror
 
-
-
-
+```
 
 
 ###### Test Mirror Rule 
 
 ```bash
-cd $SmirrorRoot
-cd deployment/mirror/aws/test
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/mirror/aws/test
 endly test.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
 ```
 
 where:
-- [@test.yaml](mirror/aws/rule/test.yaml)
-- [@rule.json](mirror/aws/rule/rule.json)
+- [@test.yaml](mirror/aws/test/test.yaml)
+- [@rule.json](mirror/aws/test/rule.json)
 
 
 
@@ -342,6 +348,8 @@ where:
 To deploy with endly automation runner use the following workflow:
 
 ```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/mirror/aws/sqs
 endly deploy.yaml authWith=myAWSSecretFile
 ```
 _where:_
@@ -351,14 +359,14 @@ _where:_
 ###### Test Mirror Rule 
 
 ```bash
-cd $SmirrorRoot
-cd deployment/mirror/aws/tets
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/mirror/aws/test
 endly test_sqs.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
 ```
 
 where:
-- [@test_sqs.yaml](mirror/aws/rule/test_sqs.yaml)
-- [@rule.json](mirror/aws/rule/rule.json)
+- [@test_sqs.yaml](mirror/aws/test/test_sqs.yaml)
+- [@rule.json](mirror/aws/test/rule.json)
 
 
 ##### StorageMirror SNS Proxy
@@ -366,6 +374,8 @@ where:
 To deploy with endly automation runner use the following workflow:
 
 ```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/mirror/aws/sns
 endly deploy.yaml authWith=myAWSSecretFile
 ```
 _where:_
@@ -376,20 +386,43 @@ _where:_
 ##### Test Mirror Rule
 
 ```bash
-cd $SmirrorRoot
-cd deployment/mirror/aws/test
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/mirror/aws/test
 endly test_sns.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
 ```
 
 where:
-- [@test_sns.yaml](mirror/aws/rule/test_sqs.yaml)
-- [@rule.json](mirror/aws/rule/rule.json)
+- [@test_sns.yaml](mirror/aws/test/test_sqs.yaml)
+- [@rule.json](mirror/aws/test/rule.json)
 
 
 
 
 ##### StorageMirror Cron
 
+To deploy with endly automation runner use the following workflow:
+
+```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/mirror/aws/sqs
+endly deploy.yaml authWith=aws-e2e gcpSecrets=viant-e2e
+```
+_where:_
+- [@deploy.yaml](mirror/aws/cron/deploy.yaml)
+- [@privilege-policy.json](mirror/aws/cron/privilege-policy.json)
+
+###### Test Cron Mirror Rule 
+
+```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/mirror/aws/test
+endly test_sqs.yaml authWith=aws-e2e  gcpSecrets=gcp-e2e
+```
+
+where:
+- [@test_cron.yaml](mirror/aws/test/test_cron.yaml)
+- [@cron_rule.json](mirror/aws/test/cron.json)
+- [@rule.json](mirror/aws/test/rule_cron.json)
 
 
 
@@ -398,6 +431,8 @@ where:
 To deploy with endly automation runner use the following workflow:
 
 ```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/monitor/aws
 endly deploy.yaml authWith=myAWSSecretFile
 ```
 _where:_
@@ -409,13 +444,15 @@ _where:_
 
 ##### StorageReplay
 
-
 To deploy with endly automation runner use the following workflow:
 
 ```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/replay/aws
 endly deploy.yaml authWith=myAWSSecretFile
 ```
 _where:_
 - [@deploy.yaml](replay/aws/deploy.yaml)
 - [@privilege-policy.json](replay/aws/privilege-policy.json)
+
 

@@ -16,7 +16,9 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
    * [S3 to Google Storage](#s3-to-google-storage)
 - [Deployment](#deployment)
 - [End to end testing](#end-to-end-testing)
-- [Monitoring and limitation](#monitoring-and-limitation)
+- [Monitoring ](#monitoring)
+- [Replay ](#replay)
+- [Limitation](#limitation)
 - [Code Coverage](#code-coverage)
 - [License](#license)
 - [Credits and Acknowledgements](#credits-and-acknowledgements)
@@ -42,76 +44,34 @@ This project provide serverless implementation for cloud storage mirror. All ext
 
 ### Google Storage to S3
 
-To mirror data from google storage that match /data/ prefix and '.csv.gz' suffix to s3://destBucket/data
-preserving parent folder (folderDepth:1) the following configuration can be used with Mirror cloud function
 
+To mirror data from google storage that matches /data/ prefix and '.csv.gz' suffix to s3://destBucket/data
+the following rule can be used 
 
-
-[@gs://sourceBucket/config/config.json](usage/gs_to_s3/config.json)
+[@gs://sourceBucket/config/config.json](usage/gs_to_s3/rule.json)
 ```json
-{
-  "Mirrors": {
-    "BaseURL": "gs://${gsConfigBucket}/StorageMirror/Rules/",
-    "Rules": [
-      {
-        "Source": {
-          "Prefix": "/data/",
-          "Suffix": ".csv.gz"
-        },
-        "Dest": {
-          "URL": "s3://destBucket/data",
-          "Credentials": {
-            "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
-            "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
-          }
-        },
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnFailure": [
-          {
-            "Action": "move",
-            "URL": "gs://sourceBucket/data/errors/"
-          }
-        ],
-        "Codec": "gzip",
-        "PreserveDepth": 1
-      },
-      {
-        "Source": {
-          "Filter": "^\/[a-z]+/data/\\d+/",
-          "Suffix": ".csv.gz"
-        },
-        "Dest": {
-          "URL": "s3://destBucket/data/chunks/",
-          "Credentials": {
-            "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
-            "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
-          }
-        },
-        "Split": {
-          "MaxLines": 10000,
-          "Template": "%s_%05d"
-        },
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnFailure": [
-          {
-            "Action": "move",
-            "URL": "gs://sourceBucket/data/errors/"
-          }
-        ],
-        "Codec": "gzip",
-        "PreserveDepth": 1
+[
+  {
+    "Source": {
+      "Prefix": "/data/",
+      "Suffix": ".csv.gz"
+    },
+    "Dest": {
+      "URL": "s3://destBucket/data",
+      "Credentials": {
+        "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
+        "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
       }
-    ]
+    },
+    "Codec": "gzip",
+    "Info": {
+      "Workflow": "My workflow name here",
+      "Description": "my description",
+      "ProjectURL": "JIRA/WIKi or any link referece",
+      "LeadEngineer": "my@dot.com"
+    }
   }
-}
+]
 ```
 
 
@@ -120,75 +80,34 @@ preserving parent folder (folderDepth:1) the following configuration can be used
 [![Google storage to S3 mirror](images/s3to_gs_mirror.png)](images/s3to_gs_mirror.png)
 
 
-To mirror data from S3 that match /data/ prefix and '.csv.gz' suffix to gs://destBucket/data
-preserving parent folder (folderDepth:1) the following configuration can be used with Mirror cloud function
+To mirror data from S3 that matches /myprefix/ prefix and '.csv.gz' suffix to gs://destBucket/data
+splitting source file into maximum 8 MB files in destination you can use the following
 
-[@gs://sourceBucket/config/config.json](usage/s3_to_gs/config.json)
+
+[@gs://sourceBucket/config/config.json](usage/s3_to_gs/rule.json)
 ```json
-{
-  "Mirrors": {
-    "BaseURL": "gs://${gsConfigBucket}/StorageMirror/Rules/",
-    "Rules": [
-      {
-        "Source": {
-          "Prefix": "/data/",
-          "Suffix": ".csv.gz"
-        },
-        "Dest": {
-          "URL": "gs://destBucket/data",
-          "Credentials": {
-            "Parameter": "storagemirror.gcp",
-            "Key": "smirror"
-          }
-        },
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnFailure": [
-          {
-            "Action": "move",
-            "URL": "s3://sourceBucket/data/errors/"
-          }
-        ],
-        "Codec": "gzip",
-        "PreserveDepth": 1
-      },
-      {
-        "Source": {
-          "Prefix": "/large/data/",
-          "Suffix": ".csv.gz"
-        },
-        "Dest": {
-          "URL": "gs://destBucket/data/chunks/",
-          "Credentials": {
-            "Parameter": "storagemirror.gcp",
-            "Key": "smirror"
-          }
-        },
-        "Split": {
-          "MaxLines": 10000,
-          "Template": "%s_%05d"
-        },
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnFailure": [
-          {
-            "Action": "move",
-            "URL": "s3://sourceBucket/data/errors/"
-          }
-        ],
-        "Codec": "gzip",
-        "PreserveDepth": 1
+[
+  {
+    "Source": {
+      "Prefix": "/myprefix/",
+      "Suffix": ".csv.gz"
+    },
+    "Dest": {
+      "URL": "gs://${destBucket}",
+      "Credentials": {
+        "Parameter": "StorageMirror.GCP-DestProject",
+        "Key": "smirror"
       }
-    ]
+    },
+    "Split": {
+      "MaxSize": 8388608,
+      "Template": "%s_%05d"
+    },
+    "Codec": "gzip"
   }
-}
+]
 ```
+
 
 
  ### Google Storage To Pubsub
@@ -196,42 +115,84 @@ preserving parent folder (folderDepth:1) the following configuration can be used
 [![Google storage to Pubsub](images/g3ToPubsub.png)](images/g3ToPubsub.png)
 
 
-To mirror data from google storage that match /data/ prefix and '.csv' suffix to pubsub 'myTopic' topic
-the following configuration can be used with Mirror cloud function
+To mirror data from google storage that match /myprefix/ prefix and '.csv' suffix to pubsub 'myTopic' topic
+you can use the following rule
 
-[@gs://sourceBucket/config/config.json](usage/gs_to_pubsub/config.json)
+[@gs://sourceBucket/config/config.json](usage/gs_to_pubsub/rule.json)
+```json
+[
+  {
+    "Source": {
+      "Prefix": "/myprefix/",
+      "Suffix": ".csv"
+    },
+    "Dest": {
+      "Topic": "myTopic"
+    },
+    "Split": {
+      "MaxLines": 1000
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "gs:///${opsBucket}/StorageMirror/Errors/"
+      }
+    ],
+    "PreserveDepth": 1
+  }
+]
+```
+
+
+## Post actions
+
+Each mirror rule accepts collection on OnSuccess and OnFailure post actions.
+
+The follwoing action are supported:
+
+- **delete**: remove source (trigger asset)
+
+
 ```json
 {
-  "Mirrors": {
-    "Rules": [
-      {
-        "Source": {
-          "Prefix": "/data/p6",
-          "Suffix": ".csv"
-        },
-        "Dest": {
-          "Topic": "myTopic"
-        },
-        "Split": {
-          "MaxLines": 1000
-        },
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnFailure": [
-          {
-            "Action": "move",
-            "URL": "gs:///${gsTriggerBucket}/StorageMirror/errors/"
-          }
-        ],
-        "PreserveDepth": 1
-      }
-    ]
-  }
+   "OnSuccess": [{"Action": "delete"}]
 }
 ```
+
+- **move**: move source to specified destination
+
+```json
+{
+  "OnSuccess": [{
+          "Action": "move",
+          "URL": "gs:///${opsBucket}/StorageMirror/Processed/"
+ }],
+ "OnFailure": [{
+        "Action": "move",
+        "URL": "gs:///${opsBucket}/StorageMirror/Errors/",
+ }]
+}
+```
+
+- **notify**: notify slack
+
+```json
+{
+  "OnSuccess": [{
+        "Action": "notify",
+        "Title": "Transfer $SourceURL done",
+        "Message": "success !!",
+        "Channels": ["#e2e"],
+        "Body": "$Response"
+  }]
+}
+```
+
 
 
 ##Deployment
@@ -242,136 +203,10 @@ The following are used by storage mirror services:
 
 - _$configBucket_: bucket storing storage mirror configuration and mirror rules
 - _$triggerBucket_: bucket storing data that needs to be mirror, event triggered by GCP
-- _$operationBucket_: bucket string error, processed mirrors
--  config:Mirrors.BaseURL: location storing routes rules as JSON Array
+- _$opsBucket_: bucket string error, processed mirrors
+-  Mirrors.BaseURL: location storing routes rules as JSON Array
 
 The following [Deployment](deployment/mirror/README.md) details storage mirror generic deployment.
-
-
-
-
-###### Encrypting AWS credentials with GCP KMS 
-
-In our example s3-cred.json.enc is encrypted version of [@s3-cred.json](usage/gs_to_s3/s3-cred.json) storing AWS credentials.
-
-The following step can be used to encrypt a file.
-
-- With **endly cli**
-
-
-```bash
-endly encryt
-```
-
-[@encrypt.yaml](usage/deploy/gcp/encrypt.yaml)
-```yaml
-init:
-  gsConfigBucket: ${gsConfigBucket}
-  
-pipeline:
-  secure:
-    deployKey:
-      action: gcp/kms:deployKey
-      credentials: gcp-e2e
-      ring: my_ring
-      key: my_key
-      logging: false
-      purpose: ENCRYPT_DECRYPT
-      bindings:
-        - role: roles/cloudkms.cryptoKeyEncrypterDecrypter
-          members:
-            - serviceAccount:$gcp.serviceAccount
-
-    keyInfo:
-      action: print
-      message: 'Deployed Key: ${deployKey.Name}'
-
-    encrypt:
-      action: gcp/kms:encrypt
-      logging: false
-      ring: my_ring
-      key: my_key
-      source:
-        URL: s3-cred.json
-      dest:
-        credentials: gcp-e2e
-        URL: gs://$gsConfigBucket/StorageMirror/secrets/s3-cred.json.enc
-    info:
-      action: print
-      message: ${encrypt.CipherBase64Text}
-```
-
-Where [gcp-credentials](https://github.com/viant/endly/tree/master/doc/secrets#gc) is service account based GCP secrets
-stored in ~/.secret/gcp-credentials.json
-
-
-- With **gcloud cli**
-
-```bash
-
-gcloud kms keyrings create my_ring --location us-central1
-gcloud kms keys create my_key --location us-central1 \
-  --keyring my_ring --purpose encryption
-
-## Encrypt s3-cred.json
-
-gcloud kms encrypt \
-  --location=us-central1  \
-  --keyring=my_ring \
-  --key=my_key \
-  --version=1 \
-  --plaintext-file=s3-cred.json \
-  --ciphertext-file=s3-cred.json.enc
-
-## Upload encrypted version to google storage
-
-gsutil cp s3-cred.json.enc gs://sourceBucket/secret/s3-cred.json.enc
-
-```
-
-###### Encrypting AWS credentials with GCP KMS 
-
-In our example AWS System Manager  'smirror.gcp' parameters is encrypted version of [@gcp-cred.json](usage/s3_to_gs/gcp-cred.json) Google Secrets.
-
-The following step can be used to encrypt a google secrets.
-
-- With **endly cli**
-
-[@encrypt.yaml](usage/s3_to_gs/encrypt.yaml)
-```yaml
-init:
-  awsCredentials: aws-e2e
-  gcpSecrets: $Cat(gcp-cred.json)
-
-pipeline:
-  secure:
-    credentials: $awsCredentials
-    action: aws/kms:setupKey
-    aliasName: alias/storagemirror
-
-  encrypt:
-    action: aws/ssm:setParameter
-    name: smirror.gcp
-    '@description': Google Storage credentials
-    type: SecureString
-    keyId: alias/storagemirror
-    value: $gcpSecrets
-```
-
-
-- With **aws cli**
-
-
-```bash
-- aws kms create-key  
-- aws kms create-alias --alias-name=smirror --target-key-id=KEY_ID
-- aws ssm put-parameter \
-    --name "storagemirror.gcp" \
-    --value 'CONTENT OF GOOGLE SECRET HERE' \
-    --type SecureString \
-    --key-id alias/storagemirror
-
-```
 
 
 ## Monitoring 
@@ -418,7 +253,7 @@ init:
   monitor:
     ConfigURL: s3://${configBucket}/StorageMirror/config.json
     TriggerURL: s3://${triggerBucket}
-    ErrorURL:  gs://${opsBucket}/StorageMirror/errors/
+    ErrorURL:  gs://${opsBucket}/StorageMirror/Errors/
 
 
 pipeline:

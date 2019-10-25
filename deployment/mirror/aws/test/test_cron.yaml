@@ -23,6 +23,7 @@ pipeline:
       - URL: s3://${configBucket}/StorageMirrorCron/Rules/
         credentials: $awsCredentials
 
+
   setupCronRule:
     action: storage:copy
     expand: true
@@ -58,7 +59,7 @@ pipeline:
 
   trigger:
     action: storage:copy
-    sleepTimeMs: 20000
+    sleepTimeMs: 70000
     source:
       URL: events.csv.gz
     dest:

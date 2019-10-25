@@ -1,15 +1,14 @@
 [
   {
     "Source": {
-      "Prefix": "/testdata/pubsub/",
+      "Prefix": "/myprefix/",
       "Suffix": ".csv"
     },
     "Dest": {
-
-      "Topic": "${prefix}_storage_mirror"
+      "Topic": "myTopic"
     },
     "Split": {
-      "MaxLines": 10
+      "MaxLines": 1000
     },
     "OnSuccess": [
       {
@@ -22,6 +21,6 @@
         "URL": "gs:///${opsBucket}/StorageMirror/Errors/"
       }
     ],
-    "PreserveDepth": 3
+    "PreserveDepth": 1
   }
 ]

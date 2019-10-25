@@ -1,29 +1,29 @@
 [
   {
     "Source": {
-      "Prefix": "/${triggerBucket}/"
+      "Prefix": "/${snsTriggerBucket}/"
     },
     "Dest": {
-      "URL": "s3://${destBucket}",
+      "URL": "gs://${destBucket}/testdata",
       "Credentials": {
-        "URL": "gs://${configBucket}/Secrets/s3-ms.json.enc",
-        "Key": "projects/${gcpProject}/locations/us-central1/keyRings/${prefix}_ring/cryptoKeys/${prefix}_key"
+        "Parameter": "StorrageMirror.GCP.Test",
+        "Key": "alias/storagemirror"
       }
     },
-    "PreserveDepth": -1,
     "Codec": "gzip",
     "OnSuccess": [
       {
         "Action": "move",
-        "URL": "gs://${opsBucket}/StorageMirror/processed/"
+        "URL": "s3://${opsBucket}/StorageMirror/processed/"
       }
     ],
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs://${opsBucket}/StorageMirror/Errors/"
+        "URL": "s3://${opsBucket}/StorageMirror/Errors/"
       }
     ],
+    "PreserveDepth": -1,
     "Info": {
       "Workflow": "My workflow name here",
       "Description": "quick desciption",

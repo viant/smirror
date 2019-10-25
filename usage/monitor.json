@@ -4,6 +4,6 @@
   "TriggerURL":   "gs://${triggerBucket}",
   "UnprocessedDuration": "2hours",
 
-  "ErrorURL":     "gs://${opsBucket}/StorageMirror/errors/",
+  "ErrorURL":     "gs://${opsBucket}/StorageMirror/Errors/",
   "ErrorRecency": "3hours"
 }

@@ -50,7 +50,7 @@ Configuration:
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "s3:///${s3OpsBucket}/StorageMirror/errors/"
+        "URL": "s3:///${s3OpsBucket}/StorageMirror/Errors/"
       }
     ],
     "PreserveDepth": 1
