@@ -5,6 +5,6 @@
   },
   "SlackCredentials": {
     "URL": "gs://${gsConfigBucket}/Secrets/slack.json.enc",
-    "Key": "BqTailRing/BqTailKey"
+    "Key": "${gsPrefix}_ring/${gsPrefix}_key"
   }
 }

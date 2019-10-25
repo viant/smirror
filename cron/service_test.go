@@ -72,8 +72,8 @@ func TestService_Tick(t *testing.T) {
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
-		err = service.Tick(ctx)
-		if !assert.Nil(t, err, useCase.description) {
+		response := service.Tick(ctx)
+		if !assert.Nil(t, response.Error != "", useCase.description) {
 			continue
 		}
 
@@ -89,8 +89,8 @@ func TestService_Tick(t *testing.T) {
 		assert.True(t, exists)
 		_ = fs.Delete(ctx, funcURL)
 
-		err = service.Tick(ctx)
-		if !assert.Nil(t, err, useCase.description) {
+		response = service.Tick(ctx)
+		if !assert.Nil(t, response.Error != "", useCase.description) {
 			continue
 		}
 
