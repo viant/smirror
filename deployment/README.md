@@ -40,7 +40,6 @@ This bucket stores all configuration files:
 ```            
 
 
-
 Where:
 
 [@smirror.json](mirror/usage/gcp/config.json)

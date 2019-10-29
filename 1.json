@@ -1,0 +1,40 @@
+{
+  "TriggeredBy": "gs://viant_e2e_trigger/data/p2/events.csv.gz",
+  "DestURLs": [
+    "s3://viant-e2e-mirrored/data/p2/events.csv.gz"
+  ],
+  "TimeTakenMs": 692,
+  "Rule": {
+    "Info": {
+      "Workflow": "case_002",
+      "URL": "gs://viant_e2e_config/StorageMirror/Rules/case_002.json"
+    },
+    "Dest": {
+      "URL": "s3://viant-e2e-mirrored/data",
+      "Credentials": {
+        "URL": "gs://viant_e2e_config/Secrets/s3-mirror.json.enc",
+        "Key": "projects/viant-e2e/locations/us-central1/keyRings/viant_e2e_ring/cryptoKeys/viant_e2e_key"
+      }
+    },
+    "Source": {
+      "Prefix": "/data/p2",
+      "Suffix": ".csv.gz"
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "gs:///viant_e2e_operation/StorageMirror/errors/"
+      }
+    ],
+    "Codec": "gzip",
+    "PreserveDepth": -1
+  },
+  "TotalRules": 2,
+  "Status": "ok",
+  "StartTime": "2019-10-25T15:26:15.459564395Z"
+}
