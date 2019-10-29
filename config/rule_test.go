@@ -89,6 +89,20 @@ func TestRoute_HasMatch(t *testing.T) {
 			URL:    "ssh://host/aa/data/002/abc.tsv",
 			expect: true,
 		},
+		{
+			description: "filter bucket match",
+			Rule: Rule{
+				Source: &Resource{
+					Bucket:"xxx-billing",
+					Basic: matcher.Basic{
+						Suffix: ".zip",
+						Prefix: `/yyyy-aws-billing-detailed-line-items-with-resources-and-tags-`,
+					},
+				},
+			},
+			URL:    "s3://xxx-billing/yyyy-aws-billing-detailed-line-items-with-resources-and-tags-2019-10.csv.zip",
+			expect: true,
+		},
 	}
 
 	for _, useCase := range useCases {
