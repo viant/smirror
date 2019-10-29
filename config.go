@@ -13,11 +13,20 @@ import (
 	"strings"
 )
 
+const (
+	megaBytes              = 1024 * 1024
+	defaultStreamThreshold = 1024
+)
+
 //Config represents routes
 type Config struct {
 	base.Config
-	SlackCredentials *auth.Credentials
-	Mirrors          config.Ruleset
+	SlackCredentials      *auth.Credentials
+	Mirrors               config.Ruleset
+	StreamThresholdMb     int
+	StreamPartSize        int
+	ChecksumSkipThreshold int
+	StreamThreshold       int
 }
 
 //Init initialises routes
@@ -28,6 +37,18 @@ func (c *Config) Init(ctx context.Context, fs afs.Service) (err error) {
 	}
 	for i := range c.Mirrors.Rules {
 		c.Mirrors.Rules[i].Dest.Init(c.ProjectID)
+	}
+	if c.StreamThresholdMb == 0 {
+		c.StreamThresholdMb = defaultStreamThreshold
+	}
+	if c.StreamThreshold == 0 {
+		c.StreamThreshold = c.StreamThresholdMb * megaBytes
+	}
+	if c.StreamPartSize == 0 {
+		c.StreamPartSize = 64 * megaBytes
+	}
+	if c.ChecksumSkipThreshold == 0 {
+		c.ChecksumSkipThreshold = c.StreamThreshold
 	}
 	return nil
 }
