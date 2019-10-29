@@ -46,7 +46,7 @@ func (s *service) Trigger(ctx context.Context, resource *config.Rule, eventSourc
 	}
 
 	input := &lambda.InvokeInput{
-		FunctionName:   &resource.DestFunction,
+		FunctionName:   &resource.Dest,
 		Payload:        payload,
 		InvocationType: aws.String(lambda.InvocationTypeEvent),
 	}

@@ -76,13 +76,11 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		JSON, _ := json.Marshal(matched)
 		return errors.Errorf("multi rule match currently not supported: %s", JSON)
 	}
-
+	response.TotalRules = len(s.config.Mirrors.Rules)
 	if rule == nil {
 		response.Status = base.StatusNoMatch
 		return nil
 	}
-
-	response.TotalRules = len(s.config.Mirrors.Rules)
 	if err := s.initRule(ctx, rule); err != nil {
 		return errors.Wrapf(err, "railed to initialise rule: %v", rule.Info.Workflow)
 	}

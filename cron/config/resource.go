@@ -7,5 +7,7 @@ import (
 //Rule represents a cron resource
 type Rule struct {
 	config.Resource
-	DestFunction string
+	Dest string
 }
+
+

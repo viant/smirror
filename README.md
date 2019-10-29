@@ -291,6 +291,10 @@ _where:_
 - **UnprocessedDuration** - check for any unprocessed data file over specified time
 
 
+## Streaming settings
+
+
+
 ## Limitation
 
 This project uses serverless stack, so any transfer exceeded memory  

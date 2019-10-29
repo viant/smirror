@@ -41,7 +41,7 @@ func TestService_Tick(t *testing.T) {
 	  "Rules": [
 		{
 		  "URL": "mem://localhost/case001/",
-		  "DestFunction": "func1"
+		  "Dest": "func1"
 		}
 	  ]
   }
@@ -83,7 +83,7 @@ func TestService_Tick(t *testing.T) {
 		actual, err := loadMeta(ctx, fs, useCase.config.MetaURL)
 		assertly.AssertValues(t, useCase.expect, actual, useCase.description)
 
-		funcURL := fmt.Sprintf("mem://localhost/%v", useCase.config.Resources.Rules[0].DestFunction)
+		funcURL := fmt.Sprintf("mem://localhost/%v", useCase.config.Resources.Rules[0].Dest)
 
 		exists, _ := fs.Exists(ctx, funcURL)
 		assert.True(t, exists)
