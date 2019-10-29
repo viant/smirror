@@ -8,7 +8,7 @@ Configuration:
 
 * Global Config: [@config,json](../../../config/gs.json)
 
-* Route:
+* Rule
 
 [@config,json](../../../config/gs.json)
 ```json

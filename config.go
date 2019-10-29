@@ -16,17 +16,44 @@ import (
 const (
 	megaBytes              = 1024 * 1024
 	defaultStreamThreshold = 1024
+	defaultPartSize        = 64
 )
 
 //Config represents routes
 type Config struct {
 	base.Config
-	SlackCredentials      *auth.Credentials
-	Mirrors               config.Ruleset
-	StreamThresholdMb     int
-	StreamPartSize        int
+	SlackCredentials *auth.Credentials
+	Mirrors          config.Ruleset
+	Streaming        Streaming
+}
+
+type Streaming struct {
+	ThresholdMb           int
+	Threshold             int
+	PartSize              int
+	PartSizeMb            int
 	ChecksumSkipThreshold int
-	StreamThreshold       int
+}
+
+func (c *Streaming) Init() {
+	if c.ThresholdMb == 0 {
+		c.ThresholdMb = defaultStreamThreshold
+	}
+	if c.Threshold == 0 {
+		c.Threshold = c.ThresholdMb * megaBytes
+	}
+
+	if c.PartSizeMb == 0 {
+		c.PartSizeMb = defaultPartSize
+	}
+
+	if c.PartSize == 0 {
+		c.PartSize = c.PartSizeMb * megaBytes
+	}
+
+	if c.ChecksumSkipThreshold == 0 {
+		c.ChecksumSkipThreshold = c.Threshold
+	}
 }
 
 //Init initialises routes
@@ -38,18 +65,7 @@ func (c *Config) Init(ctx context.Context, fs afs.Service) (err error) {
 	for i := range c.Mirrors.Rules {
 		c.Mirrors.Rules[i].Dest.Init(c.ProjectID)
 	}
-	if c.StreamThresholdMb == 0 {
-		c.StreamThresholdMb = defaultStreamThreshold
-	}
-	if c.StreamThreshold == 0 {
-		c.StreamThreshold = c.StreamThresholdMb * megaBytes
-	}
-	if c.StreamPartSize == 0 {
-		c.StreamPartSize = 64 * megaBytes
-	}
-	if c.ChecksumSkipThreshold == 0 {
-		c.ChecksumSkipThreshold = c.StreamThreshold
-	}
+	c.Streaming.Init()
 	return nil
 }
 

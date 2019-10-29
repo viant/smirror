@@ -88,6 +88,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	}
 
 	response.Rule = rule
+
 	options, err := s.secret.StorageOpts(ctx, rule.Source.CloneWithURL(request.URL))
 	if err != nil {
 		return err
@@ -98,14 +99,16 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		response.NotFoundError = fmt.Sprintf("does not exist: %v", err)
 		return nil
 	}
-
+	response.ChecksumSkip = int(object.Size()) > s.config.Streaming.ChecksumSkipThreshold
+	if int(object.Size()) > s.config.Streaming.Threshold {
+		response.StreamOption = option.NewStream(s.config.Streaming.PartSize, int(object.Size()))
+	}
 	if rule.Split != nil {
-		err = s.mirrorChunkedAsset(ctx, object, rule, request, response)
+		err = s.mirrorChunkedAsset(ctx, rule, request, response)
 	} else {
-		err = s.mirrorAsset(ctx, object, rule, request.URL, response)
+		err = s.mirrorAsset(ctx, rule, request.URL, response)
 	}
 	jobContent := job.NewContext(ctx, err, request.URL, response.Rule.Name(request.URL))
-
 	response.TimeTakenMs = int(time.Now().Sub(response.StartTime) / time.Millisecond)
 	if e := rule.Actions.Run(jobContent, s.fs, s.notifier.Notify, &response.Rule.Info, response); e != nil && err == nil {
 		err = e
@@ -113,19 +116,19 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	return err
 }
 
-func (s *service) addStreamingOptions(object storage.Object, options []storage.Option) []storage.Option {
-	if int(object.Size()) > s.config.StreamThreshold {
-		options = append(options, option.NewStream(s.config.StreamPartSize, int(object.Size())))
+func (s *service) addStreamingOptions(options []storage.Option, streamOpt *option.Stream) []storage.Option {
+	if streamOpt != nil {
+		options = append(options, streamOpt)
 	}
 	return options
 }
 
-func (s *service) mirrorAsset(ctx context.Context, object storage.Object, rule *config.Rule, URL string, response *contract.Response) error {
+func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string, response *contract.Response) error {
 	options, err := s.secret.StorageOpts(ctx, rule.Source.CloneWithURL(URL))
 	if err != nil {
 		return errors.Wrapf(err, "failed to get storage option for %v", rule.Source)
 	}
-	options = s.addStreamingOptions(object, options)
+	options = s.addStreamingOptions(options, response.StreamOption)
 	reader, err := s.fs.DownloadWithURL(ctx, URL, options...)
 	if err != nil {
 		return errors.Wrapf(err, "failed to download source: %v", URL)
@@ -151,7 +154,7 @@ func (s *service) mirrorAsset(ctx context.Context, object storage.Object, rule *
 		destCompression = nil
 	}
 	dataCopy := &Transfer{
-		skipChecksum: int(object.Size()) > s.config.ChecksumSkipThreshold,
+		skipChecksum: response.ChecksumSkip,
 		rewriter:     NewRewriter(rule.Replace...),
 		Resource:     rule.Dest,
 		Reader:       reader,
@@ -160,12 +163,12 @@ func (s *service) mirrorAsset(ctx context.Context, object storage.Object, rule *
 	return s.transfer(ctx, dataCopy, response)
 }
 
-func (s *service) mirrorChunkedAsset(ctx context.Context, object storage.Object, route *config.Rule, request *contract.Request, response *contract.Response) error {
+func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Rule, request *contract.Request, response *contract.Response) error {
 	options, err := s.secret.StorageOpts(ctx, route.Source.CloneWithURL(request.URL))
 	if err != nil {
 		return err
 	}
-	options = s.addStreamingOptions(object, options)
+	options = s.addStreamingOptions(options, response.StreamOption)
 	reader, err := s.fs.DownloadWithURL(ctx, request.URL, options...)
 	if err == nil {
 		reader, err = NewReader(reader, config.NewCompressionForURL(request.URL))
@@ -181,7 +184,7 @@ func (s *service) mirrorChunkedAsset(ctx context.Context, object storage.Object,
 	counter := int32(0)
 	waitGroup := &sync.WaitGroup{}
 	rewriter := NewRewriter(route.Replace...)
-	err = Split(reader, s.chunkWriter(ctx, object, request.URL, route, &counter, waitGroup, response), route.Split, rewriter)
+	err = Split(reader, s.chunkWriter(ctx, request.URL, route, &counter, waitGroup, response), route.Split, rewriter)
 	if err == nil {
 		waitGroup.Wait()
 	}
@@ -301,7 +304,7 @@ func (s *service) initRule(ctx context.Context, rule *config.Rule) (err error) {
 	return nil
 }
 
-func (s *service) chunkWriter(ctx context.Context, object storage.Object, URL string, route *config.Rule, counter *int32, waitGroup *sync.WaitGroup, response *contract.Response) func() io.WriteCloser {
+func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rule, counter *int32, waitGroup *sync.WaitGroup, response *contract.Response) func() io.WriteCloser {
 	return func() io.WriteCloser {
 		splitCount := atomic.AddInt32(counter, 1)
 		destName := route.Split.Name(route, URL, splitCount)
@@ -313,7 +316,7 @@ func (s *service) chunkWriter(ctx context.Context, object storage.Object, URL st
 			waitGroup.Add(1)
 			defer waitGroup.Done()
 			dataCopy := &Transfer{
-				skipChecksum: int(object.Size()) > s.config.ChecksumSkipThreshold,
+				skipChecksum: response.ChecksumSkip,
 				Resource:     route.Dest,
 				Reader:       writer.Reader,
 				Dest:         NewDatafile(destURL, nil),

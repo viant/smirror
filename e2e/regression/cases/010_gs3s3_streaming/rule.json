@@ -1,11 +1,10 @@
 [
   {
     "Source": {
-      "Prefix": "/data/p1/",
-      "Suffix": ".csv"
+      "Prefix": "/data/p10/"
     },
     "Dest": {
-      "URL": "s3://${s3DestBucket}/data",
+      "URL": "s3://${s3DestBucket}/",
       "Credentials": {
         "URL": "gs://${gsConfigBucket}/Secrets/s3-mirror.json.enc",
         "Key": "projects/${gcpProject}/locations/us-central1/keyRings/${gsPrefix}_ring/cryptoKeys/${gsPrefix}_key"
@@ -13,15 +12,7 @@
     },
     "OnSuccess": [
       {
-        "Action": "move",
-        "URL": "gs://${gsOpsBucket}/StorageMirror/processed/"
-      },
-      {
-        "Action": "notify",
-        "Title": "Transfer $SourceURL done",
-        "Message": "success !!",
-        "Channels": ["#e2e"],
-        "Body": "$Response"
+        "Action": "delete"
       }
     ],
     "OnFailure": [
@@ -30,7 +21,6 @@
         "URL": "gs://${gsOpsBucket}/StorageMirror/Errors/"
       }
     ],
-    "PreserveDepth": 1,
     "Info": {
       "Workflow": "e2e test case 1"
     }

@@ -40,6 +40,7 @@ pipeline:
       dest:
         credentials: $awsCredentials
         URL: s3://${s3OpsBucket}/
+
     dest:
       action: storage:create
       isDir: true
@@ -75,6 +76,6 @@ pipeline:
       action: storage:create
       isDir: true
       dest:
-        credentials: $awsCredentials
+        credentials: $gcpCredentials
         URL: gs://${gsDestBucket}/
 

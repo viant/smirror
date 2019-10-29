@@ -2,5 +2,9 @@
   "Mirrors": {
     "BaseURL": "s3://${s3ConfigBucket}/StorageMirror/Rules/",
     "CheckInMs": 100
+  },
+  "Streaming": {
+    "PartSizeMb": 5,
+    "ThresholdMb": 10
   }
 }

@@ -1,6 +1,7 @@
 package contract
 
 import (
+	"github.com/viant/afs/option"
 	"smirror/base"
 	"smirror/config"
 
@@ -21,6 +22,8 @@ type Response struct {
 	NotFoundError string `json:",omitempty"`
 	StartTime     time.Time
 	Triggered     map[string]string `json:",omitempty"`
+	ChecksumSkip  bool              `json:",omitempty"`
+	StreamOption  *option.Stream    `json:",omitempty"`
 	mutex         *sync.Mutex
 }
 

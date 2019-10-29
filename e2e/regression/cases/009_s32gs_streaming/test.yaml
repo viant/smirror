@@ -1,0 +1,29 @@
+pipeline:
+
+  setupRule:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/rule.json
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.json
+
+
+  trigger:
+    action: storage:generate
+    sleepTimeMs: 20000
+    sizeInMb: 270
+    dest:
+      URL: s3://${s3TriggerBucket}/data/p9/asset.txt
+      credentials: $awsCredentials
+
+
+  validate:
+    action: storage:exists
+    assets:
+      - URL: gs://${gsDestBucket}/data/p9/asset.txt
+        credentials: $gcpCredentials
+
+    expect:
+      'gs://${gsDestBucket}/data/p9/asset.txt': true

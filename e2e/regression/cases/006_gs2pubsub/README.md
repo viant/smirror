@@ -7,7 +7,7 @@ Mirror suffixed *.csv data from gs://${gsTriggerBucket}/data/p1 to s3://${s3Dest
 Configuration:
 
 * Global Config: [@config,json](../../../config/gs.json)
-* Route:
+* Rule
 
 [@routes,json](rule.json)
 ```json

@@ -6,5 +6,9 @@
   "Resources": {
     "CheckInMs": 100,
     "BaseURL": "s3://${s3ConfigBucket}/StorageMirrorCron/Rules"
+  },
+  "Streaming": {
+    "PartSizeMb": 5,
+    "ThresholdMb": 10
   }
 }
