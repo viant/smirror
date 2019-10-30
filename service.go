@@ -190,7 +190,7 @@ func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Rule, re
 }
 
 func (s *service) transfer(ctx context.Context, transfer *Transfer, response *contract.Response) error {
-	if transfer.Resource.Topic != "" {
+	if transfer.Resource.Topic != "" || transfer.Resource.Queue != "" {
 		return s.publish(ctx, transfer, response)
 	}
 	if transfer.Resource.URL != "" {

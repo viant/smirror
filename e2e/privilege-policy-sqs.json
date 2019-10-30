@@ -6,7 +6,7 @@
       "Action": [
         "sqs:*"
       ],
-      "Resource": "arn:aws:sqs:*:${aws.accountID}:${s3Queue}"
+      "Resource": "arn:aws:sqs:*:${aws.accountID}:${s3TriggerQueue}"
     },
     {
       "Effect": "Allow",

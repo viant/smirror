@@ -1,1 +1,1 @@
-gs://${s3TriggerBucket}/data/p8/events.csv to s3
+gs://${gsTriggerBucket}/data/p8/events.csv to s3

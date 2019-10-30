@@ -35,7 +35,7 @@ Configuration:
         "OnError": [
           {
             "Action": "move",
-            "URL": "gs:///${gsTriggerBucket}/StorageMirror/Errors/"
+            "URL": "gs:///${gsOpsBucket}/StorageMirror/Errors/"
           }
         ]
       },
@@ -60,4 +60,4 @@ Data:
 
 
 Output:
-- s3://${gsTriggerBucket}/data/p1/events.csv
+- s3://${s3TriggerBucket}/data/p1/events.csv

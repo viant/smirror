@@ -5,7 +5,7 @@ pipeline:
     assets:
       - URL:  gs://${gsDestBucket}/
         credentials: $gcpCredentials
-      - URL:  gs://${s3DestBucket}/
+      - URL:  gs://${gsDestBucket}/
         credentials: $awsCredentials
       - URL:  s3://${s3OpsBucket}/
         credentials: $awsCredentials

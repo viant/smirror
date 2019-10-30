@@ -6,7 +6,7 @@ pipeline:
       assets:
         - URL:  gs://${gsConfigBucket}/StorageMirror
           credentials: $gcpCredentials
-        - URL:  gs://${s3ConfigBucket}/StorageMirror
+        - URL:  gs://${gsConfigBucket}/StorageMirror
           credentials: $awsCredentials
 
 

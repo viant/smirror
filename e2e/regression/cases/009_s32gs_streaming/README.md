@@ -52,18 +52,15 @@ Configuration:
 
 * Trigger:
 
-* event Type: google.storage.object.finalize
-* resource: projects/_/buckets/${gsTriggerBucket}
-* entryPoint: StorageMirror
+* event Type: s3:ObjectCreated:*
+* resource: ${s3TriggerBucket}
 * environmentVariables:
   - LOGGING: 'true'
-  - CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
+  - CONFIG: s3://${s3ConfigBucket}/StorageMirror/config.json
  
-
-
 Data:
 - s3://${s3TriggerBucket}/data/p9/events.csv
 
 
 Output:
-- gs://${gsDestBucket}/data/p9/events.csv
+- gs://${gsDestBucket}/data/p9/events.csv/p9/events.csv

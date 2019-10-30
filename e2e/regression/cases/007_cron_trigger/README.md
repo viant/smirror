@@ -1,6 +1,6 @@
 #### Scenario:
 
-Mirror suffixed *.csv data from gs://${s3ExternalBucket}/data/p1 to gs://${gsTriggerBucket}/data
+Mirror suffixed *.csv data from gs://${gsExternalBucket}/data/p1 to gs://${gsTriggerBucket}/data
 
 #### Input:
 

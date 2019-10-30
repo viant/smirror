@@ -23,6 +23,13 @@
     {
       "Effect": "Allow",
       "Action": [
+        "sqs:*"
+      ],
+      "Resource": "arn:aws:sqs:*:${aws.accountID}:${s3Queue}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "s3:*"
       ],
       "Resource": [

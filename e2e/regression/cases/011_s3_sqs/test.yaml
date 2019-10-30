@@ -1,0 +1,36 @@
+init:
+  part1: $Cat('${parent.path}/data/expect/events_00001.csv')
+  part2: $Cat('${parent.path}/data/expect/events_00002.csv')
+  events: $Cat('${parent.path}/data/expect/events.json')
+  exepct: $AsData($events)
+
+pipeline:
+
+  setupRule:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/rule.json
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.json
+
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 20000
+    source:
+      URL: ${parent.path}/data/prepare/events.csv
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3TriggerBucket}/data/p11/events.csv
+
+  validate:
+    action: msg:pull
+    timeoutMs: 10000
+    source:
+      URL: ${s3Queue}
+      type: queue
+      vendor: aws
+      credentials: $awsCredentials
+    count: 2
+    expect: $exepct

@@ -16,7 +16,12 @@ pipeline:
           topic:
             URL: /projects/${gcp.projectID}/topics/${gsPrefix}_storage_mirror
 
-      - URL: ${s3Queue}
+      - URL: $s3Queue
+        type: queue
+        vendor: aws
+        credentials: $awsCredentials
+
+      - URL: ${s3TriggerQueue}
         type: queue
         vendor: aws
         credentials: $awsCredentials

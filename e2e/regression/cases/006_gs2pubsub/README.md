@@ -29,7 +29,7 @@ Configuration:
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs:///${gsTriggerBucket}/StorageMirror/Errors/"
+        "URL": "gs:///${gsOpsBucket}/StorageMirror/Errors/"
       }
     ],
     "PreserveDepth": 1
@@ -39,18 +39,15 @@ Configuration:
 
 * Trigger:
 
-* event Type: google.storage.object.finalize
-* resource: projects/_/buckets/${gsTriggerBucket}
-* entryPoint: StorageMirror
+* event Type: s3:ObjectCreated:*
+* resource: ${s3TriggerBucket}
 * environmentVariables:
   - LOGGING: 'true'
-  - CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
+  - CONFIG: s3://${s3ConfigBucket}/StorageMirror/config.json
  
-
-
 Data:
-- gs://${gsTriggerBucket}/data/p1/events.csv
+- s3://${s3TriggerBucket}/data/p6/events.csv
 
 
 Output:
-- s3://${gsTriggerBucket}/data/p1/events.csv
+- gs://${gsDestBucket}/data/p8/events.csv
