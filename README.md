@@ -346,7 +346,7 @@ The following [Deployment](deployment/mirror/README.md) details storage mirror g
 ## Notification & Proxy
 
 To simplify mirroring maintenance once instance of storage mirror is recommended per project or region.
-Since lambda/cloud function accept only one trigger bucket you an use sqs/sns/pubsub bucket proxy to notify main
+Since lambda/cloud function accept only one trigger bucket you can use sqs/sns/pubsub bucket proxy to notify main
 StorageMirror instance by copying/moving underlying resource to trigger bucket.
  
 
