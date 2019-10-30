@@ -14,7 +14,14 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
    * [Google Storage to S3](#google-storage-to-s3)
    * [Google Storage to Pubsub](#google-storage-to-pubsub)
    * [S3 to Google Storage](#s3-to-google-storage)
+- [Configuration](#configuration)
+   * [Rule](#rule))
+        - [Post Action](#post-actions)
+   * [Slack Credentials](#slack-credentials)
+   * [Streaming settings](#streaming-settings)
+   
 - [Deployment](#deployment)
+- [Notification & Proxy](#notification--proxy)
 - [End to end testing](#end-to-end-testing)
 - [Monitoring ](#monitoring)
 - [Replay ](#replay)
@@ -108,9 +115,7 @@ splitting source file into maximum 8 MB files in destination you can use the fol
 ]
 ```
 
-
-
- ### Google Storage To Pubsub
+### Google Storage To Pubsub
 
 [![Google storage to Pubsub](images/g3ToPubsub.png)](images/g3ToPubsub.png)
 
@@ -130,7 +135,7 @@ you can use the following rule
       "Topic": "myTopic"
     },
     "Split": {
-      "MaxLines": 1000
+      "MaxSize": 524288
     },
     "OnSuccess": [
       {
@@ -148,12 +153,131 @@ you can use the following rule
 ]
 ```
 
+### S3 To Simple Message Queue
 
-## Post actions
+## Configuration
+
+### Rule
+
+Global config delegates a mirror rules to a separate location, 
+
+- **Mirrors.BaseURL**: mirror rule location 
+- **Mirrors.CheckInMs**: frequency to reload ruled from specified location
+
+Typical rule defines the following matching Source and mirror destination which are defined are [Resource](config/resource.go)
+
+**Source settings:**
+
+- **Source.Bucket**: optional matching bucket
+- **Source.Prefix**: optional matching prefix
+- **Source.Suffix**: optional matching suffix
+- **Source.Filter**: optional regexp matching filter
+- **Source.Credentials**: optional source credentials
+- **Source.CustomKey**: optional server side encryption AES key
+
+**Destination settings:**
+
+- **Dest.URL**: destination base location 
+- **Dest.Credentials**: optional dest credentials
+- **Dest.CustomKey**: optional server side encryption AES key
+
+
+_Message bus destination_
+
+- **Dest.Topic**: pubsub topic
+- **Dest.Queue**: simple message queue
+
+When destination is a message bus, you have to specify split option, 
+when data is published to destination path defined by split template. Source attribute is added:
+For example if original resource xx://mybucket/data/p11/events.csv is splitted twice,  two messages are published
+with data payload and /data/p11/0001_events.csv and /data/p11/0002_events.csv source attribute resepectivelly.
+
+
+**Payload substitution:**
+
+- **Replace** collection on replacement rules
+
+**Splitting source payload:**
+
+Optionally mirror process can spliy source content lines by size or max line count.
+
+- **Split.MaxLines**: maximum lines in dest splitted file
+- **Split.MaxSize**: maximum size in dest splitted file (lines are presrved)
+- **Split.Template**: optional template for dest file with '%04d_%v' default value, where %d - is expanded with a split number and %s is replaced with a file name. 
+
+
+
+**Source path dest naming settings:**
+
+By default source the whole source path is copied to destination
+
+ - **PreserveDepth**: optional number to manipulate source path transformation, positive number
+ preservce number of folders from leaf side, and negative truncates from root side.
+ 
+
+To see preserve depth control assume the following: 
+- _source URL_: xx://myXXBucket/folder/subfolder/grandsubfolder/asset.txt
+- _dest base URL_: yy://myYYBucket/zzz
+
+| PreserveDepth | dest URL | description |
+| --- | --- | --- |
+| Not specified | yy://myYYBucket/zzz//folder/subfolder/grandsubfolder/asset.txt | the whole source path is preserved |  
+| 1 | yy://myYYBucket/zzz/grandsubfolder/asset.txt | source path adds 1 element from leaf size  |
+| -2 | yy://myYYBucket/zzz/grandsubfolder/asset.txt | source path 2 elements truncated from root side  |
+
+
+**Compression options**
+
+By default is not split or replacement rules is specified, source is copied to destination without decompressing source archive.
+
+- **Codec** defines destination codec (gzip is only option currently supported).
+
+
+**Secrets options**
+
+- **Credentials.Key**: KMS key or alias name
+- **Credentials.Parameter**: aws system manager parameters name storing encrypted secrets
+- **Credentials.URL**: location for encrypted secrets 
+
+
+**Server-Side Encryption with Customer-Provided Encryption Keys (AES-256)** 
+
+- **CustomKey.Key**: KMS key or alias name
+- **CustomKey.Parameter**: aws system manager parameters name storing encrypted secrets
+- **CustomKey.URL**: location for encrypted secrets 
+
+
+All security sensitive credentials/secrets are stored with KMS service. 
+In Google Cloud Platform in google storage.
+In Amazon Web Srvice in System Management Service.
+See [deployment](deployment/README.md) details for securing credentials.
+
+
+Check end to end testing scenario for various rule examples.
+
+
+### Slack Credentials
+
+To you notify post action you have to supply encryted slack credentials:
+
+where the raw (unecrypted) content uses the following JSON format 
+
+```json
+{
+        "Token":"xoxp-myslack_token"
+}
+```
+
+- **SlackCredentials.Key**: KMS key or alias name
+- **SlackCredentials.Parameter**: aws system manager parameters name storing encrypted secrets
+- **SlackCredentials.URL**: location for encrypted secrets 
+
+
+#### Post actions
 
 Each mirror rule accepts collection on OnSuccess and OnFailure post actions.
 
-The follwoing action are supported:
+The following action are supported:
 
 - **delete**: remove source (trigger asset)
 
@@ -194,6 +318,16 @@ The follwoing action are supported:
 ```
 
 
+### Streaming settings
+
+By default any payload smaller than 1 GB is loaded into memory to compute checksum(crc/md5) by upload operation, this means that lambda needs enough memory.
+Larger content is streamed with checksum computation skipped on upload to reduce memory footprint. 
+
+The following global config settings controls streaming behaviour:
+- **Streaming.ThresholdMb**: streaming option threshold
+- **Streaming.PartSizeMb**: download stream part/chunk size
+- **ChecksumSkipThresholdMb**: skiping checksum on upload threshold
+
 
 ## Deployment
 
@@ -209,6 +343,15 @@ The following are used by storage mirror services:
 The following [Deployment](deployment/mirror/README.md) details storage mirror generic deployment.
 
 
+## Notification & Proxy
+
+To simplify mirroring maintenance once instance of storage mirror is recommended per project or region.
+Since lambda/cloud function accept only one trigger bucket you an use sqs/sns/pubsub bucket proxy to notify main
+StorageMirror instance by copying/moving underlying resource to trigger bucket.
+ 
+
+
+
 ## Monitoring 
 
 [StorageMonitor](mon) can be used to monitor trigger and error buckets.
@@ -221,50 +364,17 @@ curl -d @monitor.json -X POST  -H "Content-Type: application/json"  $monitorEndp
 ```
 
 [@monitor.json](usage/monitor.json)
-```json
-{
-  "ConfigURL":    "gs://${configBucket}/StorageMirror/config.json",
-  "TriggerURL":   "gs://${triggerBucket}",
-  "UnprocessedDuration": "2hours",
-  "ErrorURL":     "gs://${opsBucket}/StorageMirror/Errors/",
-  "ErrorRecency": "3hours"
-}
-```
+
 
 _where:_
 - **UnprocessedDuration** - check for any unprocessed data file over specified time
 - **ErrorRecency** - specified errors within specified time
 
 
-On Amazon Web Service cloud
-
+On Amazon Web Service:
 
 ```endly monitor.yaml authWith=aws-e2e```
 [@monitor.yaml](usage/monitor.yaml)
-
-```yaml
-init:
-  '!awsCredentials': $params.authWith
-  bucketPrefix: ms-dataflow
-  configBucket: ${bucketPrefix}-config
-  triggerBucket: ${bucketPrefix}-trigger
-  opsBucket: ${bucketPrefix}-operation
-
-  monitor:
-    ConfigURL: s3://${configBucket}/StorageMirror/config.json
-    TriggerURL: s3://${triggerBucket}
-    ErrorURL:  gs://${opsBucket}/StorageMirror/Errors/
-
-
-pipeline:
-  trigger:
-    action: aws/lambda:call
-    credentials: $awsCredentials
-    functionname: StorageMonitor
-    payload: $AsJSON($monitor)
-```
-
-
 
 
 ## Replay
@@ -291,13 +401,12 @@ _where:_
 - **UnprocessedDuration** - check for any unprocessed data file over specified time
 
 
-## Streaming settings
-
-
-
 ## Limitation
 
-This project uses serverless stack, so any transfer exceeded memory  
+Serverless restriction
+- execution time
+- network restriction
+- memory limitation  
 
 ## End to end testing
 
@@ -313,7 +422,6 @@ cd smirror/e2e
 ### Update mirrors bucket for both S3, Google Storage in e2e/run.yaml (gsTriggerBucket, s3TriggerBucket)
 endly 
 ```
-
 
 
 ## Code Coverage

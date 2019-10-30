@@ -1,5 +1,5 @@
 {
-  "@indexBy@": "Attributes.Dest",
+  "@indexBy@": "Attributes.Source",
   "/p6/0001_events.csv": {
     "Data": "$part1"
   },

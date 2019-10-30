@@ -32,6 +32,7 @@ type Streaming struct {
 	Threshold             int
 	PartSize              int
 	PartSizeMb            int
+	ChecksumSkipThresholdMb int
 	ChecksumSkipThreshold int
 }
 
@@ -51,8 +52,11 @@ func (c *Streaming) Init() {
 		c.PartSize = c.PartSizeMb * megaBytes
 	}
 
+	if c.ChecksumSkipThresholdMb == 0 {
+		c.ChecksumSkipThresholdMb = defaultStreamThreshold
+	}
 	if c.ChecksumSkipThreshold == 0 {
-		c.ChecksumSkipThreshold = c.Threshold
+		c.ChecksumSkipThreshold = c.ChecksumSkipThresholdMb * megaBytes
 	}
 }
 

@@ -15,8 +15,8 @@ const (
 	//StatusUnProcess status for unprocessed file
 	StatusUnProcess = "unprocessed"
 
-	//DestAttribute dest attribute
-	DestAttribute = "Dest"
+	//SourceAttribute dest attribute
+	SourceAttribute = "Source"
 
 	//UnclassifiedStatus
 	UnclassifiedStatus = "unclassified"

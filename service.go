@@ -215,9 +215,9 @@ func (s *service) publish(ctx context.Context, transfer *Transfer, response *con
 	}
 
 	switch s.config.SourceScheme {
-	case gs.Scheme:
+	case gs.Scheme, s3.Scheme:
 		attributes := make(map[string]interface{})
-		attributes[base.DestAttribute] = transfer.Dest.URL
+		attributes[base.SourceAttribute] = transfer.Dest.URL
 		dest := transfer.Resource.Topic
 		if dest == "" {
 			dest = transfer.Resource.Queue

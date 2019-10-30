@@ -1,9 +1,9 @@
 {
-  "@indexBy@": "Attributes.Dest",
-  "/p6/0001_events.csv": {
+  "@indexBy@": "Attributes.Source",
+  "/data/p11/0001_events.csv": {
     "Data": "$part1"
   },
-  "/p6/0002_events.csv": {
+  "/data/p11/0002_events.csv": {
     "Data": "$part2"
   }
 }
