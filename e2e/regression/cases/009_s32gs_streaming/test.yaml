@@ -12,7 +12,7 @@ pipeline:
 
   trigger:
     action: storage:generate
-    sleepTimeMs: 20000
+    sleepTimeMs: 60000
     sizeInMb: 270
     dest:
       URL: s3://${s3TriggerBucket}/data/p9/asset.txt
