@@ -1,7 +1,9 @@
 [
   {
-    "URL": "s3://${s3ExternalBucket}/data/p7",
-    "DestFunction": "StorageMirror",
+    "Source": {
+      "URL": "s3://${s3ExternalBucket}/data/p7"
+    },
+    "Dest": "StorageMirror",
     "CustomKey": {
       "Parameter": "storagemirror.customer001CustomKey",
       "Key": "alias/storagemirror"

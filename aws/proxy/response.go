@@ -5,7 +5,7 @@ type Response struct {
 	Source      string
 	Destination string
 	Triggered   map[string]string `json:",omitempty"`
-	ProxyMethod   string
+	ProxyMethod string
 	ProxyType   string
 	Status      string
 	Error       string

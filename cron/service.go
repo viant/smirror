@@ -4,16 +4,17 @@ import (
 	"context"
 	"fmt"
 	"github.com/viant/afs"
+	"github.com/viant/afs/file"
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/storage"
 	"github.com/viant/afs/url"
 	"github.com/viant/afsc/s3"
+	"path"
 	"smirror/base"
 	cfg "smirror/config"
 	"smirror/cron/config"
 	"smirror/cron/meta"
 	"smirror/cron/trigger"
-	"smirror/cron/trigger/lambda"
 	"smirror/cron/trigger/mem"
 	"smirror/secret"
 	"sync"
@@ -22,7 +23,7 @@ import (
 
 //Service represents a cron service
 type Service interface {
-	Tick(ctx context.Context) (*Response)
+	Tick(ctx context.Context) *Response
 }
 
 type service struct {
@@ -34,7 +35,7 @@ type service struct {
 }
 
 //Tick run cron service
-func (s *service) Tick(ctx context.Context) (*Response) {
+func (s *service) Tick(ctx context.Context) *Response {
 	response := NewResponse()
 	err := s.tick(ctx, response)
 	if err != nil {
@@ -44,17 +45,17 @@ func (s *service) Tick(ctx context.Context) (*Response) {
 	return response
 }
 
-func (s *service) tick(ctx context.Context, response *Response) (error) {
+func (s *service) tick(ctx context.Context, response *Response) error {
 	changed, err := s.config.Resources.ReloadIfNeeded(ctx, s.fs)
 	if changed && err == nil {
 		err = s.UpdateSecrets(ctx)
 	}
 	if err != nil {
-		return  err
+		return err
 	}
 	var matched = make([]storage.Object, 0)
 	for _, resource := range s.config.Resources.Rules {
-		processed, err := s.processResource(ctx, resource)
+		processed, err := s.processResource(ctx, resource, response)
 		if err != nil {
 			return err
 		}
@@ -63,7 +64,7 @@ func (s *service) tick(ctx context.Context, response *Response) (error) {
 			matched = append(matched, processed...)
 			matched := &Matched{
 				Resource: resource,
-				URLs:make([]string, 0),
+				URLs:     make([]string, 0),
 			}
 			matched.Add(processed...)
 			response.Matched = append(response.Matched, matched)
@@ -72,8 +73,7 @@ func (s *service) tick(ctx context.Context, response *Response) (error) {
 	return err
 }
 
-
-func (s *service) processResource(ctx context.Context, resource *config.Rule) ([]storage.Object, error) {
+func (s *service) processResource(ctx context.Context, resource *config.Rule, response *Response) ([]storage.Object, error) {
 	objects, err := s.getResourceCandidates(ctx, resource)
 	if err != nil {
 		return nil, err
@@ -83,17 +83,30 @@ func (s *service) processResource(ctx context.Context, resource *config.Rule) ([
 		return nil, err
 	}
 
-	if err = s.notifyAll(ctx, resource, pending); err != nil {
+	if err = s.notifyAll(ctx, resource, pending, response); err != nil {
 		return nil, err
 	}
 	return pending, s.metaService.AddProcessed(ctx, pending)
 }
 
-func (s *service) notify(ctx context.Context, resource *config.Rule, object storage.Object) error {
-	return s.dest.Trigger(ctx, resource, object)
+func (s *service) notify(ctx context.Context, resource *config.Rule, object storage.Object, response *Response) error {
+	notified, err := s.dest.Trigger(ctx, resource, object)
+	if err != nil {
+		return err
+	}
+	if len(notified) > 0 {
+		for k, v := range notified {
+			if resource.Move {
+				response.Moved[k] = v
+				continue
+			}
+			response.Copied[k] = v
+		}
+	}
+	return err
 }
 
-func (s *service) notifyAll(ctx context.Context, resource *config.Rule, objects []storage.Object) error {
+func (s *service) notifyAll(ctx context.Context, resource *config.Rule, objects []storage.Object, response *Response) error {
 	if len(objects) == 0 {
 		return nil
 	}
@@ -103,7 +116,7 @@ func (s *service) notifyAll(ctx context.Context, resource *config.Rule, objects 
 	for i := range objects {
 		go func(object storage.Object) {
 			defer waitGroup.Done()
-			errors <- s.notify(ctx, resource, object)
+			errors <- s.notify(ctx, resource, object, response)
 		}(objects[i])
 	}
 	for i := 0; i < len(objects); i++ {
@@ -114,18 +127,17 @@ func (s *service) notifyAll(ctx context.Context, resource *config.Rule, objects 
 	return nil
 }
 
-
 func (s *service) getResourceCandidates(ctx context.Context, resource *config.Rule) ([]storage.Object, error) {
 	var result = make([]storage.Object, 0)
-	options, err := s.secret.StorageOpts(ctx, &resource.Resource)
+	options, err := s.secret.StorageOpts(ctx, &resource.Source)
 	if err != nil {
 		return nil, err
 	}
 	options = s.addLastModifiedTimeMatcher(options)
-	return result, s.appendResources(ctx, resource.URL, &result, options)
+	return result, s.appendResources(ctx, resource.Source.URL, &result, &resource.Source.Basic, options)
 }
 
-func (s *service) appendResources(ctx context.Context, URL string, result *[]storage.Object, options []storage.Option) error {
+func (s *service) appendResources(ctx context.Context, URL string, result *[]storage.Object, filter *matcher.Basic, options []storage.Option) error {
 	objects, err := s.fs.List(ctx, URL, options...)
 	if err != nil {
 		return err
@@ -135,12 +147,16 @@ func (s *service) appendResources(ctx context.Context, URL string, result *[]sto
 			continue
 		}
 		if objects[i].IsDir() {
-			if err = s.appendResources(ctx, objects[i].URL(), result, options); err != nil {
+			if err = s.appendResources(ctx, objects[i].URL(), result, filter, options); err != nil {
 				return err
 			}
 			continue
 		}
-		*result = append(*result, objects[i])
+		_, URLPath := url.Base(objects[i].URL(), file.Scheme)
+		parent, _ := path.Split(URLPath)
+		if filter.Match(parent, objects[i]) {
+			*result = append(*result, objects[i])
+		}
 	}
 	return nil
 }
@@ -155,9 +171,10 @@ func (s *service) Init(ctx context.Context, fs afs.Service) error {
 	if s.config.SourceScheme == "" {
 		s.config.SourceScheme = url.Scheme(s.config.MetaURL, "")
 	}
+
 	switch s.config.SourceScheme {
 	case s3.Scheme:
-		s.dest, err = lambda.New()
+		s.dest, err = trigger.New(s.fs, s.secret)
 	case mem.Scheme: //testing only
 		s.dest = mem.New(fs)
 	default:
@@ -172,14 +189,13 @@ func (s *service) Init(ctx context.Context, fs afs.Service) error {
 	return err
 }
 
-
 func (s *service) UpdateSecrets(ctx context.Context) error {
 	if s.secret == nil {
 		return nil
 	}
 	resources := make([]*cfg.Resource, len(s.config.Resources.Rules))
 	for i := range s.config.Resources.Rules {
-		resources[i] = &s.config.Resources.Rules[i].Resource
+		resources[i] = &s.config.Resources.Rules[i].Source
 	}
 	return s.secret.Init(ctx, s.fs, resources)
 }

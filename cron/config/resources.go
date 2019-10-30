@@ -36,7 +36,7 @@ func (r *Ruleset) loadAndInit(ctx context.Context, fs afs.Service) (err error) {
 		return err
 	}
 	for i := range r.Rules {
-		r.Rules[i].Init(r.projectID)
+		r.Rules[i].Source.Init(r.projectID)
 	}
 	return nil
 }

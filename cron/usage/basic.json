@@ -9,7 +9,7 @@
     "Rules": [
       {
         "URL": "s3://externalBucket/data/2019/",
-        "DestFunction": "myLambdaFunction",
+        "Dest": "myLambdaFunction",
         "CustomKey": {
           "Parameter": "smirror.partnerX.customKey",
           "Key": "storagemirror"

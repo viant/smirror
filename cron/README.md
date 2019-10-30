@@ -18,7 +18,7 @@ no direct cloud event integration.
     "Rules": [
       {
         "URL": "s3://externalBucket/data/2019/",
-        "DestFunction": "myLambdaFunction",
+        "Dest": "myLambdaFunction",
         "CustomKey": {
           "Parameter": "smirror.partnerX.customKey",
           "Key": "storagemirror"
@@ -30,7 +30,7 @@ no direct cloud event integration.
 ```
 
 - **MetaURL** stores all process files. In example above all files with modified time within 2 * 720 sec
-- **Resources** baseURL for resource rules or list of resources rules with source base URL and DestFunction function
+- **Resources** baseURL for resource rules or list of resources rules with source base URL and Dest function
 - **CustomKey** kms key name and ssm parameters storing [AES256Key](../config/key.go) encrypted value.
 - **Credentials**  kms key name and ssm parameters storing encrypted credentials
 

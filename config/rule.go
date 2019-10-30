@@ -61,7 +61,7 @@ func (r *Rule) SourceCompression(URL string) (source *Compression) {
 		return source
 	}
 	hasDestCompression := dest != nil && source != nil
-	if (hasDestCompression && source.Equals(dest)) || ! hasDestCompression {
+	if (hasDestCompression && source.Equals(dest)) || !hasDestCompression {
 		return nil
 	}
 	return source

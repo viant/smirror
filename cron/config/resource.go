@@ -6,8 +6,7 @@ import (
 
 //Rule represents a cron resource
 type Rule struct {
-	config.Resource
-	Dest string
+	Source config.Resource
+	Dest   string
+	Move   bool `json:",omitempty"`
 }
-
-

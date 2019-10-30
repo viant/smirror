@@ -9,6 +9,7 @@ import (
 	"github.com/viant/afs/mem"
 	"github.com/viant/afs/storage"
 	"github.com/viant/assertly"
+	"github.com/viant/toolbox"
 	"io"
 	"io/ioutil"
 	"smirror/base"
@@ -20,11 +21,11 @@ import (
 )
 
 type serviceUseCase struct {
-	description     string
-	sourceURL       string
-	sourceContent   string
-	config          *Config
-	compress        bool
+	description   string
+	sourceURL     string
+	sourceContent string
+	config        *Config
+	compress      bool
 
 	expectResponse  interface{}
 	expectedURLs    map[string]int
@@ -37,7 +38,7 @@ func TestService_Mirror(t *testing.T) {
 
 		{
 			description: "compress unchanges",
-			compress:true,
+			compress:    true,
 			sourceURL:   "mem://localhost/folder/subfolder/file1.txt.gz",
 			sourceContent: `line1,
 line2,
@@ -71,7 +72,7 @@ line9
 			},
 			expectedURLs: map[string]int{
 				"mem://localhost/folder/subfolder/file1.txt.gz": 58,
-				"mem://localhost/data/file1.txt.gz":          58,
+				"mem://localhost/data/file1.txt.gz":             58,
 			},
 			expectResponse: `{
 	"DestURLs": [
@@ -80,7 +81,6 @@ line9
 	"Status": "ok"
 }`,
 		},
-
 
 		{
 			description: "compressed transfer",
@@ -276,7 +276,7 @@ line11
 					},
 				},
 			},
-			compress:true,
+			compress: true,
 			expectedURLs: map[string]int{
 				"mem://localhost/folder/subfolder/file1.txt": 77,
 				"mem://localhost/data/file1_00001.txt.gz":    62,
@@ -332,7 +332,7 @@ line11
 					},
 				},
 			},
-			compress:true,
+			compress: true,
 			expectedURLs: map[string]int{
 				"mem://localhost/folder/subfolder/file1.txt.gz": 64,
 				"mem://localhost/data/file1_00001.txt.gz":       62,
@@ -431,7 +431,6 @@ line4`,
 }`,
 		},
 
-
 		{
 			description: "seamless transfer",
 			sourceURL:   "mem://localhost/unzip/subfolder/file2.txt.gz",
@@ -448,7 +447,7 @@ line4`,
 
 								Basic: matcher.Basic{
 									Suffix: ".txt.gz",
-									Prefix:"/unzip/",
+									Prefix: "/unzip/",
 								},
 							},
 							Dest: &config.Resource{
@@ -467,9 +466,9 @@ line4`,
 				},
 			},
 			expectedURLs: map[string]int{
-				"mem://localhost/seamless/data/file2.txt.gz":      26,
+				"mem://localhost/seamless/data/file2.txt.gz":   26,
 				"mem://localhost/unzip/subfolder/file2.txt.gz": 0,
-				"mem://localhost/processed/file2.txt.gz":        26,
+				"mem://localhost/processed/file2.txt.gz":       26,
 			},
 			expectResponse: `{
 	"DestURLs": ["mem://localhost/seamless/data/file2.txt.gz"],
@@ -477,10 +476,9 @@ line4`,
 }`,
 		},
 
-
 		{
 			description: "root direction folder cut",
-			compress:true,
+			compress:    true,
 			sourceURL:   "mem://localhost/viant_dataflow_trigger/xxxxxxx/2019-10-06T00:00:00Z.gz",
 			sourceContent: `line1,
 line2,
@@ -514,7 +512,7 @@ line9
 			},
 			expectedURLs: map[string]int{
 				"mem://localhost/viant_dataflow_trigger/xxxxxxx/2019-10-06T00:00:00Z.gz": 58,
-				"mem://localhost/data/xxxxxxx/2019-10-06T00:00:00Z.gz":          58,
+				"mem://localhost/data/xxxxxxx/2019-10-06T00:00:00Z.gz":                   58,
 			},
 			expectResponse: `{
 	"DestURLs": [
@@ -523,7 +521,6 @@ line9
 	"Status": "ok"
 }`,
 		},
-
 	}
 
 	ctx := context.Background()
@@ -531,7 +528,6 @@ line9
 	for _, useCase := range useCases {
 		initUseCase(ctx, useCase, mgr, t)
 		service, err := New(ctx, useCase.config)
-
 		if useCase.hasServiceError {
 			assert.NotNil(t, err, useCase.description)
 			continue
@@ -539,14 +535,15 @@ line9
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
+
 		response := service.Mirror(ctx, &contract.Request{URL: useCase.sourceURL})
 		if !assertly.AssertValues(t, useCase.expectResponse, response, useCase.description) {
+			toolbox.DumpIndent(response, true)
 
 		}
 		if len(useCase.expectedURLs) == 0 {
 			continue
 		}
-
 
 		for URL, expectedSize := range useCase.expectedURLs {
 			reader, err := mgr.DownloadWithURL(ctx, URL)
@@ -560,7 +557,7 @@ line9
 			}
 			data, err := ioutil.ReadAll(reader)
 			assert.Nil(t, err, useCase.description)
-			assert.Equal(t, expectedSize, len(data), useCase.description + " on " + URL)
+			assert.Equal(t, expectedSize, len(data), useCase.description+" on "+URL)
 		}
 	}
 

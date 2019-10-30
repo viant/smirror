@@ -3,8 +3,8 @@ package secret
 import (
 	"context"
 	"encoding/json"
-	"github.com/pkg/errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/option"
@@ -120,7 +120,7 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 	var err error
 	scheme := url.Scheme(resource.URL, file.Scheme)
 	if resource.Credentials != nil && len(resource.Credentials.Auth) > 0 {
-		if ! json.Valid(resource.Credentials.Auth) {
+		if !json.Valid(resource.Credentials.Auth) {
 			return nil, errors.Errorf("invalid credentials format, expected JSON but had: %s", resource.Credentials.Auth)
 		}
 		var authOpt interface{}

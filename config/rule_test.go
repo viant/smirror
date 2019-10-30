@@ -93,7 +93,7 @@ func TestRoute_HasMatch(t *testing.T) {
 			description: "filter bucket match",
 			Rule: Rule{
 				Source: &Resource{
-					Bucket:"xxx-billing",
+					Bucket: "xxx-billing",
 					Basic: matcher.Basic{
 						Suffix: ".zip",
 						Prefix: `/yyyy-aws-billing-detailed-line-items-with-resources-and-tags-`,
@@ -153,7 +153,7 @@ func TestRoute_Name(t *testing.T) {
 			description: "gzip compression",
 			Rule: Rule{
 				PreserveDepth: base.IntPtr(0),
-				Compression: &Compression{Codec: GZipCodec},
+				Compression:   &Compression{Codec: GZipCodec},
 			},
 			URL:    "s3://myducket/folder/sub/asset1.txt",
 			expect: "asset1.txt.gz",

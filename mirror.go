@@ -62,7 +62,7 @@ func proxy(ctx context.Context, destination string, evnt event.StorageEvent) (*c
 	isMove := os.Getenv(base.ProxyMethod) == base.ProxyMethodMove
 	err := base.Trigger(ctx, fs, isMove, evnt.URL(), evnt.ProxyDestURL(destBucket), response.Triggered)
 	if err != nil {
-		if exists, e := fs.Exists(ctx, evnt.URL()); e == nil && ! exists {
+		if exists, e := fs.Exists(ctx, evnt.URL()); e == nil && !exists {
 			response.Status = base.StatusNoFound
 			response.Error = ""
 			response.NotFoundError = err.Error()
@@ -72,7 +72,6 @@ func proxy(ctx context.Context, destination string, evnt event.StorageEvent) (*c
 	}
 	return response, err
 }
-
 
 func storageMirror(ctx context.Context, event event.StorageEvent) (response *contract.Response, err error) {
 	destination := os.Getenv(base.DestEnvKey)

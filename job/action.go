@@ -44,8 +44,6 @@ func (a Action) WriteError(context *Context, service afs.Service) error {
 	return service.Upload(context.Context, moveURL, file.DefaultFileOsMode, strings.NewReader(context.Error.Error()))
 }
 
-
-
 //Do perform an action
 func (a Action) Do(context *Context, service afs.Service, notify Notify, info *base.Info, response interface{}) (err error) {
 	URL := context.SourceURL

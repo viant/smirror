@@ -20,14 +20,14 @@ type service struct {
 }
 
 //Trigger triggers lambda execution
-func (s *service) Trigger(ctx context.Context, resource *config.Rule, eventSource storage.Object) error {
+func (s *service) Trigger(ctx context.Context, resource *config.Rule, eventSource storage.Object) (map[string]string, error) {
 	URL := fmt.Sprintf("%v://localhost/%v", mem.Scheme, resource.Dest)
 	event := Event{URL: eventSource.URL(), Size: eventSource.Size()}
 	payload, err := json.Marshal(event)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return s.Upload(ctx, URL, 0644, bytes.NewReader(payload))
+	return nil, s.Upload(ctx, URL, 0644, bytes.NewReader(payload))
 }
 
 //New creates a new memory trigger destination

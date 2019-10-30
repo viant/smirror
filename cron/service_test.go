@@ -12,6 +12,7 @@ import (
 	"github.com/viant/afs/url"
 	"github.com/viant/assertly"
 	"os"
+	"smirror/base"
 	"smirror/cron/meta"
 	"testing"
 	"time"
@@ -40,7 +41,9 @@ func TestService_Tick(t *testing.T) {
   "Resources": {	
 	  "Rules": [
 		{
-		  "URL": "mem://localhost/case001/",
+          "Source": {
+		  	  "URL": "mem://localhost/case001/"
+          },
 		  "Dest": "func1"
 		}
 	  ]
@@ -73,11 +76,11 @@ func TestService_Tick(t *testing.T) {
 			continue
 		}
 		response := service.Tick(ctx)
-		if !assert.Nil(t, response.Error != "", useCase.description) {
+
+		if !assert.Equal(t, base.StatusOK, response.Status, useCase.description+" "+response.Error) {
 			continue
 		}
-
-		if !assert.Nil(t, err, useCase.description) {
+		if !assert.Equal(t, 1, len(response.Matched), useCase.description) {
 			continue
 		}
 		actual, err := loadMeta(ctx, fs, useCase.config.MetaURL)
@@ -90,10 +93,9 @@ func TestService_Tick(t *testing.T) {
 		_ = fs.Delete(ctx, funcURL)
 
 		response = service.Tick(ctx)
-		if !assert.Nil(t, response.Error != "", useCase.description) {
+		if !assert.Equal(t, 0, len(response.Matched), useCase.description) {
 			continue
 		}
-
 		exists, _ = fs.Exists(ctx, funcURL)
 		//make sure that function is triggered only once
 		assert.False(t, exists, useCase.description)

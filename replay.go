@@ -39,7 +39,7 @@ func replayUnprocessed(writer http.ResponseWriter, httpRequest *http.Request) (e
 	}
 	service := replay.Singleton()
 	response := service.Replay(context.Background(), request)
-	if data, err := json.Marshal(response);err == nil {
+	if data, err := json.Marshal(response); err == nil {
 		fmt.Printf("%s\n", data)
 	}
 	if err = json.NewEncoder(writer).Encode(response); err != nil {
