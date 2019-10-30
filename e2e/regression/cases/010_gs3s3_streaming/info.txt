@@ -1,1 +1,1 @@
-s3://${s3TriggerBucket}/data/p9/* to gs
+gs://${s3TriggerBucket}/data/p10/* to s3
