@@ -6,31 +6,45 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"log"
-	"os"
-	"smirror/aws/proxy"
+	"github.com/pkg/errors"
+	"smirror/event"
+	"smirror/proxy"
 )
 
-const DestEnvKey = "DEST"
+var config *proxy.Config
 
 func handleMessages(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
-	dest := os.Getenv(DestEnvKey)
-	if dest == "" {
-		log.Print("env.%v key was empty", DestEnvKey)
-	}
 	if len(sqsEvent.Records) == 0 {
-		return err
+		return nil
 	}
-
-	proxier, err := proxy.Singleton()
-	if err != nil {
-		return err
+	if config == nil {
+		config, err = proxy.NewConfig(ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to create config")
+		}
 	}
-
+	proxier := proxy.Singleton(config)
 	for _, record := range sqsEvent.Records {
-		response := proxier.Do(ctx, dest, []byte(record.Body))
-		if data, err := json.Marshal(response); err == nil {
-			fmt.Printf("%v\n", string(data))
+		s3Event, err := event.NewS3EventFromJSON([]byte(record.Body))
+		if err != nil {
+			return errors.Wrapf(err, "unable unmarshal s3 event from %s", record.Body)
+		}
+		err = s3Event.Each(func(URL string) error {
+			response := proxier.Proxy(ctx, &proxy.Request{
+				Source: config.Source.CloneWithURL(URL),
+				Dest:   &config.Dest,
+				Move:   config.Move,
+			})
+			if data, err := json.Marshal(response); err == nil {
+				fmt.Printf("%v\n", string(data))
+			}
+			if response.Error != "" {
+				return errors.New(response.Error)
+			}
+			return nil
+		})
+		if err != nil {
+			return err
 		}
 	}
 	return err

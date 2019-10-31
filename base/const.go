@@ -39,4 +39,11 @@ const (
 
 	//App
 	App = "StorageMirror"
+
+	//LambdaScheme represents lambda schem
+	LambdaScheme = "lambda"
+
+	//CloudFunctionScheme represents clud function scheme
+	CloudFunctionScheme = "cloudfunction"
+
 )

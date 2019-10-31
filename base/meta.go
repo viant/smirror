@@ -2,6 +2,7 @@ package base
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/storage"
@@ -57,7 +58,7 @@ func (m *Meta) HasChanged(ctx context.Context, fs afs.Service) (bool, error) {
 	}
 	routes, err := fs.List(ctx, m.baseURL, basicMatcher.Match)
 	if err != nil {
-		return false, err
+		return false, errors.Wrapf(err, "failed to load rules %v", m.baseURL)
 	}
 	if !m.hasChanges(routes) {
 		return false, nil

@@ -1,4 +1,4 @@
-package cron
+package proxy
 
 import (
 	"context"
@@ -8,26 +8,38 @@ import (
 	"github.com/viant/toolbox"
 	"os"
 	"smirror/base"
-	"smirror/cron/config"
+	"smirror/config"
 	"strings"
 )
 
-//Config represents cron config
+//Config represents proxy config
 type Config struct {
 	base.Config
-	MetaURL    string
-	TimeWindow config.TimeWindow
-	Resources  config.Ruleset
+	Dest   config.Resource
+	Source config.Resource
+	Move   bool
 }
 
-//Init initialises routes
-func (c *Config) Init(ctx context.Context, fs afs.Service) error {
-	c.Config.Init()
-	c.TimeWindow.Init()
-	if err := c.TimeWindow.Validate(); err != nil {
-		return err
+//Validate checks if config is valid
+func (c *Config) Validate() error {
+	c.Init()
+	if  c.Dest.URL == "" {
+		return errors.Errorf("dest.url was empty")
 	}
-	return c.Resources.Init(ctx, fs, c.ProjectID)
+	return nil
+}
+
+//NewConfig creates a config
+func NewConfig(ctx context.Context) (*Config, error) {
+	if os.Getenv(base.ConfigEnvKey) != "" {
+		return NewConfigFromEnv(ctx, base.ConfigEnvKey)
+	}
+	cfg := &Config{
+		Dest: config.Resource{
+			URL: os.Getenv(base.DestEnvKey),
+		},
+	}
+	return cfg, cfg.Validate()
 }
 
 //NewConfigFromEnv returns new config from env
@@ -44,9 +56,8 @@ func NewConfigFromJSON(ctx context.Context, payload string) (*Config, error) {
 	cfg := &Config{}
 	err := json.NewDecoder(strings.NewReader(payload)).Decode(cfg)
 	if err == nil {
-		err = cfg.Init(ctx, afs.New())
+		err = cfg.Validate()
 	}
-
 	return cfg, err
 }
 
@@ -55,12 +66,13 @@ func NewConfigFromURL(ctx context.Context, URL string) (*Config, error) {
 	service := afs.New()
 	reader, err := service.DownloadWithURL(ctx, URL)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to download config: %v", URL)
+		return nil, errors.Wrapf(err, "failed to download: %v", URL)
 	}
 	cfg := &Config{}
 	err = json.NewDecoder(reader).Decode(cfg)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode config: %v ", URL)
+		return nil, errors.Wrapf(err, "failed to decode: %v ", URL)
 	}
-	return cfg, cfg.Init(ctx, afs.New())
+	err = cfg.Validate()
+	return cfg, err
 }

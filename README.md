@@ -168,7 +168,6 @@ Typical rule defines the following matching Source and mirror destination which 
 
 **Source settings:**
 
-- **Source.Bucket**: optional matching bucket
 - **Source.Prefix**: optional matching prefix
 - **Source.Suffix**: optional matching suffix
 - **Source.Filter**: optional regexp matching filter

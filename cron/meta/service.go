@@ -33,7 +33,7 @@ func (s *service) loadState(ctx context.Context) (*State, error) {
 	}
 	reader, err := s.DownloadWithURL(ctx, s.metaURL)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to load meta file: %v", s.metaURL)
 	}
 	err = json.NewDecoder(reader).Decode(state)
 	return state, err

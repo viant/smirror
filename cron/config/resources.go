@@ -37,9 +37,11 @@ func (r *Ruleset) loadAndInit(ctx context.Context, fs afs.Service) (err error) {
 	}
 	for i := range r.Rules {
 		r.Rules[i].Source.Init(r.projectID)
+		r.Rules[i].Dest.Init(r.projectID)
 	}
 	return nil
 }
+
 
 func (r *Ruleset) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, error) {
 	changed, err := r.meta.HasChanged(ctx, fs)
@@ -48,6 +50,8 @@ func (r *Ruleset) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, err
 	}
 	return true, r.loadAndInit(ctx, fs)
 }
+
+
 
 func (r *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 	if r.BaseURL == "" {

@@ -6,7 +6,9 @@ no direct cloud event integration.
 
 # Configuration
 
-[@config.json](usage/basic.json)
+**Config:**
+
+[@rule.json](usage/config.json)
 ```json
 {
   "MetaURL": "s3://myopsBucket/smirror/cron/meta.json",
@@ -14,19 +16,32 @@ no direct cloud event integration.
     "DurationInSec": 720
   },
   "Resources": {
-    "BaseURL": "s3://myopsBucket/smirror/cron/rules",
-    "Rules": [
-      {
-        "URL": "s3://externalBucket/data/2019/",
-        "Dest": "myLambdaFunction",
-        "CustomKey": {
-          "Parameter": "smirror.partnerX.customKey",
-          "Key": "storagemirror"
-        }
-      }
-    ]
+    "CheckInMs": 60000,
+    "BaseURL": "s3://myopsBucket/smirror/cron/rules"
   }
 }
+
+```
+
+**Resource Rule:**
+
+[@rule.json](usage/rule.json)
+```json
+[
+  {
+    "Source": {
+      "URL": "s3://externalBucket/data/2019/",
+      "Suffix": ".zip",
+      "CustomKey": {
+        "Parameter": "smirror.partnerX.customKey",
+        "Key": "storagemirror"
+      }
+    },
+    "Dest": {
+      "URL": "s3://triggerBucket/data/2019/"
+    }
+  }
+]
 ```
 
 - **MetaURL** stores all process files. In example above all files with modified time within 2 * 720 sec

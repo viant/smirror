@@ -1,0 +1,10 @@
+{
+  "MetaURL": "s3://myopsBucket/smirror/cron/meta.json",
+  "TimeWindow": {
+    "DurationInSec": 720
+  },
+  "Resources": {
+    "CheckInMs": 60000,
+    "BaseURL": "s3://myopsBucket/smirror/cron/rules"
+  }
+}

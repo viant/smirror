@@ -47,7 +47,6 @@ func (r *Resource) Init(projectID string) {
 			r.Topic = fmt.Sprintf("projects/%s/topics/%s", r.ProjectID, r.Topic)
 		}
 	}
-
 	if r.ProjectID == "" {
 		if elements := strings.Split(r.Topic, ""); len(elements) == 4 {
 			r.ProjectID = elements[1]

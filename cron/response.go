@@ -2,17 +2,15 @@ package cron
 
 import (
 	"github.com/viant/afs/storage"
-	"smirror/base"
 	"smirror/cron/config"
+	"smirror/proxy"
 )
 
 //Response represents schedule response
 type Response struct {
+	*proxy.Response
 	Matched []*Matched        `json:",omitempty"`
-	Copied  map[string]string `json:",omitempty"`
-	Moved   map[string]string `json:",omitempty"`
-	Status  string            `json:",omitempty"`
-	Error   string            `json:",omitempty"`
+
 }
 
 type Matched struct {
@@ -27,11 +25,10 @@ func (m *Matched) Add(objects ...storage.Object) {
 }
 
 //NewResponse create a response
-func NewResponse() *Response {
+func NewResponse(baseResponse *proxy.Response) *Response {
 	return &Response{
-		Status:  base.StatusOK,
+		Response: baseResponse,
 		Matched: make([]*Matched, 0),
-		Copied:  make(map[string]string),
-		Moved:   make(map[string]string),
+
 	}
 }

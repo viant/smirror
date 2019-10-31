@@ -3,7 +3,6 @@ package cron
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/afs"
 	"github.com/viant/afs/asset"
@@ -14,6 +13,7 @@ import (
 	"os"
 	"smirror/base"
 	"smirror/cron/meta"
+	"strings"
 	"testing"
 	"time"
 )
@@ -44,7 +44,9 @@ func TestService_Tick(t *testing.T) {
           "Source": {
 		  	  "URL": "mem://localhost/case001/"
           },
-		  "Dest": "func1"
+		  "Dest": {
+  			  "URL": "mem://localhost/"
+          }
 		}
 	  ]
   }
@@ -86,22 +88,22 @@ func TestService_Tick(t *testing.T) {
 		actual, err := loadMeta(ctx, fs, useCase.config.MetaURL)
 		assertly.AssertValues(t, useCase.expect, actual, useCase.description)
 
-		funcURL := fmt.Sprintf("mem://localhost/%v", useCase.config.Resources.Rules[0].Dest)
 
-		exists, _ := fs.Exists(ctx, funcURL)
-		assert.True(t, exists)
-		_ = fs.Delete(ctx, funcURL)
+		for i := range resources {
 
+			sourceURL := url.Join(useCase.baseURL, resources[i].Name)
+			basePath := strings.Replace(sourceURL, "mem://", "", 1)
+			destURL := url.Join(useCase.config.Resources.Rules[0].Dest.URL, basePath)
+			exists, _ := fs.Exists(ctx, destURL)
+			assert.True(t, exists)
+			_ = fs.Delete(ctx, destURL)
+
+		}
 		response = service.Tick(ctx)
 		if !assert.Equal(t, 0, len(response.Matched), useCase.description) {
 			continue
 		}
-		exists, _ = fs.Exists(ctx, funcURL)
-		//make sure that function is triggered only once
-		assert.False(t, exists, useCase.description)
-
 	}
-
 }
 
 func loadMeta(ctx context.Context, fs afs.Service, URL string) (*meta.State, error) {

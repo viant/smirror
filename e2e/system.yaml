@@ -8,7 +8,7 @@ init:
   mirrorS3Config: $Cat(config/s3.json)
   mirrorS3ConfigJSON: $AsJSON($mirrorS3Config)
 
-  mirrorS3CronConfig: $Cat(config/s3Cron.json)
+  mirrorS3CronConfig: $Cat(config/s3cron.json)
   mirrorS3CronConfigJSON: $AsJSON($mirrorS3CronConfig)
 
 

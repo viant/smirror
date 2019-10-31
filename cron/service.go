@@ -2,20 +2,18 @@ package cron
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/storage"
 	"github.com/viant/afs/url"
-	"github.com/viant/afsc/s3"
 	"path"
 	"smirror/base"
 	cfg "smirror/config"
 	"smirror/cron/config"
 	"smirror/cron/meta"
-	"smirror/cron/trigger"
-	"smirror/cron/trigger/mem"
+	"smirror/proxy"
 	"smirror/secret"
 	"sync"
 	"time"
@@ -29,14 +27,14 @@ type Service interface {
 type service struct {
 	config      *Config
 	fs          afs.Service
-	dest        trigger.Service
+	proxy       proxy.Service
 	secret      secret.Service
 	metaService meta.Service
 }
 
 //Tick run cron service
 func (s *service) Tick(ctx context.Context) *Response {
-	response := NewResponse()
+	response := NewResponse(proxy.NewResponse())
 	err := s.tick(ctx, response)
 	if err != nil {
 		response.Status = base.StatusError
@@ -89,21 +87,22 @@ func (s *service) processResource(ctx context.Context, resource *config.Rule, re
 	return pending, s.metaService.AddProcessed(ctx, pending)
 }
 
-func (s *service) notify(ctx context.Context, resource *config.Rule, object storage.Object, response *Response) error {
-	notified, err := s.dest.Trigger(ctx, resource, object)
-	if err != nil {
-		return err
+func (s *service) notify(ctx context.Context, rule *config.Rule, object storage.Object, response *Response) error {
+	proxyResponse := s.proxy.Proxy(ctx, &proxy.Request{
+		Source: rule.Source.CloneWithURL(object.URL()),
+		Dest:   &rule.Dest,
+		Move:   rule.Move,
+	})
+	if proxyResponse.Error != "" {
+		return errors.New(proxyResponse.Error)
 	}
-	if len(notified) > 0 {
-		for k, v := range notified {
-			if resource.Move {
-				response.Moved[k] = v
-				continue
-			}
-			response.Copied[k] = v
-		}
+	for k, v := range proxyResponse.Moved {
+		response.AddMoved(k, v)
 	}
-	return err
+	for k, v := range proxyResponse.Copied {
+		response.AddCopied(k, v)
+	}
+	return nil
 }
 
 func (s *service) notifyAll(ctx context.Context, resource *config.Rule, objects []storage.Object, response *Response) error {
@@ -112,15 +111,15 @@ func (s *service) notifyAll(ctx context.Context, resource *config.Rule, objects 
 	}
 	waitGroup := &sync.WaitGroup{}
 	waitGroup.Add(len(objects))
-	var errors = make(chan error, len(objects))
+	var errorChannel = make(chan error, len(objects))
 	for i := range objects {
 		go func(object storage.Object) {
 			defer waitGroup.Done()
-			errors <- s.notify(ctx, resource, object, response)
+			errorChannel <- s.notify(ctx, resource, object, response)
 		}(objects[i])
 	}
 	for i := 0; i < len(objects); i++ {
-		if err := <-errors; err != nil {
+		if err := <-errorChannel; err != nil {
 			return err
 		}
 	}
@@ -171,18 +170,7 @@ func (s *service) Init(ctx context.Context, fs afs.Service) error {
 	if s.config.SourceScheme == "" {
 		s.config.SourceScheme = url.Scheme(s.config.MetaURL, "")
 	}
-
-	switch s.config.SourceScheme {
-	case s3.Scheme:
-		s.dest, err = trigger.New(s.fs, s.secret)
-	case mem.Scheme: //testing only
-		s.dest = mem.New(fs)
-	default:
-		err = fmt.Errorf("unsupported source scheme: %v", s.config.SourceScheme)
-	}
-	if err != nil {
-		return err
-	}
+	s.proxy = proxy.New(s.fs, s.secret)
 	if err = s.config.Init(ctx, fs); err == nil {
 		err = s.UpdateSecrets(ctx)
 	}

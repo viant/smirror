@@ -9,7 +9,7 @@ Mirror suffixed *.csv data from gs://${gsExternalBucket}/data/p1 to gs://${gsTri
 
 Configuration:
 
-* Global Config: [@config,json](../../../config/s3Cron.json)
+* Global Config: [@config,json](../../../config/s3cron.json)
 
 * Rule:  [@cron,json](cron.json)
 

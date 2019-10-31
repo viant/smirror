@@ -1,0 +1,15 @@
+[
+  {
+    "Source": {
+      "URL": "s3://externalBucket/data/2019/",
+      "Suffix": ".zip",
+      "CustomKey": {
+        "Parameter": "smirror.partnerX.customKey",
+        "Key": "storagemirror"
+      }
+    },
+    "Dest": {
+      "URL": "s3://triggerBucket/data/2019/"
+    }
+  }
+]
