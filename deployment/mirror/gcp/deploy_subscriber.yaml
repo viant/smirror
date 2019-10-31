@@ -20,6 +20,7 @@ init:
   configText: $Cat('$configLocation')
 
 
+
 pipeline:
 
 
@@ -49,7 +50,7 @@ pipeline:
       '@name': $functionName
       entryPoint: $functionName
       runtime: go111
-      availableMemoryMb: 2048
+      availableMemoryMb: 128
       timeout: 540s
       serviceAccountEmail: $serviceAccount
       retry: true
@@ -59,7 +60,6 @@ pipeline:
       environmentVariables:
         LOGGING: 'true'
         DEST: gs://${triggerBucket}/
-        #CONFIG: gs://${configBucket}/StorageMirror/config.json
       source:
         URL: ${appPath}/
       sleepTimeMs: 5000
