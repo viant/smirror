@@ -9,6 +9,7 @@
   },
   "Streaming": {
     "PartSizeMb": 5,
-    "ThresholdMb": 10
+    "ThresholdMb": 10,
+    "ChecksumSkipThresholdMb": 10
   }
 }

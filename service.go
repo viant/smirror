@@ -84,9 +84,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	if err := s.initRule(ctx, rule); err != nil {
 		return errors.Wrapf(err, "railed to initialise rule: %v", rule.Info.Workflow)
 	}
-
 	response.Rule = rule
-
 	options, err := s.secret.StorageOpts(ctx, rule.Source.CloneWithURL(request.URL))
 	if err != nil {
 		return err
