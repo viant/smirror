@@ -1,15 +1,11 @@
 [
   {
     "Source": {
-      "Prefix": "/data/p7",
-      "Suffix": ".csv",
-      "CustomKey": {
-        "Parameter": "storagemirror.customer001CustomKey",
-        "Key": "alias/storagemirror"
-      }
+      "Prefix": "/${s3ExternalBucket}/",
+      "Suffix": ".csv"
     },
     "Dest": {
-      "URL": "gs://${gsDestBucket}/data",
+      "URL": "gs://${gsDestBucket}/",
       "Credentials": {
         "Parameter": "storagemirror.gcp",
         "Key": "alias/storagemirror"
@@ -26,7 +22,6 @@
         "URL": "s3:///${s3OpsBucket}/StorageMirror/Errors/"
       }
     ],
-    "PreserveDepth": 1
+    "PreserveDepth": -1
   }
-
 ]

@@ -1,7 +1,7 @@
 init:
   fnAppPath: $Pwd(..)
   mirrorAppZip: $Pwd(../aws/smirror.zip)
-  mirrorCronZip: $Pwd(../cron/aws/smirrorcron.zip)
+  mirrorCronZip: $Pwd(../aws/cron/smirrorcron.zip)
   mirrorSqsZip: $Pwd(../aws/sqs/smirrorsqs.zip)
   functionName: StorageMirror
   privilegePolicy: privilege-policy.json
@@ -24,12 +24,15 @@ pipeline:
       - cd aws
       - go build smirror.go
       - zip -j smirror.zip smirror
-      - cd ../cron/aws
+      - cd ../aws/cron
       - go build -o smirrorcron
       - zip -j smirrorcron.zip smirrorcron
       - cd ../../aws/sqs
       - go build -o smirrorsqs
       - zip -j smirrorsqs.zip smirrorsqs
+      - cd ../../aws/sns
+      - go build -o smirrorsns
+      - zip -j smirrorsns.zip smirrorsns
 
 
   deployCludFunction:

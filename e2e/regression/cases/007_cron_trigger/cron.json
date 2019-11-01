@@ -1,14 +1,14 @@
 [
   {
     "Source": {
-      "URL": "s3://${s3ExternalBucket}/data/p7"
-    },
+      "URL": "s3://${s3ExternalBucket}/data/p7",
+      "CustomKey": {
+        "Parameter": "storagemirror.customer001CustomKey",
+        "Key": "alias/storagemirror"
+      }
+      },
     "Dest": {
-      "URL": "lambda://StorageMirror"
-    },
-    "CustomKey": {
-      "Parameter": "storagemirror.customer001CustomKey",
-      "Key": "alias/storagemirror"
+      "URL": "s3://${s3TriggerBucket}"
     }
   }
 ]

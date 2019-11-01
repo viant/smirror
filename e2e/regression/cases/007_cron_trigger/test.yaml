@@ -19,6 +19,12 @@ pipeline:
       URL: s3://${s3ConfigBucket}/StorageMirrorCron/Rules/case_${parent.index}.json
 
 
+  cleanup:
+    action: storage:remove
+    assets:
+      - URL: gs://${gsDestBucket}/data/p7/events.csv
+        credentials: $gcpCredentials
+
   trigger:
     action: storage:copy
     sleepTimeMs: 70000
