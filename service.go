@@ -249,7 +249,7 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 		return err
 	}
 	if transfer.skipChecksum {
-		options = append(options, option.NewChecksum(true))
+		options = append(options, option.NewSkipChecksum(true))
 	}
 	if err = s.fs.Upload(ctx, transfer.Dest.URL, file.DefaultFileOsMode, reader, options...); err != nil {
 		return errors.Wrapf(err, "failed to upload %v", transfer.Dest.URL)
