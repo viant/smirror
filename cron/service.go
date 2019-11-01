@@ -2,7 +2,7 @@ package cron
 
 import (
 	"context"
-	"errors"
+	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/matcher"
@@ -57,7 +57,6 @@ func (s *service) tick(ctx context.Context, response *Response) error {
 		if err != nil {
 			return err
 		}
-
 		if len(processed) > 0 {
 			matched = append(matched, processed...)
 			matched := &Matched{
@@ -74,18 +73,25 @@ func (s *service) tick(ctx context.Context, response *Response) error {
 func (s *service) processResource(ctx context.Context, resource *config.Rule, response *Response) ([]storage.Object, error) {
 	objects, err := s.getResourceCandidates(ctx, resource)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to get resource candidate %v", resource.Source.URL)
 	}
 	pending, err := s.metaService.PendingResources(ctx, objects)
 	if err != nil || len(pending) == 0 {
+		if err != nil {
+			err = errors.Wrapf(err, "failed to read pending resource %v", len(objects))
+		}
 		return nil, err
 	}
-
 	if err = s.notifyAll(ctx, resource, pending, response); err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to notify all")
 	}
-	return pending, s.metaService.AddProcessed(ctx, pending)
+	err = s.metaService.AddProcessed(ctx, pending)
+	if err != nil {
+		err = errors.Wrapf(err, "failed to update processed")
+	}
+	return pending, err
 }
+
 
 func (s *service) notify(ctx context.Context, rule *config.Rule, object storage.Object, response *Response) error {
 	proxyResponse := s.proxy.Proxy(ctx, &proxy.Request{
@@ -101,6 +107,9 @@ func (s *service) notify(ctx context.Context, rule *config.Rule, object storage.
 	}
 	for k, v := range proxyResponse.Copied {
 		response.AddCopied(k, v)
+	}
+	for k, v := range proxyResponse.Invoked {
+		response.AddInvoked(k, v)
 	}
 	return nil
 }
@@ -181,9 +190,10 @@ func (s *service) UpdateSecrets(ctx context.Context) error {
 	if s.secret == nil {
 		return nil
 	}
-	resources := make([]*cfg.Resource, len(s.config.Resources.Rules))
+	resources := make([]*cfg.Resource, 0)
 	for i := range s.config.Resources.Rules {
-		resources[i] = &s.config.Resources.Rules[i].Source
+		resources = append(resources, &s.config.Resources.Rules[i].Source)
+		resources = append(resources, &s.config.Resources.Rules[i].Dest)
 	}
 	return s.secret.Init(ctx, s.fs, resources)
 }

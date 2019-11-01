@@ -40,6 +40,7 @@ func (s *service) Proxy(ctx context.Context, request *Request) *Response {
 	return respose
 }
 
+
 //Trigger triggers lambda execution
 func (s *service) proxy(ctx context.Context, request *Request, response *Response) error {
 	if err := request.Validate(); err != nil {
@@ -70,19 +71,22 @@ func (s *service) proxy(ctx context.Context, request *Request, response *Respons
 		destOptions = make([]storage.Option, 0)
 	}
 	if len(sourceOptions) > 0 {
-		destOptions = append(destOptions, option.NewAuth(true))
+		if _, ok:=sourceOptions[0].(*option.AES256Key); !ok || len(sourceOptions) > 1 {
+			destOptions = append(destOptions, option.NewAuth(true))
+		}
 		options = append(options, option.NewSource(sourceOptions...))
 	}
 	if len(destOptions) > 0 {
 		options = append(options, option.NewDest(destOptions...))
 	}
+
 	if request.Stream {
 		object, err := s.fs.Object(ctx, request.Source.URL, sourceOptions...)
 		if err != nil {
 			return errors.Wrapf(err, "source not found: %v", request.Source.URL)
 		}
 		sourceOptions = append(sourceOptions, option.NewStream(partSize, int(object.Size())))
-		destOptions = append(destOptions, option.NewChecksum(true))
+		destOptions = append(destOptions, option.NewSkipChecksum(true))
 	}
 	sourceBucket := url.Host(request.Source.URL)
 	_, sourcePath := url.Base(request.Source.URL, "")

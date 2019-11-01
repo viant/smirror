@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/viant/afsc/s3"
+	"github.com/viant/afsc/logger"
 	"smirror/base"
 	"smirror/cron"
 )
+
+
 
 func main() {
 	defer func() {
@@ -22,9 +24,9 @@ func main() {
 
 
 func handleRequest(ctx context.Context) (*cron.Response, error) {
-	if base.IsLoggingEnabled() {
-		s3.Logf = s3.StdoutLogger
-	}
+	//if base.IsLoggingEnabled() {
+		logger.Logf = logger.StdoutLogger
+	//}
 	service, err := cron.NewFromEnv(ctx, base.ConfigEnvKey)
 	if err != nil {
 		return nil, err

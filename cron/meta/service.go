@@ -43,9 +43,13 @@ func (s *service) storeState(ctx context.Context, state *State) error {
 	buffer := new(bytes.Buffer)
 	err := json.NewEncoder(buffer).Encode(state)
 	if err != nil {
-		return err
+		err = errors.Wrapf(err, "failed to encode meta: %v with %v", s.metaURL, state)
 	}
-	return s.Upload(ctx, s.metaURL, 0644, buffer)
+	err = s.Upload(ctx, s.metaURL, 0644, buffer)
+	if err != nil {
+		err = errors.Wrapf(err, "failed to upload meta: %v", s.metaURL)
+	}
+	return err
 }
 
 //PendingResources filters pending resources for supplied candidate with processed resources

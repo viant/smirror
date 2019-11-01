@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/matcher"
@@ -42,7 +43,6 @@ func (r *Ruleset) loadAndInit(ctx context.Context, fs afs.Service) (err error) {
 	return nil
 }
 
-
 func (r *Ruleset) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, error) {
 	changed, err := r.meta.HasChanged(ctx, fs)
 	if err != nil || !changed {
@@ -50,8 +50,6 @@ func (r *Ruleset) ReloadIfNeeded(ctx context.Context, fs afs.Service) (bool, err
 	}
 	return true, r.loadAndInit(ctx, fs)
 }
-
-
 
 func (r *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 	if r.BaseURL == "" {
@@ -91,6 +89,14 @@ func (r *Ruleset) loadResources(ctx context.Context, storage afs.Service, object
 	err = json.NewDecoder(reader).Decode(&resources)
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
+	}
+	for i:= range resources {
+		if resources[i].Source.URL == "" {
+			return fmt.Errorf("source.url was empty: %v", object.URL())
+		}
+		if resources[i].Dest.URL == "" {
+			return fmt.Errorf("dest.url was empty: %v", object.URL())
+		}
 	}
 	r.Rules = append(r.Rules, resources...)
 	return err

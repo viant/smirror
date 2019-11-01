@@ -27,6 +27,9 @@ func (c *Config) Init(ctx context.Context, fs afs.Service) error {
 	if err := c.TimeWindow.Validate(); err != nil {
 		return err
 	}
+	if c.MetaURL == "" {
+		return errors.New("metaURL was empty")
+	}
 	return c.Resources.Init(ctx, fs, c.ProjectID)
 }
 

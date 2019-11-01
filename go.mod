@@ -10,8 +10,8 @@ require (
 	github.com/nlopes/slack v0.6.0
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.3.0
-	github.com/viant/afs v0.6.1
-	github.com/viant/afsc v0.6.4
+	github.com/viant/afs v0.7.0
+	github.com/viant/afsc v0.7.0
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.28.0
 	google.golang.org/api v0.7.0
