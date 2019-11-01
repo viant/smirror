@@ -6,16 +6,21 @@ init:
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
   prefix: $Replace($gcpProject,'_','-')
-
+  configLocation: config/proxy.json
+  configText: $Cat('$configLocation')
   handler: smirrorsqs
   appPath: /tmp/${handler}
   appLocation: ${appPath}/aws/sqs/${handler}.zip
   functionName: StorageMirrorSqs
   privilegePolicy: privilege-policy.json
-  triggerBucket: ${prefix}-sqs-trigger
-  destBucket: s3://${prefix}-trigger
+  snsTriggerBucket: ${prefix}-sns-trigger
+  triggerBucket: ${prefix}-trigger
+  destBucket: ${prefix}-trigger
+  configBucket: ${prefix}-config
+  sqsTriggerBucket: ${prefix}-sqs-trigger
   queue: ${prefix}-storage-mirror-queue
   dest: s3://${prefix}-trigger
+  lambdaConfig: s3://${configBucket}/StorageMirror/sqs_proxy.json
 
 pipeline:
 
@@ -27,7 +32,17 @@ pipeline:
         type: queue
         vendor: aws
 
-  deploy:
+  uploadConfig:
+    action: storage:upload
+    init:
+      configJSON: $AsJSON($configText)
+    sourceKey: configJSON
+    expand: true
+    dest:
+      credentials: $awsCredentials
+      URL: $lambdaConfig
+
+    deploy:
     checkOut:
       action: vc/git:checkout
       Origin:
@@ -59,7 +74,8 @@ pipeline:
       timeout: 360
       environment:
         variables:
-          DEST: $dest
+          CONFIG: $lambdaConfig
+
       code:
         zipfile: $LoadBinary(${appLocation})
       rolename: lambda-${functionName}-executor
@@ -74,7 +90,6 @@ pipeline:
           enabled: true
           batchSize: 1
 
-
   setupSqsBucket:
     action: storage:create
     isDir: true
@@ -84,7 +99,7 @@ pipeline:
 
   setBucketQueueNotification:
     action: aws/s3:setupBucketNotification
-    bucket: ${triggerBucket}
+    bucket: ${sqsTriggerBucket}
     queueConfigurations:
       - queue: $queue
         id: ObjectCreatedEvents

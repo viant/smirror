@@ -7,20 +7,36 @@ init:
   appLocation: ${appPath}/aws/sns/${handler}.zip
   functionName: StorageMirrorSns
   privilegePolicy: privilege-policy.json
+  configLocation: config/proxy.json
+  configText: $Cat('$configLocation')
 
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
   prefix: $Replace($gcpProject,'_','-')
-  triggerBucket: ${prefix}-sns-trigger
+  snsTriggerBucket: ${prefix}-sns-trigger
+  triggerBucket: ${prefix}-trigger
   destBucket: ${prefix}-trigger
+  configBucket: ${prefix}-config
   topic: ${prefix}-storagemirrir-topic
-  dest: s3://${prefix}-trigger
+  lambdaConfig: s3://${configBucket}/StorageMirror/sns_proxy.json
 
 pipeline:
 
   info:
     action: print
     message: "creating topic: $topic"
+
+  uploadConfig:
+    action: storage:upload
+    init:
+      configJSON: $AsJSON($configText)
+    sourceKey: configJSON
+    expand: true
+    dest:
+      credentials: $awsCredentials
+      URL: $lambdaConfig
+
+
 
   setup:
     action: msg:setupResource
@@ -62,7 +78,7 @@ pipeline:
       timeout: 360
       environment:
         variables:
-          DEST: $dest
+          CONFIG: $lambdaConfig
       code:
         zipfile: $LoadBinary(${appLocation})
       rolename: lambda-${functionName}-executor
@@ -72,27 +88,23 @@ pipeline:
       attach:
         - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
-
   setupSubscription:
     action: aws/sns:setupSubscription
     protocol: lambda
     endpoint: $functionName
     topic: $topic
 
-
-
   setupSnsBucket:
     action: storage:create
     isDir: true
     dest:
       credentials: $awsCredentials
-      URL: s3://${triggerBucket}/
-
+      URL: s3://${snsTriggerBucket}/
 
   setBucketTopicNotification:
     action: aws/s3:setupBucketNotification
     credentials: $awsCredentials
-    bucket: ${triggerBucket}
+    bucket: ${snsTriggerBucket}
     topicConfigurations:
       - topic: $topic
         id: ObjectCreatedEvents
