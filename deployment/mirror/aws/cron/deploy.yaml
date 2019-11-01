@@ -4,7 +4,7 @@ init:
   '!gcpCredentials': $params.gcpSecrets
   handler: smirrorcron
   appPath: /tmp/${handler}
-  appLocation: ${appPath}/cron/aws/${handler}.zip
+  appLocation: ${appPath}/aws/cron/${handler}.zip
   functionName: StorageMirrorCron
   privilegePolicy: privilege-policy.json
 
@@ -52,7 +52,7 @@ pipeline:
         - export GOOS=linux
         - export GOARCH=amd64
         - go mod vendor
-        - cd cron/aws
+        - cd aws/cron
         - go build -o ${handler}
         - zip -j ${handler}.zip ${handler}
 
