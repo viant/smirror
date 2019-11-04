@@ -1,12 +1,7 @@
 [
   {
     "Source": {
-      "Bucket": "${triggerBucket}",
-      "Suffix": ".csv",
-      "Credentials": {
-        "Parameter": "StorrageMirror.Integration",
-        "Key": "alias/storagemirror"
-      }
+        "Prefix": "/${extTriggerBucket}/"
     },
     "Dest": {
       "URL": "gs://${destBucket}/testdata/cron/",

@@ -9,7 +9,8 @@ init:
 
 
   configBucket: ${sourcePrefix}-config
-  triggerBucket: viant-e2e-integration
+  extTriggerBucket: viant-e2e-integration
+  triggerBucket: ${sourcePrefix}-trigger
   opsBucket: ${sourcePrefix}-operation
   destBucket: ${destPrefix}_mirrored
 
@@ -47,13 +48,13 @@ pipeline:
   cleanupDest:
     action: storage:remove
     assets:
-      - URL: gs://${destBucket}/testdata/cron/data/test/events.csv.gz
+      - URL: gs://${destBucket}/testdata/cron/viant-e2e-integration/data/test/events.csv.gz
         credentials: $gcpCredentials
 
   checkDest:
     action: storage:exists
     assets:
-      - URL: gs://${destBucket}/testdata/cron/data/test/events.csv.gz
+      - URL: gs://${destBucket}/testdata/cron/viant-e2e-integration/data/test/events.csv.gz
         credentials: $gcpCredentials
 
 
@@ -64,13 +65,13 @@ pipeline:
       URL: events.csv.gz
     dest:
       credentials: viant-integration
-      URL: s3://${triggerBucket}/data/test/events.csv.gz
+      URL: s3://${extTriggerBucket}/data/test/events.csv.gz
 
 
   verify:
     action: storage:exists
     assets:
-      - URL: gs://${destBucket}/testdata/cron/data/test/events.csv.gz
+      - URL: gs://${destBucket}/testdata/cron/viant-e2e-integration/data/test/events.csv.gz
         credentials: $gcpCredentials
     expect:
-      'gs://${destBucket}/testdata/cron/data/test/events.csv.gz': true
+      'gs://${destBucket}/testdata/cron/viant-e2e-integration/data/test/events.csv.gz': true

@@ -1,14 +1,14 @@
 [
   {
     "Source": {
-      "URL": "s3://${triggerBucket}",
+      "URL": "s3://${extTriggerBucket}",
       "Credentials": {
         "Parameter": "StorrageMirror.Integration",
         "Key": "alias/storagemirror"
       }
     },
     "Dest": {
-      "URL": "lambda://StorageMirror"
+      "URL": "s3://${triggerBucket}/"
     }
   }
 ]

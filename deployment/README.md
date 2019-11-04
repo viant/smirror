@@ -444,7 +444,7 @@ git chckout https://github.com/viant/smirror.git
 cd smirror/deployment/mirror/aws/sqs
 endly deploy.yaml authWith=aws-e2e gcpSecrets=viant-e2e
 ```
-_where:_
+    _where:_
 - [@deploy.yaml](mirror/aws/cron/deploy.yaml)
 - [@privilege-policy.json](mirror/aws/cron/privilege-policy.json)
 
