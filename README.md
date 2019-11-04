@@ -275,10 +275,18 @@ By default is not split or replacement rules is specified, source is copied to d
 
 **Secrets options**
 
+A secrets data use KMS to decypt/encrypt GCP/AWS/Slack secrets or credentials.
+
+ 
 - **Credentials.Key**: KMS key or alias name
 - **Credentials.Parameter**: aws system manager parameters name storing encrypted secrets
 - **Credentials.URL**: location for encrypted secrets 
 
+See how to secure:
+- [AWS Credentials](deployment/README.md#securing-aws-credentials) 
+- [GCP Google Secrets](deployment/README.md#secure-gcp-credentials-google-secrets)
+- [Slack Token](deployment/README.md#securing-slack-credentials)
+ 
 
 **Server-Side Encryption with Customer-Provided Encryption Keys (AES-256)** 
 

@@ -177,6 +177,16 @@ gcloud functions deploy MyGsBucketToS3Mirror --entry-point StorageMirror \
 
 ######  Securing AWS credentials
 
+Storage Mirror uses the following format to operate on AWS secrets:
+
+```json
+{
+    "Region":"us-west-1",
+    "Key":"xxx",
+    "Secret":"yyy"
+}
+```
+
 To deploy StorageMirror cloud function with **endly** automation runner use the following workflow:
 
 ```bash
