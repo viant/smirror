@@ -1,6 +1,6 @@
 init:
 
-  '!awsCredentials': $params.authWith
+  '!awsCredentiacds': $params.authWith
   '!gcpCredentials': $params.gcpSecrets
 
   gcp: ${secrets.$gcpCredentials}

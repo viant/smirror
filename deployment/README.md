@@ -284,10 +284,38 @@ _where:_
 
 ###### StorageMonitor
 
+To deploy with endly automation runner use the following workflow:
+
+```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/monitor/gcp
+endly deploy.yaml authWith=myGoogleSecrets.json
+```
+_where:_
+- [@deploy.yaml](monitor/gcp/deploy.yaml)
 
 
 ###### StorageReplay
 
+Storage replay use cloud scheduler with the following request:
+[@request.json](replay/gcp/request.json)
+```json
+{
+  "TriggerURL": "gs://${triggerBucket}",
+  "ReplayBucket":"${replayBucket}",
+  "UnprocessedDuration": "1hour"
+}
+```
+
+To deploy with endly automation runner use the following workflow:
+
+```bash
+git chckout https://github.com/viant/smirror.git
+cd smirror/deployment/replay/gcp
+endly deploy.yaml authWith=myGoogleSecrets.json
+```
+_where:_
+- [@deploy.yaml](replay/gcp/deploy.yaml)
 
 
 
