@@ -6,8 +6,8 @@ init:
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
   prefix: $Replace($gcpProject,'_','-')
-  configLocation: config/proxy.json
-  configText: $Cat('$configLocation')
+  configText: $Cat('config.json')
+
   handler: smirrorsqs
   appPath: /tmp/${handler}
   appLocation: ${appPath}/aws/sqs/${handler}.zip
@@ -42,7 +42,7 @@ pipeline:
       credentials: $awsCredentials
       URL: $lambdaConfig
 
-    deploy:
+  deploy:
     checkOut:
       action: vc/git:checkout
       Origin:

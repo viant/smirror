@@ -7,8 +7,7 @@ init:
   appLocation: ${appPath}/aws/sns/${handler}.zip
   functionName: StorageMirrorSns
   privilegePolicy: privilege-policy.json
-  configLocation: config/proxy.json
-  configText: $Cat('$configLocation')
+  configText: $Cat('config.json')
 
   gcp: ${secrets.$gcpCredentials}
   gcpProject: $gcp.ProjectID
