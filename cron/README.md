@@ -32,9 +32,9 @@ no direct cloud event integration.
     "Source": {
       "URL": "s3://externalBucket/data/2019/",
       "Suffix": ".zip",
-      "CustomKey": {
-        "Parameter": "smirror.partnerX.customKey",
-        "Key": "storagemirror"
+      "Credentials": {
+         "Parameter": "smirror.partnerX.customSecrets",
+         "Key": "storagemirror"
       }
     },
     "Dest": {
@@ -43,6 +43,7 @@ no direct cloud event integration.
   }
 ]
 ```
+
 
 - **MetaURL** stores all process files. In example above all files with modified time within 2 * 720 sec
 - **Resources** baseURL for resource rules or list of resources rules with source base URL and Dest function

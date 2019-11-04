@@ -344,23 +344,26 @@ The following [Deployment](deployment/mirror/README.md) details storage mirror g
 
 ## Notification & Proxy
 
-To simplify mirroring maintenance once instance of storage mirror is recommended per project or region.
-Since lambda/cloud function accept only one trigger bucket you can use sqs/sns/pubsub bucket 
+
+To simplify mirroring maintenance only one instance of storage mirror is recommended per project or region.
+Since lambda/cloud function accept only one trigger per bucket you can use sqs/sns/pubsub notification bucket to
 propagate source event to the StorageMirror instance by either invoking or copying/moving underlying resource to trigger bucket.
 
-When copy/move setting is used to trigger main StrageMirror event, the original bucket is added as prefix to the resource path:
+When copy/move setting is used to trigger control StrageMirror events, the original bucket is added as prefix to the resource path:
 For example source path gs://myTopicTriggerBucket/myPath/asset.txt is transformed to gs://mytriggerBucet/myTopicTriggerBucket/myPath/asset.txt 
 when copy/move proxy option is used.
 
 
-#### GCP Topic
+[![Google storage to S3 mirror](images/mbus_mirror.png)](images/mbus_mirror.png)
 
-#### SQS Queue
 
-#### SNS Subscription
+All proxy share simple [config](usage/s3proxy.json) with dest URL.
+
 
 #### Cron scheduler
 
+In case you do not own or control a bucket that has some mirroring assets you can use [cron lambda/cloud function](cron/README.md).
+It  pulls external URL to simulate cloud storage event by coping it to main trigger buceket.
 
 
 ## Monitoring 
