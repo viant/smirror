@@ -55,7 +55,7 @@ This project provide serverless implementation for cloud storage mirror. All ext
 To mirror data from google storage that matches /data/ prefix and '.csv.gz' suffix to s3://destBucket/data
 the following rule can be used 
 
-[@gs://sourceBucket/config/config.json](usage/gs_to_s3/rule.json)
+[@gs://$configBucket/StorageMirror/Rules/rule.json](usage/gs_to_s3/rule.json)
 ```json
 [
   {
@@ -91,7 +91,7 @@ To mirror data from S3 that matches /myprefix/ prefix and '.csv.gz' suffix to gs
 splitting source file into maximum 8 MB files in destination you can use the following
 
 
-[@gs://sourceBucket/config/config.json](usage/s3_to_gs/rule.json)
+[@s3://$configBucket/StorageMirror/Rules/rule.json](usage/s3_to_gs/rule.json)
 ```json
 [
   {
@@ -123,7 +123,7 @@ splitting source file into maximum 8 MB files in destination you can use the fol
 To mirror data from google storage that match /myprefix/ prefix and '.csv' suffix to pubsub 'myTopic' topic
 you can use the following rule
 
-[@gs://sourceBucket/config/config.json](usage/gs_to_pubsub/rule.json)
+[@gs://$configBucket/StorageMirror/Rules/rule.json](usage/gs_to_pubsub/rule.json)
 ```json
 [
   {
@@ -147,13 +147,54 @@ you can use the following rule
         "Action": "move",
         "URL": "gs:///${opsBucket}/StorageMirror/Errors/"
       }
-    ],
-    "PreserveDepth": 1
+    ]
   }
 ]
 ```
 
+Source data in divided with a line boundary with max size specified in split section.
+Each message also get 'source' attribute with source path part.
+
+
+
 ### S3 To Simple Message Queue
+
+To mirror data from s3  that match /myprefix/ prefix and '.csv' suffix to simple message 'myQueue'
+you can use the following rule
+
+
+[@s3://$configBucket/StorageMirror/Rules/rule.json](usage/s3_to_sqs/rule.json)
+```json
+[
+  {
+    "Source": {
+      "Prefix": "/myprefix/",
+      "Suffix": ".csv"
+    },
+    "Dest": {
+      "Queue": "myQueue"
+    },
+    "Split": {
+      "MaxLines": 1000,
+      "Template": "%s_%05d"
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "s3:///${opsBucket}/StorageMirror/Errors/"
+      }
+    ]
+  }
+]
+
+```
+
+
 
 ## Configuration
 
@@ -188,8 +229,8 @@ _Message bus destination_
 
 When destination is a message bus, you have to specify split option, 
 when data is published to destination path defined by split template. Source attribute is added:
-For example if original resource xx://mybucket/data/p11/events.csv is splitted twice,  two messages are published
-with data payload and /data/p11/0001_events.csv and /data/p11/0002_events.csv source attribute resepectivelly.
+For example if original resource xx://mybucket/data/p11/events.csv is divided into 2 parts,  two messages are published
+with data payload and /data/p11/0001_events.csv and /data/p11/0002_events.csv source attribute respectively.
 
 
 **Payload substitution:**

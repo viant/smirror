@@ -1,0 +1,26 @@
+[
+  {
+    "Source": {
+      "Prefix": "/myprefix/",
+      "Suffix": ".csv"
+    },
+    "Dest": {
+      "Queue": "myQuee"
+    },
+    "Split": {
+      "MaxLines": 1000,
+      "Template": "%s_%05d"
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ],
+    "OnFailure": [
+      {
+        "Action": "move",
+        "URL": "s3:///${opsBucket}/StorageMirror/Errors/"
+      }
+    ]
+  }
+]
