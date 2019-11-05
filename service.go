@@ -29,6 +29,8 @@ import (
 	"time"
 )
 
+
+
 //Slack represents a mirror service
 type Service interface {
 	//Mirror copies/split source to matched destination
@@ -45,18 +47,25 @@ type service struct {
 }
 
 func (s *service) Mirror(ctx context.Context, request *contract.Request) *contract.Response {
+	request.Attempt++
 	response := contract.NewResponse(request.URL)
 	err := s.mirror(ctx, request, response)
-
 	if err != nil {
 		response.Status = base.StatusError
 		response.Error = err.Error()
+	}
+	if response.Error =="" {
+		return response
 	}
 
 	if IsNotFound(response.Error) {
 		response.Status = base.StatusNoFound
 		response.Error = ""
 		response.NotFoundError = response.Error
+	} else if IsBackendError(response.Error) {
+		if request.Attempt <  s.config.MaxRetries {
+			return s.Mirror(ctx, request)
+		}
 	}
 	return response
 }
@@ -105,7 +114,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		err = s.mirrorAsset(ctx, rule, request.URL, response)
 	}
 	jobContent := job.NewContext(ctx, err, request.URL, response.Rule.Name(request.URL))
-	response.TimeTakenMs = int(time.Now().Sub(response.StartTime) / time.Millisecond)
+	response.TimeTakenMs = int(time.Now().Sub(request.Timestamp) / time.Millisecond)
 	if e := rule.Actions.Run(jobContent, s.fs, s.notifier.Notify, &response.Rule.Info, response); e != nil && err == nil {
 		err = e
 	}

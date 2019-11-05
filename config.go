@@ -17,11 +17,13 @@ const (
 	megaBytes              = 1024 * 1024
 	defaultStreamThreshold = 1024
 	defaultPartSize        = 64
+	maxRetries = 3
 )
 
 //Config represents routes
 type Config struct {
 	base.Config
+	MaxRetries int
 	SlackCredentials *auth.Credentials
 	Mirrors          config.Ruleset
 	Streaming        Streaming
@@ -65,6 +67,9 @@ func (c *Config) Init(ctx context.Context, fs afs.Service) (err error) {
 	c.Config.Init()
 	if err = c.Mirrors.Init(ctx, fs, c.ProjectID); err != nil {
 		return err
+	}
+	if c.MaxRetries == 0 {
+		c.MaxRetries = maxRetries
 	}
 	for i := range c.Mirrors.Rules {
 		c.Mirrors.Rules[i].Dest.Init(c.ProjectID)
