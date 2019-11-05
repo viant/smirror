@@ -92,12 +92,12 @@ func (s *service) processResource(ctx context.Context, resource *config.Rule, re
 	return pending, err
 }
 
-
 func (s *service) notify(ctx context.Context, rule *config.Rule, object storage.Object, response *Response) error {
 	proxyResponse := s.proxy.Proxy(ctx, &proxy.Request{
 		Source: rule.Source.CloneWithURL(object.URL()),
 		Dest:   &rule.Dest,
 		Move:   rule.Move,
+		Stream: true,
 	})
 	if proxyResponse.Error != "" {
 		return errors.New(proxyResponse.Error)
