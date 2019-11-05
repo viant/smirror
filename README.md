@@ -252,7 +252,7 @@ Optionally mirror process can spliy source content lines by size or max line cou
 By default source the whole source path is copied to destination
 
  - **PreserveDepth**: optional number to manipulate source path transformation, positive number
- preservce number of folders from leaf side, and negative truncates from root side.
+ preserves number of folders from leaf side, and negative truncates from root side.
  
 
 To see preserve depth control assume the following: 
@@ -264,6 +264,7 @@ To see preserve depth control assume the following:
 | Not specified | yy://myYYBucket/zzz//folder/subfolder/grandsubfolder/asset.txt | the whole source path is preserved |  
 | 1 | yy://myYYBucket/zzz/grandsubfolder/asset.txt | source path adds 1 element from leaf size  |
 | -2 | yy://myYYBucket/zzz/grandsubfolder/asset.txt | source path 2 elements truncated from root side  |
+| -1 | yy://myYYBucket/zzz/subfolder/grandsubfolder/asset.txt | source path 1 element truncated from root side  |
 
 
 **Compression options**
