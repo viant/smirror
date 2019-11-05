@@ -50,10 +50,10 @@ pipeline:
     credentials: $gcpCredentials
     init:
       body: $Cat('request.json')
-    name: Replay
+    name: StorageReplay
     schedule: 0 * * * *
     body: $body
-    timeZone: UTC
+    timeZone: GMT
     httpTarget:
       headers:
         User-Agent: Google-Cloud-Scheduler
