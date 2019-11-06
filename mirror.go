@@ -19,6 +19,7 @@ func StorageMirror(ctx context.Context, event event.StorageEvent) (err error) {
 	}()
 	_, err = storageMirror(ctx, event)
 	if err != nil {
+
 		err = errors.Wrap(err, "failed to mirror "+event.URL())
 		return err
 	}

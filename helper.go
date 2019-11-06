@@ -3,7 +3,7 @@ package smirror
 import "strings"
 
 const (
-	notFoundMessage = "notfound"
+	notFound = "404"
 	backendError = "backendError"
 )
 
@@ -12,9 +12,10 @@ func IsNotFound(message string) bool {
 	if message == "" {
 		return false
 	}
-	message = strings.Replace(strings.ToLower(message), " ", "", len(message))
-	return strings.Contains(message, notFoundMessage)
+	return strings.Contains(message, notFound)
 }
+
+
 
 
 

@@ -47,8 +47,11 @@ type service struct {
 }
 
 func (s *service) Mirror(ctx context.Context, request *contract.Request) *contract.Response {
+
 	request.Attempt++
 	response := contract.NewResponse(request.URL)
+
+
 	err := s.mirror(ctx, request, response)
 	if err != nil {
 		response.Status = base.StatusError
