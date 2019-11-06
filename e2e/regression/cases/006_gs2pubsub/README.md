@@ -29,7 +29,7 @@ Configuration:
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs:///${gsOpsBucket}/StorageMirror/Errors/"
+        "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
       }
     ],
     "PreserveDepth": 1

@@ -18,7 +18,7 @@
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs://${opsBucket}/Errors/"
+        "URL": "gs://${opsBucket}/errors/"
       }
     ],
     "Codec": "gzip",

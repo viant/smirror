@@ -30,7 +30,7 @@ Mirror compressed data from gs://${gsTriggerBucket}/data/p2 and suffixed *.csv.g
          "OnError": [
            {
              "Action": "move",
-             "URL": "gs:///${gsOpsBucket}/StorageMirror/Errors/"
+             "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
            }
          ]
        },

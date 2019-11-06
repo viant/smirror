@@ -35,7 +35,7 @@ Configuration:
         "OnError": [
           {
             "Action": "move",
-            "URL": "gs:///${gsOpsBucket}/StorageMirror/Errors/"
+            "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
           }
         ]
       },

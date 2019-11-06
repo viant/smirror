@@ -145,7 +145,7 @@ you can use the following rule
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs:///${opsBucket}/StorageMirror/Errors/"
+        "URL": "gs:///${opsBucket}/StorageMirror/errors/"
       }
     ]
   }
@@ -186,7 +186,7 @@ you can use the following rule
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "s3:///${opsBucket}/StorageMirror/Errors/"
+        "URL": "s3:///${opsBucket}/StorageMirror/errors/"
       }
     ]
   }
@@ -343,11 +343,11 @@ The following action are supported:
 {
   "OnSuccess": [{
           "Action": "move",
-          "URL": "gs:///${opsBucket}/StorageMirror/Processed/"
+          "URL": "gs:///${opsBucket}/StorageMirror/processed/"
  }],
  "OnFailure": [{
         "Action": "move",
-        "URL": "gs:///${opsBucket}/StorageMirror/Errors/",
+        "URL": "gs:///${opsBucket}/StorageMirror/errors/",
  }]
 }
 ```

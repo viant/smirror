@@ -57,6 +57,7 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 	if response.Error =="" {
 		return response
 	}
+
 	if IsNotFound(response.Error) {
 		response.Status = base.StatusNoFound
 		response.Error = ""

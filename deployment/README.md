@@ -77,7 +77,7 @@ and routes files store JSON array with process routes.
     "OnFailure": [
       {
         "Action": "move",
-        "URL": "gs://${opsBucket}/Errors/"
+        "URL": "gs://${opsBucket}/errors/"
       }
     ],
     "Codec": "gzip",
