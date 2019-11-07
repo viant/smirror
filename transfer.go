@@ -37,7 +37,7 @@ func (t *Transfer) getReader() (reader io.Reader, err error) {
 		t.rewriter = NewRewriter()
 	}
 
-	if (t.Dest == nil || t.Dest.Compression == nil) && !t.rewriter.HasReplacer() {
+	if (t.Dest == nil || t.Dest.Compression == nil || t.Dest.Compression.Codec == "") && !t.rewriter.HasReplacer() {
 		return reader, nil
 	}
 

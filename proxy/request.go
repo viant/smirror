@@ -5,7 +5,6 @@ import (
 	"smirror/config"
 )
 
-
 //Request represents proxy
 type Request struct {
 	Source *config.Resource
@@ -13,7 +12,6 @@ type Request struct {
 	Move   bool
 	Stream bool
 }
-
 
 //Validate checks if request is valid
 func (r *Request) Validate() error {

@@ -28,6 +28,14 @@ type Rule struct {
 	Group string `json:",omitempty"`
 }
 
+//HasSplit returns true if rule has split defined
+func (r *Rule) HasSplit() bool {
+	if r.Split == nil {
+		return false
+	}
+	return r.Split.MaxSize > 0 || r.Split.MaxLines > 0
+}
+
 //HasPreserveDepth returns true if property has been specified
 func (r *Rule) HasPreserveDepth() bool {
 	return r.PreserveDepth != nil
@@ -41,8 +49,22 @@ func (r *Rule) GetPreserveDepth() int {
 	return 0
 }
 
+func (r *Rule) ShallArchiveWalk(URL string) bool {
+	if r.Compression == nil {
+		return false
+	}
+	return (strings.HasSuffix(URL, TarExtension) || strings.HasSuffix(URL, ZIPExtension)) && r.Compression.Uncompress
+}
+
+func (r *Rule) ArchiveWalkURL(URL string) string {
+	ext := path.Ext(URL)
+	ext = strings.Replace(ext, ".", "", 1)
+	return fmt.Sprintf("%v/%v//localhost/", URL, ext)
+}
+
 //Validate checks if route is valid
 func (r *Rule) Validate() error {
+	r.Init()
 	if r.Source == nil {
 		return fmt.Errorf("source was empty")
 	}
@@ -52,16 +74,28 @@ func (r *Rule) Validate() error {
 	return nil
 }
 
+//Init initialises routes
+func (r *Rule) Init() {
+	if r.HasSplit() || len(r.Replace) > 0 {
+		if r.Compression == nil {
+			r.Compression = &Compression{}
+		}
+		r.Compression.Uncompress = true
+	}
+}
+
 //SourceCompression returns compression for URL
 func (r *Rule) SourceCompression(URL string) (source *Compression) {
 	source = NewCompressionForURL(URL)
-	dest := r.Compression
-	shallTransform := r.Split != nil || len(r.Replace) > 0
-	if (dest != nil && dest.Uncompress) || shallTransform {
+	compression := r.Compression
+	if compression != nil && compression.Uncompress {
+		if source != nil {
+			source.Uncompress = compression.Uncompress
+		}
 		return source
 	}
-	hasDestCompression := dest != nil && source != nil
-	if (hasDestCompression && source.Equals(dest)) || !hasDestCompression {
+	hasDestCompression := (compression != nil && compression.Codec != "") && source != nil
+	if (hasDestCompression && source.Equals(compression)) || !hasDestCompression {
 		return nil
 	}
 	return source
@@ -105,7 +139,7 @@ func (r *Rule) Name(URL string) string {
 				name += GZIPExtension
 			}
 		}
-	} else if sourceCompression != nil {
+	} else if sourceCompression != nil && sourceCompression.Uncompress {
 		if ext == GZIPExtension {
 			name = string(name[:len(name)-len(ext)])
 		}

@@ -14,6 +14,7 @@ import (
 	"github.com/viant/afsc/s3"
 	"io"
 	"io/ioutil"
+	"os"
 	"path"
 	"smirror/base"
 	"smirror/config"
@@ -28,8 +29,6 @@ import (
 	"sync/atomic"
 	"time"
 )
-
-
 
 //Slack represents a mirror service
 type Service interface {
@@ -51,13 +50,12 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 	request.Attempt++
 	response := contract.NewResponse(request.URL)
 
-
 	err := s.mirror(ctx, request, response)
 	if err != nil {
 		response.Status = base.StatusError
 		response.Error = err.Error()
 	}
-	if response.Error =="" {
+	if response.Error == "" {
 		return response
 	}
 
@@ -66,7 +64,7 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 		response.Error = ""
 		response.NotFoundError = response.Error
 	} else if IsBackendError(response.Error) {
-		if request.Attempt <  s.config.MaxRetries {
+		if request.Attempt < s.config.MaxRetries {
 			return s.Mirror(ctx, request)
 		}
 	}
@@ -111,11 +109,8 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	if int(object.Size()) > s.config.Streaming.Threshold {
 		response.StreamOption = option.NewStream(s.config.Streaming.PartSize, int(object.Size()))
 	}
-	if rule.Split != nil {
-		err = s.mirrorChunkedAsset(ctx, rule, request, response)
-	} else {
-		err = s.mirrorAsset(ctx, rule, request.URL, response)
-	}
+
+	err = s.mirrorAsset(ctx, rule, request.URL, response)
 	jobContent := job.NewContext(ctx, err, request.URL, response.Rule.Name(request.URL))
 	response.TimeTakenMs = int(time.Now().Sub(request.Timestamp) / time.Millisecond)
 	if e := rule.Actions.Run(jobContent, s.fs, s.notifier.Notify, &response.Rule.Info, response); e != nil && err == nil {
@@ -132,31 +127,46 @@ func (s *service) addStreamingOptions(options []storage.Option, streamOpt *optio
 }
 
 func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string, response *contract.Response) error {
+	transferStream := s.transferStream
+	if rule.Split != nil {
+		transferStream = s.transferChunkStream
+	}
 	options, err := s.secret.StorageOpts(ctx, rule.Source.CloneWithURL(URL))
 	if err != nil {
 		return errors.Wrapf(err, "failed to get storage option for %v", rule.Source)
 	}
 	options = s.addStreamingOptions(options, response.StreamOption)
+	if rule.ShallArchiveWalk(URL) {
+		archvieURL := rule.ArchiveWalkURL(URL)
+		return s.fs.Walk(ctx, archvieURL, func(ctx context.Context, baseURL string, parent string, info os.FileInfo, reader io.Reader) (toContinue bool, err error) {
+			if info.IsDir() {
+				return true, nil
+			}
+			streamURL := URL + "-" + info.Name()
+			err = transferStream(ctx, ioutil.NopCloser(reader), streamURL, rule, response)
+			return err == nil, err
+		}, options...)
+	}
 	reader, err := s.fs.DownloadWithURL(ctx, URL, options...)
 	if err != nil {
 		return errors.Wrapf(err, "failed to download source: %v", URL)
 	}
+	defer func() {
+		_ = reader.Close()
+	}()
+	return transferStream(ctx, reader, URL, rule, response)
+}
+
+func (s *service) transferStream(ctx context.Context, reader io.ReadCloser, URL string, rule *config.Rule, response *contract.Response) (err error) {
 	sourceCompression := rule.SourceCompression(URL)
 	reader, err = NewReader(reader, sourceCompression)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
 	}
-	defer func() {
-		if reader != nil {
-			_ = reader.Close()
-		}
-	}()
 	destName := rule.Name(URL)
 	destURL := url.Join(rule.Dest.URL, destName)
-	if reader == nil {
-		return fmt.Errorf("reader was empty")
-	}
 	destCompression := rule.Compression
+
 	if path.Ext(URL) == path.Ext(destURL) && len(rule.Replace) == 0 {
 		sourceCompression = nil
 		destCompression = nil
@@ -171,28 +181,16 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 	return s.transfer(ctx, dataCopy, response)
 }
 
-func (s *service) mirrorChunkedAsset(ctx context.Context, route *config.Rule, request *contract.Request, response *contract.Response) error {
-	options, err := s.secret.StorageOpts(ctx, route.Source.CloneWithURL(request.URL))
+func (s *service) transferChunkStream(ctx context.Context, reader io.ReadCloser, URL string, rule *config.Rule, response *contract.Response) (err error) {
+	sourceCompression := rule.SourceCompression(URL)
+	reader, err = NewReader(reader, sourceCompression)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to create reader")
 	}
-	options = s.addStreamingOptions(options, response.StreamOption)
-	reader, err := s.fs.DownloadWithURL(ctx, request.URL, options...)
-	if err == nil {
-		reader, err = NewReader(reader, config.NewCompressionForURL(request.URL))
-		if err != nil {
-			return err
-		}
-	}
-	defer func() {
-		if reader != nil {
-			_ = reader.Close()
-		}
-	}()
 	counter := int32(0)
 	waitGroup := &sync.WaitGroup{}
-	rewriter := NewRewriter(route.Replace...)
-	err = Split(reader, s.chunkWriter(ctx, request.URL, route, &counter, waitGroup, response), route.Split, rewriter)
+	rewriter := NewRewriter(rule.Replace...)
+	err = Split(reader, s.chunkWriter(ctx, URL, rule, &counter, waitGroup, response), rule.Split, rewriter)
 	if err == nil {
 		waitGroup.Wait()
 	}
@@ -312,12 +310,12 @@ func (s *service) initRule(ctx context.Context, rule *config.Rule) (err error) {
 	return nil
 }
 
-func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rule, counter *int32, waitGroup *sync.WaitGroup, response *contract.Response) func() io.WriteCloser {
+func (s *service) chunkWriter(ctx context.Context, URL string, rule *config.Rule, counter *int32, waitGroup *sync.WaitGroup, response *contract.Response) func() io.WriteCloser {
 	return func() io.WriteCloser {
 		splitCount := atomic.AddInt32(counter, 1)
-		destName := route.Split.Name(route, URL, splitCount)
-		destURL := url.Join(route.Dest.URL, destName)
-		return NewWriter(route, func(writer *Writer) error {
+		destName := rule.Split.Name(rule, URL, splitCount)
+		destURL := url.Join(rule.Dest.URL, destName)
+		return NewWriter(rule, func(writer *Writer) error {
 			if writer.Reader == nil {
 				return fmt.Errorf("Writer reader was empty")
 			}
@@ -325,7 +323,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, route *config.Rul
 			defer waitGroup.Done()
 			dataCopy := &Transfer{
 				skipChecksum: response.ChecksumSkip,
-				Resource:     route.Dest,
+				Resource:     rule.Dest,
 				Reader:       writer.Reader,
 				Dest:         NewDatafile(destURL, nil),
 			}

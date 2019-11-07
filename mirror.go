@@ -26,7 +26,6 @@ func StorageMirror(ctx context.Context, event event.StorageEvent) (err error) {
 	return err
 }
 
-
 func storageMirror(ctx context.Context, event event.StorageEvent) (response *contract.Response, err error) {
 	service, err := NewFromEnv(ctx, base.ConfigEnvKey)
 	if err != nil {

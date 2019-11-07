@@ -29,7 +29,7 @@ func NewWriter(rule *config.Rule, listener OnClose) io.WriteCloser {
 		buffer:      buffer,
 		listener:    listener,
 	}
-	if compression != nil {
+	if compression != nil && compression.Uncompress {
 		if compression.Codec == config.GZipCodec {
 			result.gzipWriter = gzip.NewWriter(buffer)
 			result.WriteCloser = result.gzipWriter

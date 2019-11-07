@@ -88,7 +88,6 @@ func TestService_Tick(t *testing.T) {
 		actual, err := loadMeta(ctx, fs, useCase.config.MetaURL)
 		assertly.AssertValues(t, useCase.expect, actual, useCase.description)
 
-
 		for i := range resources {
 
 			sourceURL := url.Join(useCase.baseURL, resources[i].Name)

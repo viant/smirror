@@ -34,6 +34,8 @@ type serviceUseCase struct {
 
 func TestService_Mirror(t *testing.T) {
 
+	selectCase := "" //"compressed split transfer"
+
 	var useCases = []*serviceUseCase{
 
 		{
@@ -526,6 +528,9 @@ line9
 	ctx := context.Background()
 	mgr := mem.Singleton()
 	for _, useCase := range useCases {
+		if selectCase != "" && useCase.description != selectCase {
+			continue
+		}
 		initUseCase(ctx, useCase, mgr, t)
 		service, err := New(ctx, useCase.config)
 		if useCase.hasServiceError {

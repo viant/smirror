@@ -7,7 +7,6 @@ import (
 
 var singleton Service
 
-
 //Singleton returns proxy singleton service
 func Singleton(config *Config) Service {
 	if singleton != nil {

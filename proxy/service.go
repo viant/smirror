@@ -22,7 +22,7 @@ const partSize = 32 * 1024 * 1024
 
 //Service represents trigger service
 type Service interface {
-	Proxy(ctx context.Context, request *Request) (*Response)
+	Proxy(ctx context.Context, request *Request) *Response
 }
 
 type service struct {
@@ -39,7 +39,6 @@ func (s *service) Proxy(ctx context.Context, request *Request) *Response {
 	}
 	return respose
 }
-
 
 //Trigger triggers lambda execution
 func (s *service) proxy(ctx context.Context, request *Request, response *Response) error {
@@ -71,7 +70,7 @@ func (s *service) proxy(ctx context.Context, request *Request, response *Respons
 		destOptions = make([]storage.Option, 0)
 	}
 	if len(sourceOptions) > 0 {
-		if _, ok:=sourceOptions[0].(*option.AES256Key); !ok || len(sourceOptions) > 1 {
+		if _, ok := sourceOptions[0].(*option.AES256Key); !ok || len(sourceOptions) > 1 {
 			destOptions = append(destOptions, option.NewAuth(true))
 		}
 		options = append(options, option.NewSource(sourceOptions...))
@@ -118,7 +117,6 @@ func invokeLambda(ctx context.Context, request *Request, response *Response) err
 	})
 	return err
 }
-
 
 //Note that invoking cloud function has restriction and should not be used on production
 func (s *service) invokeCloudFunction(ctx context.Context, request *Request, response *Response) error {

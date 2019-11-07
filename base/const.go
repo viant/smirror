@@ -45,5 +45,4 @@ const (
 
 	//CloudFunctionScheme represents clud function scheme
 	CloudFunctionScheme = "cloudfunction"
-
 )

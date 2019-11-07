@@ -17,25 +17,25 @@ const (
 	megaBytes              = 1024 * 1024
 	defaultStreamThreshold = 1024
 	defaultPartSize        = 64
-	maxRetries = 3
+	maxRetries             = 3
 )
 
 //Config represents routes
 type Config struct {
 	base.Config
-	MaxRetries int
+	MaxRetries       int
 	SlackCredentials *auth.Credentials
 	Mirrors          config.Ruleset
 	Streaming        Streaming
 }
 
 type Streaming struct {
-	ThresholdMb           int
-	Threshold             int
-	PartSize              int
-	PartSizeMb            int
+	ThresholdMb             int
+	Threshold               int
+	PartSize                int
+	PartSizeMb              int
 	ChecksumSkipThresholdMb int
-	ChecksumSkipThreshold int
+	ChecksumSkipThreshold   int
 }
 
 func (c *Streaming) Init() {

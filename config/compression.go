@@ -7,6 +7,16 @@ const (
 	GZipCodec = "gzip"
 	//GZIPExtension gzip extension
 	GZIPExtension = ".gz"
+
+	//ZipCodec zip code
+	ZipCodec = "zip"
+	//ZIPExtension zip extension
+	ZIPExtension = ".zip"
+
+	//TarCodec tar code
+	TarCodec = "tar"
+	//TarExtension tar extension
+	TarExtension = ".tar"
 )
 
 //Compression represents conversion strategy

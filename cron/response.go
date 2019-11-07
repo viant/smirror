@@ -9,8 +9,7 @@ import (
 //Response represents schedule response
 type Response struct {
 	*proxy.Response
-	Matched []*Matched        `json:",omitempty"`
-
+	Matched []*Matched `json:",omitempty"`
 }
 
 type Matched struct {
@@ -28,7 +27,6 @@ func (m *Matched) Add(objects ...storage.Object) {
 func NewResponse(baseResponse *proxy.Response) *Response {
 	return &Response{
 		Response: baseResponse,
-		Matched: make([]*Matched, 0),
-
+		Matched:  make([]*Matched, 0),
 	}
 }

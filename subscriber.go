@@ -12,7 +12,6 @@ import (
 
 var proxyConfug *proxy.Config
 
-
 //StorageMirrorSubscriber cloud function entry point
 func StorageMirrorSubscriber(ctx context.Context, event event.PubsubBucketNotification) (err error) {
 	storageEvent := event.StorageEvent()
@@ -38,5 +37,3 @@ func StorageMirrorSubscriber(ctx context.Context, event event.PubsubBucketNotifi
 	}
 	return nil
 }
-
-

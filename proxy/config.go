@@ -23,7 +23,7 @@ type Config struct {
 //Validate checks if config is valid
 func (c *Config) Validate() error {
 	c.Init()
-	if  c.Dest.URL == "" {
+	if c.Dest.URL == "" {
 		return errors.Errorf("dest.url was empty")
 	}
 	return nil

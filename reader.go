@@ -1,26 +1,19 @@
 package smirror
 
 import (
-	"bytes"
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"smirror/config"
 )
 
 //NewReader returns compression or regular reader returning raw data
 func NewReader(reader io.ReadCloser, compression *config.Compression) (io.ReadCloser, error) {
-	if compression == nil {
+	if compression == nil || !compression.Uncompress {
 		return reader, nil
 	}
-	payload, err := ioutil.ReadAll(reader)
-	_ = reader.Close()
-	if err != nil {
-		return nil, err
-	}
 	if compression.Codec == config.GZipCodec {
-		return gzip.NewReader(bytes.NewReader(payload))
+		return gzip.NewReader(reader)
 	}
 	return nil, fmt.Errorf("unsupported code: %v", compression.Codec)
 }
