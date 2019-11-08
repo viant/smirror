@@ -142,13 +142,16 @@ func (s *Split) Name(router *Rule, URL string, counter int32, partition interfac
 	if templ == "" {
 		templ = "%04d_%s"
 		if s.Partition != nil {
-			templ = "%04d_%s_%v"
+			templ += "_%v"
 		}
 	}
+
 	if templ != "" {
-		templ = strings.Replace(templ, "%v", "$partition", 1)
 		templ = strings.Replace(templ, "%s", "$name", 1)
+		templ = strings.Replace(templ, "%v", "$partition", 1)
+		templ = strings.Replace(templ, "$chunk", "%03d", 1)
 	}
+
 	destName = templ
 	destName = strings.Replace(destName, "$name", child, 2)
 	if partition != nil && strings.Contains(destName, "$partition") {

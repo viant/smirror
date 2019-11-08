@@ -33,7 +33,7 @@ func (r *Rule) HasSplit() bool {
 	if r.Split == nil {
 		return false
 	}
-	return r.Split.MaxSize > 0 || r.Split.MaxLines > 0
+	return r.Split.MaxSize > 0 || r.Split.MaxLines > 0 || r.Split.Partition != nil
 }
 
 //HasPreserveDepth returns true if property has been specified

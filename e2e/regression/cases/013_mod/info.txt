@@ -1,1 +1,0 @@
-gs://${gsTriggerBucket}/data/p1/events.csv to s3
