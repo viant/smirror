@@ -28,11 +28,11 @@ type Split struct {
 
 //Partition represent partition split
 type Partition struct {
+	Field       string
+	FieldIndex  int
+	Separator   string
 	Mod         int
 	Hash        string
-	FiledIndex  int
-	Separator   string
-	Field       string
 	keyProvider func(data []byte) (interface{}, error)
 }
 
@@ -56,7 +56,7 @@ func newKeyProvider(partition *Partition) func(data []byte) (interface{}, error)
 	if separator == "" {
 		separator = ","
 	}
-	index := partition.FiledIndex
+	index := partition.FieldIndex
 	return func(data []byte) (interface{}, error) {
 		elements := strings.Split(string(data), separator)
 		if index >= len(elements) {

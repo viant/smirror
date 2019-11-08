@@ -6,25 +6,18 @@
     },
     "Dest": {
 
-      "Topic": "${gsPrefix}_storage_mirror_p$partition"
+      "Topic": "mytopic_p$partition"
     },
     "Split": {
       "MaxSize": 1048576,
       "Partition": {
-        "FiledIndex": 0,
+        "FieldIndex": 0,
         "Mod": 2
-      },
-      "Template": "$name_$chunk_$partition"
+      }
     },
     "OnSuccess": [
       {
         "Action": "delete"
-      }
-    ],
-    "OnFailure": [
-      {
-        "Action": "move",
-        "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
       }
     ],
     "PreserveDepth": 1

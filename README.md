@@ -14,6 +14,8 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
    * [Google Storage to S3](#google-storage-to-s3)
    * [Google Storage to Pubsub](#google-storage-to-pubsub)
    * [S3 to Google Storage](#s3-to-google-storage)
+   * [S3 To Simple Message Queue](#s3-to-simple-message-queue)
+   * [Partitioning](#partitioning)
 - [Configuration](#configuration)
    * [Rule](#rule))
         - [Post Action](#post-actions)
@@ -195,6 +197,42 @@ you can use the following rule
 ```
 
 
+## Partitioning
+
+To mirror data from Google Storage that match /data/subfolder  prefix and '.csv' suffix to topic mytopic_p$partition you can use the following rule.
+During mirroring process data is split by partition evaluated from CSV field[0] with mod(2) 
+Destination topic is dynamically evaluated based on parition value.
+ 
+
+[@gs://$configBucket/StorageMirror/Rules/rule.json](usage/partition/rule.json)
+
+```json
+[
+  {
+    "Source": {
+      "Prefix": "/data/subfolder",
+      "Suffix": ".csv"
+    },
+    "Dest": {
+      "Topic": "mytopic_p$partition"
+    },
+
+    "Split": {
+      "MaxSize": 1048576,
+      "Partition": {
+        "FieldIndex": 0,
+        "Mod": 2
+      }
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ],
+    "PreserveDepth": 1
+  }
+]
+```
 
 ## Configuration
 
@@ -242,11 +280,11 @@ Both topic and queue support **$partition** variable to expanded ir with partiti
 
 **Splitting source payload:**
 
-Optionally mirror process can spliy source content lines by size or max line count.
+Optionally mirror process can split source content lines by size or max line count.
 
 - **Split.MaxLines**: maximum lines in dest splitted file
 - **Split.MaxSize**: maximum size in dest splitted file (lines are presrved)
-- **Split.Template**: optional template for dest file with '%04d_%s' default value, 
+- **Split.Template**: optional template for dest file name with '%04d_%s' default value, 
 _where_:
     * %d or $chunk - is expanded with a split number  
     * %s or $name is replaced with a file name, 
@@ -254,7 +292,7 @@ _where_:
 
 - **Split.Partition**: partition allows you splitting by partition
 - **Split.Partition.Field**: name of filed (JSON/Avro)
-- **Split.Partition.FiledIndex**: field index (CSV) 
+- **Split.Partition.FieldIndex**: field index (CSV) 
 - **Split.Partition.Separator**: optional separator, default (,) (CSV)
 - **Split.Partition.Hash**: optional hash for int64 partition value, the following are supported
   - md5

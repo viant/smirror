@@ -25,7 +25,7 @@ Configuration:
     "Split": {
       "MaxSize": 1048576,
       "Partition": {
-          "FiledIndex": 0,
+          "FieldIndex": 0,
           "Mod": 2
       },
       "Template": "$name_$chunk_$partition"

@@ -77,7 +77,7 @@ func TestSplit(t *testing.T) {
 			description: "partition - filed index",
 			split: &config.Split{MaxSize: 1024,
 				Partition: &config.Partition{
-					FiledIndex: &index,
+					FieldIndex: &index,
 					Hash:       "fnv",
 					Mod:        2,
 				},
