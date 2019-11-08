@@ -64,7 +64,7 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 		response.Status = base.StatusNoFound
 		response.Error = ""
 		response.NotFoundError = response.Error
-	} else if IsBackendError(response.Error) {
+	} else if IsRetryError(response.Error) {
 		if request.Attempt < s.config.MaxRetries {
 			return s.Mirror(ctx, request)
 		}
@@ -206,7 +206,7 @@ func (s *service) transfer(ctx context.Context, transfer *Transfer, response *co
 	if transfer.Resource.URL != "" {
 		err := s.upload(ctx, transfer, response)
 		if err != nil {
-			return errors.Wrapf(err, "failed to transfer: %v to %v", transfer.Resource.URL, transfer.Dest.URL)
+			return errors.Wrapf(err, "failed to transfer to: %v", transfer.Dest.URL)
 		}
 		return nil
 	}
