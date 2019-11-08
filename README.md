@@ -455,7 +455,7 @@ The following [Deployment](deployment/mirror/README.md) details storage mirror g
 
 To simplify mirroring maintenance only one instance of storage mirror is recommended per project or region.
 Since lambda/cloud function accept only one trigger per bucket you can use sqs/sns/pubsub notification bucket to
-propagate source event to the StorageMirror instance by either invoking or copying/moving underlying resource to trigger bucket.
+propagate source event from any bucket to the StorageMirror instance by either invoking or copying/moving underlying resource to trigger bucket.
 
 When copy/move setting is used to trigger control StrageMirror events, the original bucket is added as prefix to the resource path:
 For example source path gs://myTopicTriggerBucket/myPath/asset.txt is transformed to gs://mytriggerBucet/myTopicTriggerBucket/myPath/asset.txt 
