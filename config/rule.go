@@ -59,7 +59,7 @@ func (r *Rule) ShallArchiveWalk(URL string) bool {
 func (r *Rule) ArchiveWalkURL(URL string) string {
 	ext := path.Ext(URL)
 	ext = strings.Replace(ext, ".", "", 1)
-	return fmt.Sprintf("%v/%v//localhost/", URL, ext)
+	return fmt.Sprintf("%v/%v://localhost/", strings.Replace(URL, "://", ":", 1), ext)
 }
 
 //Validate checks if route is valid

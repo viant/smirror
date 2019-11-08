@@ -1,0 +1,1 @@
+gs://${gsTriggerBucket}/data/p1/archive.zip to s3

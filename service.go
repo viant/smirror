@@ -142,7 +142,8 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 			if info.IsDir() {
 				return true, nil
 			}
-			streamURL := URL + "-" + info.Name()
+			location := path.Join(parent, info.Name())
+			streamURL := url.Join(URL, location)
 			err = transferStream(ctx, ioutil.NopCloser(reader), streamURL, rule, response)
 			return err == nil, err
 		}, options...)
