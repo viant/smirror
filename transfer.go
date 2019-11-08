@@ -13,6 +13,7 @@ var lineBreak = []byte{'\n'}
 
 //Transfer represents a data transfer
 type Transfer struct {
+	partition    string
 	skipChecksum bool
 	rewriter     *Rewriter
 	Resource     *config.Resource

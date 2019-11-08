@@ -32,9 +32,9 @@ func handleMessages(ctx context.Context, sqsEvent events.SNSEvent) (err error) {
 		}
 		err = s3Event.Each(func(URL string) error {
 			response := proxier.Proxy(ctx, &proxy.Request{
-				Source:config.Source.CloneWithURL(URL),
-				Dest:&config.Dest,
-				Move:config.Move,
+				Source: config.Source.CloneWithURL(URL),
+				Dest:   &config.Dest,
+				Move:   config.Move,
 			})
 			if data, err := json.Marshal(response); err == nil {
 				fmt.Printf("%v\n", string(data))
@@ -44,7 +44,7 @@ func handleMessages(ctx context.Context, sqsEvent events.SNSEvent) (err error) {
 			}
 			return nil
 		})
-		if err  != nil {
+		if err != nil {
 			return err
 		}
 	}

@@ -14,7 +14,34 @@ pipeline:
         credentials: $gcpCredentials
         config:
           topic:
-            URL: /projects/${gcp.projectID}/topics/${gsPrefix}_storage_mirror
+            URL: /projects/${gcp.ProjectID}/topics/${gsPrefix}_storage_mirror
+
+      - URL: ${gsPrefix}_storage_mirror_p0
+        type: topic
+        vendor: gcp
+        credentials: $gcpCredentials
+
+      - URL: ${gsPrefix}_storage_mirror_p0
+        type: subscription
+        vendor: gcp
+        credentials: $gcpCredentials
+        config:
+          topic:
+            URL: /projects/${gcp.ProjectID}/topics/${gsPrefix}_storage_mirror_p0
+
+      - URL: ${gsPrefix}_storage_mirror_p1
+        type: topic
+        vendor: gcp
+        credentials: $gcpCredentials
+
+      - URL: ${gsPrefix}_storage_mirror_p1
+        type: subscription
+        vendor: gcp
+        credentials: $gcpCredentials
+        config:
+          topic:
+            URL: /projects/${gcp.ProjectID}/topics/${gsPrefix}_storage_mirror_p1
+
 
       - URL: $s3Queue
         type: queue

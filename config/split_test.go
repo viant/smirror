@@ -20,20 +20,20 @@ func TestSplit_Name(t *testing.T) {
 			description: "prefix template",
 			route:       &Rule{},
 			split: &Split{
-				Template: "%03d_%v",
+				Template: "%03d_%s",
 			},
 			URL:    "gs://bucket/folder/data.csv.gz",
-			expect: "000_data.csv.gz",
+			expect: "folder/000_data.csv.gz",
 		},
 		{
 			description: "suffix template",
 			route:       &Rule{},
 			counter:     2,
 			split: &Split{
-				Template: "%v_abc_%03d",
+				Template: "%s_abc_%03d",
 			},
 			URL:    "gs://bucket/folder/data.csv.gz",
-			expect: "data_abc_002.csv.gz",
+			expect: "folder/data_abc_002.csv.gz",
 		},
 		{
 			description: "suffix template with 2 depth",
@@ -42,7 +42,7 @@ func TestSplit_Name(t *testing.T) {
 			},
 			counter: 32,
 			split: &Split{
-				Template: "%v_%03d",
+				Template: "%s_%03d",
 			},
 			URL:    "gs://bucket/folder1/subfolder/data.csv.gz",
 			expect: "folder1/subfolder/data_032.csv.gz",
@@ -50,7 +50,7 @@ func TestSplit_Name(t *testing.T) {
 	}
 
 	for _, useCase := range useCases {
-		actual := useCase.split.Name(useCase.route, useCase.URL, useCase.counter)
+		actual := useCase.split.Name(useCase.route, useCase.URL, useCase.counter, nil)
 		assert.EqualValues(t, useCase.expect, actual, useCase.description)
 	}
 

@@ -25,6 +25,7 @@ import (
 	"smirror/msgbus/sqs"
 	"smirror/secret"
 	"smirror/slack"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -231,6 +232,7 @@ func (s *service) publish(ctx context.Context, transfer *Transfer, response *con
 		if dest == "" {
 			dest = transfer.Resource.Queue
 		}
+		dest = strings.Replace(dest, "$partition", transfer.partition, 1)
 		pubResponse, err := s.msgbus.Publish(ctx, &msgbus.Request{
 			Dest:       dest,
 			Data:       data,
@@ -311,10 +313,10 @@ func (s *service) initRule(ctx context.Context, rule *config.Rule) (err error) {
 	return nil
 }
 
-func (s *service) chunkWriter(ctx context.Context, URL string, rule *config.Rule, counter *int32, waitGroup *sync.WaitGroup, response *contract.Response) func() io.WriteCloser {
-	return func() io.WriteCloser {
+func (s *service) chunkWriter(ctx context.Context, URL string, rule *config.Rule, counter *int32, waitGroup *sync.WaitGroup, response *contract.Response) func(partition interface{}) io.WriteCloser {
+	return func(partition interface{}) io.WriteCloser {
 		splitCount := atomic.AddInt32(counter, 1)
-		destName := rule.Split.Name(rule, URL, splitCount)
+		destName := rule.Split.Name(rule, URL, splitCount, partition)
 		destURL := url.Join(rule.Dest.URL, destName)
 		return NewWriter(rule, func(writer *Writer) error {
 			if writer.Reader == nil {
@@ -323,6 +325,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, rule *config.Rule
 			waitGroup.Add(1)
 			defer waitGroup.Done()
 			dataCopy := &Transfer{
+				partition:    fmt.Sprintf("%v", partition),
 				skipChecksum: response.ChecksumSkip,
 				Resource:     rule.Dest,
 				Reader:       writer.Reader,

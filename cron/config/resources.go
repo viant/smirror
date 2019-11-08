@@ -90,7 +90,7 @@ func (r *Ruleset) loadResources(ctx context.Context, storage afs.Service, object
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
 	}
-	for i:= range resources {
+	for i := range resources {
 		if resources[i].Source.URL == "" {
 			return fmt.Errorf("source.url was empty: %v", object.URL())
 		}

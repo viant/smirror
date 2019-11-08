@@ -10,8 +10,6 @@ import (
 	"smirror/cron"
 )
 
-
-
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -21,11 +19,9 @@ func main() {
 	lambda.Start(handleRequest)
 }
 
-
-
 func handleRequest(ctx context.Context) (*cron.Response, error) {
 	//if base.IsLoggingEnabled() {
-		logger.Logf = logger.StdoutLogger
+	logger.Logf = logger.StdoutLogger
 	//}
 	service, err := cron.NewFromEnv(ctx, base.ConfigEnvKey)
 	if err != nil {

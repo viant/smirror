@@ -1,0 +1,50 @@
+init:
+  part0: $Cat('${parent.path}/data/expect/events_p0.csv')
+  part1: $Cat('${parent.path}/data/expect/events_p1.csv')
+  events_p0: $Cat('${parent.path}/data/expect/events_p0.json')
+  events_p1: $Cat('${parent.path}/data/expect/events_p1.json')
+  exepct_p0: $AsData($events_p0)
+  exepct_p1: $AsData($events_p1)
+
+pipeline:
+
+  setupRule:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/rule.json
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}.json
+
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 20000
+    source:
+      URL: ${parent.path}/data/prepare/events.csv
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsTriggerBucket}/data/p13/events.csv
+
+  validate:
+    partition_p0:
+      action: msg:pull
+      timeoutMs: 10000
+      source:
+        URL: ${gsPrefix}_storage_mirror_p0
+        type: subscription
+        vendor: gcp
+        credentials: $gcpCredentials
+      count: 1
+      expect: $exepct_p0
+
+    partition_p1:
+      action: msg:pull
+      timeoutMs: 10000
+      source:
+        URL: ${gsPrefix}_storage_mirror_p1
+        type: subscription
+        vendor: gcp
+        credentials: $gcpCredentials
+      count: 1
+      expect: $exepct_p1

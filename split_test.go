@@ -17,7 +17,7 @@ func TestSplit(t *testing.T) {
 		data = append(data, []byte(fmt.Sprintf("%v %v\n", strings.Repeat("x", 2), i))...)
 	}
 	text := string(data)
-
+	index := 0
 	useCases := []struct {
 		description string
 		split       *config.Split
@@ -73,11 +73,24 @@ func TestSplit(t *testing.T) {
 				"xx 0\nxx 1\nxx 2\nxx 3", "xx 4\nxx 5\nxx 6\nxx 7", "xx 8",
 			},
 		},
+		{
+			description: "partition - filed index",
+			split: &config.Split{MaxSize: 1024,
+				Partition: &config.Partition{
+					FiledIndex: &index,
+					Hash:       "fnv",
+					Mod:        2,
+				},
+			},
+			expect: []string{
+				"\nxx 0\nxx 2\nxx 4\nxx 6\nxx 8", "\nxx 1\nxx 3\nxx 5\nxx 7",
+			},
+		},
 	}
 
 	for _, useCase := range useCases {
 		var data = make([]string, 0)
-		err := Split(strings.NewReader(text), func() io.WriteCloser { return newTestWriter(&data) }, useCase.split, NewRewriter())
+		err := Split(strings.NewReader(text), func(partition interface{}) io.WriteCloser { return newTestWriter(&data) }, useCase.split, NewRewriter())
 		assert.Nil(t, err)
 		assert.EqualValues(t, useCase.expect, data, useCase.description)
 	}

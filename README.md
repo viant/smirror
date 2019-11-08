@@ -232,6 +232,9 @@ when data is published to destination path defined by split template. Source att
 For example if original resource xx://mybucket/data/p11/events.csv is divided into 2 parts,  two messages are published
 with data payload and /data/p11/0001_events.csv and /data/p11/0002_events.csv source attribute respectively.
 
+Both topic and queue support **$partition** variable to expanded ir with partition when Split.Partition setting is used. 
+
+
 
 **Payload substitution:**
 
@@ -243,7 +246,21 @@ Optionally mirror process can spliy source content lines by size or max line cou
 
 - **Split.MaxLines**: maximum lines in dest splitted file
 - **Split.MaxSize**: maximum size in dest splitted file (lines are presrved)
-- **Split.Template**: optional template for dest file with '%04d_%v' default value, where %d - is expanded with a split number and %s is replaced with a file name. 
+- **Split.Template**: optional template for dest file with '%04d_%s' default value, 
+_where_:
+    * %d or $chunk - is expanded with a split number  
+    * %s or $name is replaced with a file name, 
+    * %v or $partition is replaced with a partition key value (if applicable)
+
+- **Split.Partition**: partition allows you splitting by partition
+- **Split.Partition.Field**: name of filed (JSON/Avro)
+- **Split.Partition.FiledIndex**: field index (CSV) 
+- **Split.Partition.Separator**: optional separator, default (,) (CSV)
+- **Split.Partition.Hash**: optional hash for int64 partition value, the following are supported
+  - md5
+  - fnv
+  - murmur
+- **Split.Partition.Mod**: optional moulo value for numeric partition value   
 
 
 
@@ -272,6 +289,9 @@ To see preserve depth control assume the following:
 By default is not split or replacement rules is specified, source is copied to destination without decompressing source archive.
 
 - **Codec** defines destination codec (gzip is only option currently supported).
+- **Uncompress**: uncompress value is set when split or replace options are used, you can this value for zip/tar source file if you need
+mirror individual archive assets.   
+
 
 
 **Secrets options**
