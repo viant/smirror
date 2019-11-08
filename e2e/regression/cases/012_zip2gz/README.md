@@ -3,6 +3,8 @@
 Mirror data from gs://${gsTriggerBucket}/data/p12/archive.zip  to gs://${gsTriggerBucket}/data/p12/archive.zip/*.gz
 
 Since **Uncompress** option is specified all files from archive are individually mirror to destination.
+During mirroring process files compress with gzip as specified in **codec** attribute.
+
 
 #### Input:
 
