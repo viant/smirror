@@ -200,7 +200,7 @@ you can use the following rule
 ## Partitioning
 
 To partition data from Google Storage that match /data/subfolder  prefix and '.csv' suffix to topic mytopic_p$partition you can use the following rule.
-The process build partition key from CSV field[0] with mod(2) 
+The process builds partition key from CSV field[0] with mod(2) 
 Destination topic is dynamically evaluated based on parition value.
  
 
