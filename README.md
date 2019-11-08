@@ -199,8 +199,8 @@ you can use the following rule
 
 ## Partitioning
 
-To mirror data from Google Storage that match /data/subfolder  prefix and '.csv' suffix to topic mytopic_p$partition you can use the following rule.
-During mirroring process data is split by partition evaluated from CSV field[0] with mod(2) 
+To partition data from Google Storage that match /data/subfolder  prefix and '.csv' suffix to topic mytopic_p$partition you can use the following rule.
+The process build partition key from CSV field[0] with mod(2) 
 Destination topic is dynamically evaluated based on parition value.
  
 
