@@ -35,21 +35,21 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
 
 ## Motivation
 
-When dealing with various cloud providers, it is a frequent use case to move seamlessly data from one cloud storage to another. 
-In some scenarios, you may also need to split transferred content into a few smaller chunks. 
-In any cases facilitating compression and post processing for both successful and failed transfer would be just additional requirement.
+When dealing with various cloud providers, it is a frequent use case to move seamlessly data from one cloud resource to another.
+This resource could be any cloud storage or even a cloud message bus. During mirroring a data may be transformed
+or partitioned all driven by declarative mirroring rules.
 
 
 ## Introduction
 
-This project provide serverless implementation for cloud storage mirror. All external secrets/credentials are secured with KMS. 
-
-**Google Storage to S3 Mirror**
-
-[![Google storage to S3 mirror](images/g3Tos3Mirror.png)](images/g3Tos3Mirror.png)
+[![Cloud  mirror](images/cloud_mirror.png)](images/cloud_mirror.png)
 
 
 ## Usage
+
+**Google Storage to S3 Mirror**
+
+[![Google storage to S3 mirror](images/g3tos3mirror.png)](images/g3tos3mirror.png)
 
 ### Google Storage to S3
 
@@ -86,7 +86,7 @@ the following rule can be used
 
 ### S3 to Google Storage
 
-[![Google storage to S3 mirror](images/s3to_gs_mirror.png)](images/s3to_gs_mirror.png)
+[![Google storage to S3 mirror](images/s3togsmirror.png)](images/s3togsmirror.png)
 
 
 To mirror data from S3 that matches /myprefix/ prefix and '.csv.gz' suffix to gs://destBucket/data
@@ -119,7 +119,7 @@ splitting source file into maximum 8 MB files in destination you can use the fol
 
 ### Google Storage To Pubsub
 
-[![Google storage to Pubsub](images/g3ToPubsub.png)](images/g3ToPubsub.png)
+[![Google storage to Pubsub](images/g3Topubsub.png)](images/g3Topubsub.png)
 
 
 To mirror data from google storage that match /myprefix/ prefix and '.csv' suffix to pubsub 'myTopic' topic
