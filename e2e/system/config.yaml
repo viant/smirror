@@ -8,6 +8,9 @@ pipeline:
           credentials: $gcpCredentials
         - URL:  gs://${gsConfigBucket}/StorageMirror
           credentials: $awsCredentials
+        - URL:  gs://${gsConfigBucket}/StorageMirror/Rules/
+          credentials: $gcpCredentials
+
 
 
   deployGoogleStorageMirroConifg:

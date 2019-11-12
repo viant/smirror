@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/matcher"
+	"github.com/viant/afs/option"
 	"github.com/viant/afs/storage"
 	"smirror/base"
 	"strings"
@@ -80,7 +81,7 @@ func (c *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 		return err
 	}
 	suffixMatcher, _ := matcher.NewBasic("", ".json", "", nil)
-	routesObject, err := fs.List(ctx, c.BaseURL, suffixMatcher)
+	routesObject, err := fs.List(ctx, c.BaseURL, suffixMatcher, option.NewRecursive(true))
 	if err != nil {
 		return err
 	}
