@@ -10,17 +10,20 @@ Configuration:
 
 * Rule
 
-[@routes,json](rule.json)
+[@rule.json(rule.json)
 ```json
 [
   {
     "Source": {
       "Prefix": "/data/p8",
-      "Suffix": ".csv"
+      "Suffix": ".csv.gz"
     },
-    "Replace": {
-        "10": "33333333"
-    },
+    "Replace": [
+      {
+        "From": "10",
+        "To": "33333333"
+      }
+    ],
     "Dest": {
       "URL": "s3://${s3DestBucket}/data",
       "Credentials": {

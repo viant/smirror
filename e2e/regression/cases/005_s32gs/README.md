@@ -10,7 +10,7 @@ Configuration:
 
 * Rule
 
-[@routes,json](rule.json)
+[@rule.json(rule.json)
 ```json
  [
    {

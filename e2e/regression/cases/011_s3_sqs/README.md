@@ -9,7 +9,7 @@ Configuration:
 * Global Config: [@config,json](../../../config/s3.json)
 * Rule
 
-[@routes,json](rule.json)
+[@rule.json(rule.json)
 ```json
 [
   {

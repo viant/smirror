@@ -163,3 +163,4 @@ func (s *Split) Name(router *Rule, URL string, counter int32, partition interfac
 	destName += "." + ext
 	return path.Join(parent, destName)
 }
+

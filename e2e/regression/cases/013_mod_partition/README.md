@@ -10,7 +10,7 @@ Configuration:
 * Global Config: [@config,json](../../../config/gs.json)
 * Rule
 
-[@routes,json](rule.json)
+[@rule.json(rule.json)
 ```json
 [
   {
