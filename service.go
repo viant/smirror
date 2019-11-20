@@ -348,7 +348,7 @@ func New(ctx context.Context, config *Config) (Service, error) {
 		fs:       fs,
 		mux:      &sync.Mutex{},
 		secret:   secretService,
-		notifier: slack.NewSlack("", config.ProjectID, fs, secretService, config.SlackCredentials),
+		notifier: slack.NewSlack(config.Region, config.ProjectID, fs, secretService, config.SlackCredentials),
 	}
 	return result, result.Init(ctx)
 }

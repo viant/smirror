@@ -8,12 +8,16 @@ import (
 
 //Config represents a base config
 type Config struct {
+	Region string
 	ProjectID    string
 	SourceScheme string
 }
 
 func (c *Config) Init() {
 	var projectID string
+	if c.Region== "" {
+		c.Region = os.Getenv("FUNCTION_REGION")
+	}
 	if c.SourceScheme == "" {
 		if projectID = os.Getenv("GCLOUD_PROJECT"); projectID != "" {
 			c.SourceScheme = gs.Scheme
