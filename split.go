@@ -9,7 +9,7 @@ import (
 
 const bufferSize = 1024 * 1024
 
-func splitByLines(scanner *bufio.Scanner, maxLines int, provider func(partition interface{}) io.WriteCloser, rewriter *Rewriter) error {
+func splitByLines(scanner *bufio.Scanner, maxLines int, provider func(partition interface{}) io.WriteCloser) error {
 	counter := 0
 	var err error
 	if maxLines == 0 {
@@ -28,7 +28,7 @@ func splitByLines(scanner *bufio.Scanner, maxLines int, provider func(partition 
 				return err
 			}
 		}
-		if err = rewriter.Write(writer, scanner.Bytes()); err != nil {
+		if _, err = writer.Write(scanner.Bytes()); err != nil {
 			return err
 		}
 		counter++
@@ -46,7 +46,7 @@ func splitByLines(scanner *bufio.Scanner, maxLines int, provider func(partition 
 	return nil
 }
 
-func splitBySize(scanner *bufio.Scanner, maxSize int, provider func(partition interface{}) io.WriteCloser, rewriter *Rewriter) error {
+func splitBySize(scanner *bufio.Scanner, maxSize int, provider func(partition interface{}) io.WriteCloser) error {
 	counter := 0
 	var err error
 	var writer io.WriteCloser
@@ -77,7 +77,7 @@ func splitBySize(scanner *bufio.Scanner, maxSize int, provider func(partition in
 				return err
 			}
 		}
-		if err = rewriter.Write(writer, data); err != nil {
+		if _, err = writer.Write(data); err != nil {
 			return err
 		}
 		counter++
@@ -89,21 +89,22 @@ func splitBySize(scanner *bufio.Scanner, maxSize int, provider func(partition in
 }
 
 //Split divides reader supplied text by number of specified line
-func Split(reader io.Reader, writerProvider func(partition interface{}) io.WriteCloser, split *config.Split, rewriter *Rewriter) error {
+func Split(reader io.Reader, writerProvider func(partition interface{}) io.WriteCloser, rule *config.Rule) error {
 	scanner := bufio.NewScanner(reader)
 	scanner.Buffer(make([]byte, bufferSize), 10*bufferSize)
+	split := rule.Split
 
 	if split.Partition != nil {
-		return splitWithPartition(scanner, split, writerProvider, rewriter)
+		return splitWithPartition(scanner, split, writerProvider)
 	}
 
 	if split.MaxSize > 0 {
-		return splitBySize(scanner, split.MaxSize, writerProvider, rewriter)
+		return splitBySize(scanner, split.MaxSize, writerProvider)
 	}
 	if split.MaxLines == 0 {
 		split.MaxLines = 1
 	}
-	return splitByLines(scanner, split.MaxLines, writerProvider, rewriter)
+	return splitByLines(scanner, split.MaxLines, writerProvider)
 }
 
 type partitionedBuffer struct {
@@ -126,7 +127,9 @@ func (p *partitionedBuffer) flush(provider func(partition interface{}) io.WriteC
 	return nil
 }
 
-func splitWithPartition(scanner *bufio.Scanner, split *config.Split, provider func(partition interface{}) io.WriteCloser, rewriter *Rewriter) (err error) {
+func splitWithPartition(scanner *bufio.Scanner, split *config.Split, provider func(partition interface{}) io.WriteCloser) (err error) {
+
+
 	var partitions = map[interface{}]*partitionedBuffer{}
 	for scanner.Scan() {
 		data := scanner.Bytes()
@@ -154,13 +157,12 @@ func splitWithPartition(scanner *bufio.Scanner, split *config.Split, provider fu
 				return err
 			}
 		}
-		if err = rewriter.Write(partition, data); err != nil {
+		if _, err = partition.Write(data); err != nil {
 			return err
 		}
 		partition.lines++
 		partition.size += len(data)
 	}
-
 	for k := range partitions {
 		partition := partitions[k]
 		if err = partition.flush(nil); err != nil {

@@ -219,7 +219,7 @@ line4`,
 							},
 							Split: &config.Split{
 								MaxLines: 3,
-								Template: "%v_%05d",
+								Template: "%s_%05d",
 							},
 						},
 					},
@@ -269,7 +269,7 @@ line11
 							},
 							Split: &config.Split{
 								MaxLines: 10,
-								Template: "%v_%05d",
+								Template: "%s_%05d",
 							},
 							Compression: &config.Compression{
 								Codec: config.GZipCodec,
@@ -325,7 +325,7 @@ line11
 							},
 							Split: &config.Split{
 								MaxLines: 10,
-								Template: "%v_%05d",
+								Template: "%s_%05d",
 							},
 							Compression: &config.Compression{
 								Codec: config.GZipCodec,

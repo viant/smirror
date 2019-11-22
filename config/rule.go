@@ -1,9 +1,11 @@
 package config
 
 import (
+	"compress/gzip"
 	"fmt"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
+	"io"
 	"path"
 	"smirror/base"
 	"smirror/job"
@@ -17,6 +19,7 @@ type Rule struct {
 	Dest    *Resource
 	Source  *Resource
 	Replace []*Replace `json:",omitempty"`
+	Recover *Recover
 
 	Split *Split `json:",omitempty"`
 	job.Actions
@@ -26,6 +29,42 @@ type Rule struct {
 
 	//Group defines group of rule to be matched, otherwise multi match is invalid
 	Group string `json:",omitempty"`
+}
+
+//NewReplacer create a replaced for the rule
+func (r *Rule) NewReplacer() *strings.Replacer {
+	if len(r.Replace) == 0 {
+		return nil
+	}
+	pairs := make([]string, 0)
+	for _, replace := range r.Replace {
+		pairs = append(pairs, replace.From)
+		pairs = append(pairs, replace.To)
+	}
+	return strings.NewReplacer(pairs...)
+}
+
+
+
+//NewReader returns a reader for a rule
+func (r *Rule) NewReader(reader io.Reader, sourceURL string) (io.Reader, error) {
+	compression := r.SourceCompression(sourceURL)
+	var err error
+	if compression != nil && compression.Codec == GZipCodec {
+		if reader, err =  gzip.NewReader(reader);err != nil {
+			return reader, err
+		}
+	}
+	if ! r.HasTransformer() {
+		 return reader, nil
+	}
+	return NewTransformer(reader, r)
+}
+
+
+//HasTransformer returns true if rule has recover or replace option
+func (r *Rule) HasTransformer() bool {
+	return r.Recover != nil || len(r.Replace) > 0
 }
 
 //HasSplit returns true if rule has split defined
@@ -76,7 +115,7 @@ func (r *Rule) Validate() error {
 
 //Init initialises routes
 func (r *Rule) Init() {
-	if r.HasSplit() || len(r.Replace) > 0 {
+	if r.HasSplit() || r.HasTransformer() {
 		if r.Compression == nil {
 			r.Compression = &Compression{}
 		}

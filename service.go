@@ -159,9 +159,9 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 	return transferStream(ctx, reader, URL, rule, response)
 }
 
-func (s *service) transferStream(ctx context.Context, reader io.ReadCloser, URL string, rule *config.Rule, response *contract.Response) (err error) {
-	sourceCompression := rule.SourceCompression(URL)
-	reader, err = NewReader(reader, sourceCompression)
+func (s *service) transferStream(ctx context.Context, reader io.Reader, URL string, rule *config.Rule, response *contract.Response) (err error) {
+
+	reader, err = rule.NewReader(reader, URL)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
 	}
@@ -169,13 +169,13 @@ func (s *service) transferStream(ctx context.Context, reader io.ReadCloser, URL 
 	destURL := url.Join(rule.Dest.URL, destName)
 	destCompression := rule.Compression
 
-	if path.Ext(URL) == path.Ext(destURL) && len(rule.Replace) == 0 {
-		sourceCompression = nil
+	if path.Ext(URL) == path.Ext(destURL) && ! rule.HasTransformer(){
 		destCompression = nil
 	}
+
 	dataCopy := &Transfer{
 		skipChecksum: response.ChecksumSkip,
-		rewriter:     NewRewriter(rule.Replace...),
+		rule:rule,
 		Resource:     rule.Dest,
 		Reader:       reader,
 		Dest:         NewDatafile(destURL, destCompression)}
@@ -183,16 +183,14 @@ func (s *service) transferStream(ctx context.Context, reader io.ReadCloser, URL 
 	return s.transfer(ctx, dataCopy, response)
 }
 
-func (s *service) transferChunkStream(ctx context.Context, reader io.ReadCloser, URL string, rule *config.Rule, response *contract.Response) (err error) {
-	sourceCompression := rule.SourceCompression(URL)
-	reader, err = NewReader(reader, sourceCompression)
+func (s *service) transferChunkStream(ctx context.Context, reader io.Reader, URL string, rule *config.Rule, response *contract.Response) (err error) {
+	reader, err = rule.NewReader(reader, URL)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
 	}
 	counter := int32(0)
 	waitGroup := &sync.WaitGroup{}
-	rewriter := NewRewriter(rule.Replace...)
-	err = Split(reader, s.chunkWriter(ctx, URL, rule, &counter, waitGroup, response), rule.Split, rewriter)
+	err = Split(reader, s.chunkWriter(ctx, URL, rule, &counter, waitGroup, response), rule)
 	if err == nil {
 		waitGroup.Wait()
 	}

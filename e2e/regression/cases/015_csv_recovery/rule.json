@@ -1,0 +1,20 @@
+[
+  {
+    "Source": {
+      "Prefix": "/data/p015",
+      "Suffix": ".csv"
+    },
+    "Dest": {
+      "URL": "gs://${gsDestBucket}/"
+    },
+    "Recover": {
+        "Format": "CSV",
+        "FieldCount": 3
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ]
+  }
+]

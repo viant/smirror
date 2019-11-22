@@ -1,0 +1,19 @@
+[
+  {
+    "Source": {
+      "Prefix": "/data/p14",
+      "Suffix": ".json"
+    },
+    "Dest": {
+      "URL": "gs://${gsDestBucket}/"
+    },
+    "Recover": {
+        "Format": "JSON"
+    },
+    "OnSuccess": [
+      {
+        "Action": "delete"
+      }
+    ]
+  }
+]
