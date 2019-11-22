@@ -10,7 +10,7 @@ Configuration:
 
 * Rule
 
-[@rule.json(rule.json)
+[@rule.json](rule.json)
 ```json
  [
    {
