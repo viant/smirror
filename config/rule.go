@@ -16,11 +16,13 @@ import (
 //Rule represent matching resource route rule
 type Rule struct {
 	Info    base.Info
+	Disabled bool  `json:",omitempty"`
 	Dest    *Resource
 	Source  *Resource
 	Replace []*Replace `json:",omitempty"`
 	Recover *Recover
 
+	Streaming *Streaming
 	Split *Split `json:",omitempty"`
 	job.Actions
 	*Compression
@@ -120,6 +122,9 @@ func (r *Rule) Init() {
 			r.Compression = &Compression{}
 		}
 		r.Compression.Uncompress = true
+	}
+	if r.Streaming != nil {
+		r.Streaming.Init()
 	}
 }
 

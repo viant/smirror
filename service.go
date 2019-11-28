@@ -92,6 +92,10 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		response.Status = base.StatusNoMatch
 		return nil
 	}
+	if rule.Disabled {
+		response.Status = base.StatusDisabled
+		return nil
+	}
 	if err := s.initRule(ctx, rule); err != nil {
 		return errors.Wrapf(err, "railed to initialise rule: %v", rule.Info.Workflow)
 	}
@@ -106,9 +110,15 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		response.NotFoundError = fmt.Sprintf("does not exist: %v", err)
 		return nil
 	}
-	response.ChecksumSkip = int(object.Size()) > s.config.Streaming.ChecksumSkipThreshold
-	if int(object.Size()) > s.config.Streaming.Threshold {
-		response.StreamOption = option.NewStream(s.config.Streaming.PartSize, int(object.Size()))
+
+	var streaming = &s.config.Streaming
+	if rule.Streaming != nil {
+		streaming = rule.Streaming
+	}
+
+	response.ChecksumSkip = int(object.Size()) > streaming.ChecksumSkipThreshold
+	if int(object.Size()) > streaming.Threshold {
+		response.StreamOption = option.NewStream(streaming.PartSize, int(object.Size()))
 	}
 
 	err = s.mirrorAsset(ctx, rule, request.URL, response)

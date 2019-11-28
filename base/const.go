@@ -12,6 +12,9 @@ const (
 	//StatusNoFound status no found
 	StatusNoFound = "notFound"
 
+	//StatusDisabled status disabled
+	StatusDisabled = "disabled"
+
 	//StatusUnProcess status for unprocessed file
 	StatusUnProcess = "unprocessed"
 
