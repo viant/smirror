@@ -1,0 +1,33 @@
+init:
+  '!gcpCredentials': $params.authWith
+  '!topic': $params.topic
+  '!destURL': $params.destURL
+  '!cfSuffix': $params.cfSuffix
+  appPath: $Pwd(../../..)
+
+pipeline:
+  package:
+    action: exec:run
+    target: $target
+    checkError: true
+    commands:
+      - cd ${appPath}
+      - unset GOPATH
+      - export GO111MODULE=on
+      - rm -rf vendor
+      - go mod vendor
+
+  deploy:
+    action: gcp/cloudfunctions:deploy
+    '@name': MessageMirror${cfSuffix}
+    entryPoint: MessageMirror
+    credentials: $gcpCredentials
+    runtime: go111
+    eventTrigger:
+      eventType: google.pubsub.topic.publish
+      resource: $topic
+    environmentVariables:
+      FORMAT: JSON
+      DEST_URL: $destURL
+    source:
+      URL: ${appPath}
