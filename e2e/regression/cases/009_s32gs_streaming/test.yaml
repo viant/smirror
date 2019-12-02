@@ -1,5 +1,16 @@
 pipeline:
 
+
+  cleanUp:
+    action: storage:remove
+    sleepTimeMs: 1000
+    assets:
+      - URL: 'gs://${s3ConfigBucket}/StorageMirror/_.cache'
+        credentials: $gcpCredentials
+      - URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.json
+        credentials: $awsCredentials
+
+
   setupRule:
     action: storage:copy
     expand: true

@@ -11,6 +11,15 @@ pipeline:
         credentials: $awsCredentials
       - URL:  s3://${s3ExternalBucket}/
         credentials: $awsCredentials
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/_.cache'
+        credentials: $gcpCredentials
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/'
+        credentials: $gcpCredentials
+      - URL: 'gs://${s3ConfigBucket}/StorageMirror/_.cache'
+        credentials: $awsCredentials
+      - URL: 'gs://${s3ConfigBucket}/StorageMirror/Rules/'
+        credentials: $awsCredentials
+
 
   create3rdParty:
     action: storage:create

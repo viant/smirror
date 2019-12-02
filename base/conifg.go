@@ -8,6 +8,7 @@ import (
 
 //Config represents a base config
 type Config struct {
+	URL string
 	Region string
 	ProjectID    string
 	SourceScheme string

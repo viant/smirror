@@ -3,6 +3,16 @@ init:
 
 pipeline:
 
+  cleanUp:
+    action: storage:remove
+    sleepTimeMs: 1000
+    assets:
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/_.cache'
+        credentials: $gcpCredentials
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.json'
+        credentials: $gcpCredentials
+
+
   setupRule:
     action: storage:copy
     expand: true
@@ -10,7 +20,8 @@ pipeline:
       URL: ${parent.path}/rule.json
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}.csv
+      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.json
+
 
   trigger:
     action: storage:copy

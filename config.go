@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
+	"github.com/viant/afs/cache"
 	"github.com/viant/toolbox"
 	"os"
 	"smirror/auth"
@@ -19,6 +20,7 @@ const (
 
 //Config represents routes
 type Config struct {
+
 	base.Config
 	MaxRetries       int
 	SlackCredentials *auth.Credentials
@@ -74,7 +76,7 @@ func NewConfigFromJSON(ctx context.Context, payload string) (*Config, error) {
 
 //NewConfigFromURL creates a new config from env
 func NewConfigFromURL(ctx context.Context, URL string) (*Config, error) {
-	service := afs.New()
+	service := cache.Singleton(URL)
 	reader, err := service.DownloadWithURL(ctx, URL)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to download: %v", URL)
@@ -84,5 +86,6 @@ func NewConfigFromURL(ctx context.Context, URL string) (*Config, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to decode: %v ", URL)
 	}
-	return cfg, cfg.Init(ctx, afs.New())
+	cfg.URL = URL
+	return cfg, cfg.Init(ctx, service)
 }

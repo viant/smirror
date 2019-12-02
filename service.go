@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
+	"github.com/viant/afs/cache"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/option"
 	"github.com/viant/afs/storage"
@@ -41,6 +42,7 @@ type service struct {
 	mux      *sync.Mutex
 	config   *Config
 	fs       afs.Service
+	cfs      afs.Service
 	secret   secret.Service
 	msgbus   msgbus.Service
 	notifier slack.Slack
@@ -73,7 +75,7 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 }
 
 func (s *service) mirror(ctx context.Context, request *contract.Request, response *contract.Response) (err error) {
-	_, err = s.config.Mirrors.ReloadIfNeeded(ctx, s.fs)
+		_, err = s.config.Mirrors.ReloadIfNeeded(ctx, s.cfs)
 	if err != nil {
 		return err
 	}
@@ -179,13 +181,13 @@ func (s *service) transferStream(ctx context.Context, reader io.Reader, URL stri
 	destURL := url.Join(rule.Dest.URL, destName)
 	destCompression := rule.Compression
 
-	if path.Ext(URL) == path.Ext(destURL) && ! rule.HasTransformer(){
+	if path.Ext(URL) == path.Ext(destURL) && ! rule.HasTransformer() {
 		destCompression = nil
 	}
 
 	dataCopy := &Transfer{
 		skipChecksum: response.ChecksumSkip,
-		rule:rule,
+		rule:         rule,
 		Resource:     rule.Dest,
 		Reader:       reader,
 		Dest:         NewDatafile(destURL, destCompression)}
@@ -279,7 +281,7 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 
 //Init initialises this service
 func (s *service) Init(ctx context.Context) error {
-	return s.config.Init(ctx, s.fs)
+	return s.config.Init(ctx, s.cfs)
 }
 
 func (s *service) initActions(actions []*job.Action) {
@@ -346,7 +348,8 @@ func (s *service) chunkWriter(ctx context.Context, URL string, rule *config.Rule
 
 //NewSlack creates a new mirror service
 func New(ctx context.Context, config *Config) (Service, error) {
-	err := config.Init(ctx, afs.New())
+	cfs := cache.Singleton(config.URL)
+	err := config.Init(ctx, cfs)
 	if err != nil {
 		return nil, err
 	}
@@ -354,6 +357,7 @@ func New(ctx context.Context, config *Config) (Service, error) {
 	secretService := secret.New(config.SourceScheme, fs)
 	result := &service{config: config,
 		fs:       fs,
+		cfs:      cfs,
 		mux:      &sync.Mutex{},
 		secret:   secretService,
 		notifier: slack.NewSlack(config.Region, config.ProjectID, fs, secretService, config.SlackCredentials),

@@ -1,7 +1,7 @@
 {
   "Mirrors": {
     "BaseURL": "gs://${gsConfigBucket}/StorageMirror/Rules/",
-    "CheckInMs": 100
+    "CheckInMs": 10
   },
   "SlackCredentials": {
     "URL": "gs://${gsConfigBucket}/Secrets/slack.json.enc",

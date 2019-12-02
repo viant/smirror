@@ -5,7 +5,6 @@
       "Suffix": ".csv"
     },
     "Dest": {
-
       "Topic": "${gsPrefix}_storage_mirror_p$partition"
     },
     "Split": {
