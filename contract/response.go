@@ -12,6 +12,7 @@ import (
 //Response represents a response
 type Response struct {
 	TriggeredBy   string
+	FileSize      int64
 	DestURLs      []string `json:",omitempty"`
 	MessageIDs    []string `json:",omitempty"`
 	TimeTakenMs   int

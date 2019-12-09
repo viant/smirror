@@ -13,7 +13,7 @@ require (
 	github.com/stretchr/testify v1.3.0
 	github.com/twmb/murmur3 v1.0.0
 	github.com/viant/afs v0.11.3
-	github.com/viant/afsc v0.11.0
+	github.com/viant/afsc v0.11.5
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.28.0
 	google.golang.org/api v0.7.0

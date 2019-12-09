@@ -112,7 +112,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		response.NotFoundError = fmt.Sprintf("does not exist: %v", err)
 		return nil
 	}
-
+	response.FileSize = object.Size()
 	var streaming = &s.config.Streaming
 	if rule.Streaming != nil {
 		streaming = rule.Streaming
