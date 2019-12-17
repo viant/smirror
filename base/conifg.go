@@ -8,15 +8,15 @@ import (
 
 //Config represents a base config
 type Config struct {
-	URL string
-	Region string
+	URL          string
+	Region       string
 	ProjectID    string
 	SourceScheme string
 }
 
 func (c *Config) Init() {
 	var projectID string
-	if c.Region== "" {
+	if c.Region == "" {
 		c.Region = os.Getenv("FUNCTION_REGION")
 	}
 	if c.SourceScheme == "" {

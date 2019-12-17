@@ -1,4 +1,4 @@
-package config
+package recover
 
 import (
 	"bufio"
@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"smirror/config"
 	"strings"
 	"unsafe"
 )
@@ -15,9 +16,9 @@ const bufferSize = 1024 * 1024
 
 var lineBreak = []byte{'\n'}
 
-type transformer struct {
+type reader struct {
 	count     int32
-	recover   *Recover
+	recover   *config.Recover
 	replacer  *strings.Replacer
 	scanner   *bufio.Scanner
 	buf       *bytes.Buffer
@@ -26,12 +27,12 @@ type transformer struct {
 	eof       bool
 }
 
-func (t *transformer) buffer() *bytes.Buffer {
+func (t *reader) buffer() *bytes.Buffer {
 	return t.buf
 }
 
-func (t *transformer) transform() error {
-	if ! t.scanner.Scan() {
+func (t *reader) transform() error {
+	if !t.scanner.Scan() {
 		t.eof = true
 	}
 	data := t.scanner.Bytes()
@@ -45,7 +46,7 @@ func (t *transformer) transform() error {
 		return nil
 	}
 	if t.recover != nil {
-		if t.recover.IsJSON() && ! json.Valid(data) {
+		if t.recover.IsJSON() && !json.Valid(data) {
 			return nil
 		}
 		if t.recover.IsCSV() {
@@ -68,7 +69,7 @@ func (t *transformer) transform() error {
 	return nil
 }
 
-func (t *transformer) recoverCSV(data []byte) []byte {
+func (t *reader) recoverCSV(data []byte) []byte {
 	csvReader := t.recover.NewCsvReader(bytes.NewReader(data))
 	record, err := csvReader.Read()
 	if err != nil {
@@ -96,12 +97,12 @@ func (t *transformer) recoverCSV(data []byte) []byte {
 	return data[:len(data)-1]
 }
 
-func (t *transformer) Read(p []byte) (n int, err error) {
+func (t *reader) Read(p []byte) (n int, err error) {
 	if t.eof && t.pending == 0 {
 		return 0, io.EOF
 	}
 	expect := len(p)
-	for t.pending < expect && ! t.eof {
+	for t.pending < expect && !t.eof {
 		err := t.transform()
 		if err != nil {
 			return 0, err
@@ -112,10 +113,10 @@ func (t *transformer) Read(p []byte) (n int, err error) {
 	return read, err
 }
 
-func NewTransformer(reader io.Reader, rule *Rule) (io.Reader, error) {
-	scanner := bufio.NewScanner(reader)
+func NewReader(r io.Reader, rule *config.Rule) (io.Reader, error) {
+	scanner := bufio.NewScanner(r)
 	scanner.Buffer(make([]byte, bufferSize), 10*bufferSize)
-	return &transformer{
+	return &reader{
 		recover:   rule.Recover,
 		transient: new(bytes.Buffer),
 		buf:       new(bytes.Buffer),
@@ -129,4 +130,3 @@ func byteToString(data []byte) string {
 	ptr := unsafe.Pointer(&data)
 	return *(*string)(ptr)
 }
-

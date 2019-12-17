@@ -31,6 +31,7 @@ type service struct {
 //Check checks triggerBucket and error
 func (s *service) Check(ctx context.Context, request *Request) *Response {
 	response := NewResponse()
+
 	err := s.check(ctx, request, response)
 	if err != nil {
 		response.Error = err.Error()
@@ -120,7 +121,7 @@ func (s *service) checkProcessed(ctx context.Context, request *Request, response
 	if err != nil {
 		return errors.Wrapf(err, "failed to load routes: configf from URL :%v", request.ConfigURL)
 	}
-	if err := routes.Mirrors.Init(ctx, s.fs, ""); err != nil {
+	if err := routes.Mirrors.Load(ctx, s.fs); err != nil {
 		return err
 	}
 	objects, err := s.list(ctx, request.ProcessedURL, nil, request.processedModifiedAfter)
@@ -146,7 +147,7 @@ func (s *service) checkUnprocessed(ctx context.Context, request *Request, respon
 	if err != nil {
 		return errors.Wrapf(err, "failed to load routes: %v", request.ConfigURL)
 	}
-	if err := routes.Mirrors.Init(ctx, s.fs, ""); err != nil {
+	if err := routes.Mirrors.Load(ctx, s.fs); err != nil {
 		return err
 	}
 	objects, err := s.list(ctx, request.TriggerURL, request.unprocessedModifiedBefore, nil)

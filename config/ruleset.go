@@ -47,8 +47,20 @@ func (r Ruleset) Validate() error {
 	return nil
 }
 
-//Init initialises resources
-func (r *Ruleset) Init(ctx context.Context, fs afs.Service, projectID string) error {
+func (r Ruleset) Init(ctx context.Context, fs afs.Service) error {
+	if len(r.Rules) == 0 {
+		return nil
+	}
+	for i := range r.Rules {
+		if err := r.Rules[i].Init(ctx, fs); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+//Load initialises resources
+func (r *Ruleset) Load(ctx context.Context, fs afs.Service) error {
 	if err := r.initRules(); err != nil {
 		return err
 	}
@@ -97,35 +109,34 @@ func (c *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 	return nil
 }
 
-func (c *Ruleset) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
-	reader, err := storage.Download(ctx, object)
+func (c *Ruleset) loadResources(ctx context.Context, fs afs.Service, object storage.Object) error {
+	reader, err := fs.Download(ctx, object)
 	defer func() {
 		_ = reader.Close()
 	}()
-	routes := make([]*Rule, 0)
-	err = json.NewDecoder(reader).Decode(&routes)
+	rules := make([]*Rule, 0)
+	err = json.NewDecoder(reader).Decode(&rules)
 	if err != nil {
 		return errors.Wrapf(err, "failed to decode: %v", object.URL())
 	}
-	transientRoutes := Ruleset{Rules: routes}
+	transientRoutes := Ruleset{Rules: rules}
+	if err := transientRoutes.Init(ctx, fs); err != nil {
+		return errors.Wrapf(err, "invalid rule: %v", object.URL())
+	}
 	if err := transientRoutes.Validate(); err != nil {
 		return errors.Wrapf(err, "invalid rule: %v", object.URL())
 	}
-
-	for i := range routes {
-		routes[i].Info.URL = object.URL()
-		if routes[i].Info.Workflow == "" {
-
+	for i := range rules {
+		rules[i].Info.URL = object.URL()
+		if rules[i].Info.Workflow == "" {
 			name := object.Name()
 			if strings.HasSuffix(name, ".json") {
 				name = string(name[:len(name)-5])
 			}
-			routes[i].Info.Workflow = name
+			rules[i].Info.Workflow = name
 		}
-		c.Rules = append(c.Rules, routes[i])
-
+		c.Rules = append(c.Rules, rules[i])
 	}
-
 	return nil
 }
 

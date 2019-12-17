@@ -24,7 +24,7 @@ type Ruleset struct {
 	meta         *base.Meta
 }
 
-//Init initialises resources
+//Load initialises resources
 func (r *Ruleset) Init(ctx context.Context, fs afs.Service, projectID string) error {
 	r.initRules()
 	r.projectID = projectID

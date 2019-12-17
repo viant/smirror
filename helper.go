@@ -3,9 +3,9 @@ package smirror
 import "strings"
 
 const (
-	notFoundCode = "404"
-	notFound     = "not found"
-	backendError = "backendError"
+	notFoundCode    = "404"
+	notFound        = "not found"
+	backendError    = "backendError"
 	connectionReset = "connection reset by peer"
 )
 

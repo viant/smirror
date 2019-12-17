@@ -16,7 +16,6 @@ type Streaming struct {
 	ChecksumSkipThreshold   int
 }
 
-
 func (c *Streaming) Init() {
 	if c.ThresholdMb == 0 {
 		c.ThresholdMb = defaultStreamThreshold

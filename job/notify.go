@@ -10,7 +10,6 @@ import (
 
 const DefaultRegion = "us-central1"
 
-
 //Notify represents notify function
 type Notify func(ctx context.Context, request *NotifyRequest) error
 
@@ -26,7 +25,7 @@ type NotifyRequest struct {
 	BodyType string
 }
 
-//Init initializes request
+//Load initializes request
 func (r *NotifyRequest) Init(location, projectID string) error {
 	if location == "" {
 		location = DefaultRegion

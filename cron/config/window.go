@@ -11,7 +11,7 @@ type TimeWindow struct {
 	DurationInSec int
 }
 
-//Init initialises time window
+//Load initialises time window
 func (t *TimeWindow) Init() {
 	if t.DurationInSec != 0 {
 		t.Duration = time.Duration(t.DurationInSec) * time.Second

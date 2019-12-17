@@ -101,7 +101,7 @@ func (r *Response) AddProcessed(route *config.Rule, object storage.Object) {
 	r.ProcessedBytes += fileSize
 }
 
-//Init initialises request
+//Load initialises request
 func (r *Request) Init() (err error) {
 	if r.UnprocessedDuration == "" {
 		r.UnprocessedDuration = defaultTriggerAge

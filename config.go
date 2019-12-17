@@ -15,12 +15,11 @@ import (
 )
 
 const (
-	maxRetries             = 3
+	maxRetries = 3
 )
 
 //Config represents routes
 type Config struct {
-
 	base.Config
 	MaxRetries       int
 	SlackCredentials *auth.Credentials
@@ -28,21 +27,20 @@ type Config struct {
 	Streaming        config.Streaming
 }
 
-
-//Init initialises routes
+//Load initialises routes
 func (c *Config) Init(ctx context.Context, fs afs.Service) (err error) {
 	c.Config.Init()
-	if err = c.Mirrors.Init(ctx, fs, c.ProjectID); err != nil {
+	if err = c.Mirrors.Load(ctx, fs); err != nil {
 		return err
 	}
 	if c.MaxRetries == 0 {
 		c.MaxRetries = maxRetries
 	}
-	for i := range c.Mirrors.Rules {
-		c.Mirrors.Rules[i].Dest.Init(c.ProjectID)
-	}
 	c.Streaming.Init()
-	return nil
+	if err = c.Mirrors.Init(ctx, fs); err != nil {
+		return err
+	}
+	return c.Mirrors.Validate()
 }
 
 //UseMessageDest returns true if any routes uses message bus

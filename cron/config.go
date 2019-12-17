@@ -20,7 +20,7 @@ type Config struct {
 	Resources  config.Ruleset
 }
 
-//Init initialises routes
+//Load initialises routes
 func (c *Config) Init(ctx context.Context, fs afs.Service) error {
 	c.Config.Init()
 	c.TimeWindow.Init()

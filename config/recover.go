@@ -15,12 +15,11 @@ type Recover struct {
 	isCSV      *bool
 }
 
-
 func (r *Recover) IsJSON() bool {
 	if r.isJSON != nil {
 		return *r.isJSON
 	}
-	isJSON :=  strings.ToUpper(r.Format) == "JSON"
+	isJSON := strings.ToUpper(r.Format) == "JSON"
 	r.isJSON = &isJSON
 	return isJSON
 }
@@ -29,7 +28,7 @@ func (r *Recover) IsCSV() bool {
 	if r.isCSV != nil {
 		return *r.isCSV
 	}
-	isCSV :=  strings.ToUpper(r.Format) == "CSV"
+	isCSV := strings.ToUpper(r.Format) == "CSV"
 	r.isCSV = &isCSV
 	return isCSV
 

@@ -20,14 +20,14 @@ func TestSplit(t *testing.T) {
 	index := 0
 	useCases := []struct {
 		description string
-		rule *config.Rule
+		rule        *config.Rule
 
-		expect      []string
+		expect []string
 	}{
 		{
 			description: "no more then 4 lines case",
-			rule:&config.Rule{
-				Split:&config.Split{MaxLines: 4},
+			rule: &config.Rule{
+				Split: &config.Split{MaxLines: 4},
 			},
 			expect: []string{
 				"xx 0\nxx 1\nxx 2\nxx 3", "xx 4\nxx 5\nxx 6\nxx 7", "xx 8",
@@ -35,7 +35,7 @@ func TestSplit(t *testing.T) {
 		},
 		{
 			description: "3 elements each",
-			rule:&config.Rule{
+			rule: &config.Rule{
 				Split: &config.Split{MaxLines: 3},
 			},
 			expect: []string{
@@ -44,7 +44,7 @@ func TestSplit(t *testing.T) {
 		},
 		{
 			description: "9 elements",
-			rule:&config.Rule{
+			rule: &config.Rule{
 				Split: &config.Split{MaxLines: 1},
 			},
 			expect: []string{
@@ -53,7 +53,7 @@ func TestSplit(t *testing.T) {
 		},
 		{
 			description: "9 elements",
-			rule:&config.Rule{
+			rule: &config.Rule{
 				Split: &config.Split{MaxLines: 0},
 			},
 			expect: []string{
@@ -62,7 +62,7 @@ func TestSplit(t *testing.T) {
 		},
 		{
 			description: "1 elements",
-			rule:&config.Rule{
+			rule: &config.Rule{
 				Split: &config.Split{MaxLines: 10},
 			},
 			expect: []string{
@@ -71,7 +71,7 @@ func TestSplit(t *testing.T) {
 		},
 		{
 			description: "1 elements",
-			rule:&config.Rule{
+			rule: &config.Rule{
 				Split: &config.Split{MaxLines: 9},
 			},
 			expect: []string{
@@ -81,7 +81,7 @@ func TestSplit(t *testing.T) {
 
 		{
 			description: "2 elements, by size",
-			rule:&config.Rule{
+			rule: &config.Rule{
 				Split: &config.Split{MaxSize: 20},
 			},
 			expect: []string{
@@ -90,7 +90,7 @@ func TestSplit(t *testing.T) {
 		},
 		{
 			description: "partition - filed index",
-			rule:&config.Rule{
+			rule: &config.Rule{
 				Split: &config.Split{MaxSize: 1024,
 					Partition: &config.Partition{
 						FieldIndex: index,

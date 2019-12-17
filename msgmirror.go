@@ -21,7 +21,7 @@ func MessageMirror(ctx context.Context, event *msg.Request) error {
 	validate := toolbox.AsBoolean(os.Getenv("VALIDATE"))
 	destURL := os.Getenv("DEST_URL")
 	config := msg.NewConfig(format, validate, destURL)
-	if err := config.RunValidation();err != nil  {
+	if err := config.RunValidation(); err != nil {
 		return err
 	}
 	service := msg.Singleton(config)
@@ -30,5 +30,3 @@ func MessageMirror(ctx context.Context, event *msg.Request) error {
 	fmt.Printf("%s\n", JSON)
 	return nil
 }
-
-

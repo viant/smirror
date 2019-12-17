@@ -129,7 +129,6 @@ func (p *partitionedBuffer) flush(provider func(partition interface{}) io.WriteC
 
 func splitWithPartition(scanner *bufio.Scanner, split *config.Split, provider func(partition interface{}) io.WriteCloser) (err error) {
 
-
 	var partitions = map[interface{}]*partitionedBuffer{}
 	for scanner.Scan() {
 		data := scanner.Bytes()

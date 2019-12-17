@@ -1,7 +1,6 @@
 package msg
 
 import (
-
 	"bytes"
 	"context"
 	"encoding/json"
@@ -32,13 +31,12 @@ func (p *service) Proxy(ctx context.Context, request *Request) *Response {
 	return response
 }
 
-
 func (p *service) proxy(ctx context.Context, request *Request, response *Response) error {
 
 	if p.config.Validate {
 		switch strings.ToUpper(p.config.SourceFormat) {
 		case "JSON":
-			if ! json.Valid(request.Data) {
+			if !json.Valid(request.Data) {
 				return fmt.Errorf("invaid JSON: %s", request.Data)
 			}
 		default:
@@ -58,7 +56,7 @@ func (p *service) proxy(ctx context.Context, request *Request, response *Respons
 //New create a service service
 func New(config *Config, fs afs.Service) Service {
 	return &service{
-		fs:fs,
-		config:config,
+		fs:     fs,
+		config: config,
 	}
 }

@@ -16,7 +16,6 @@ func (d *Datafile) CompressionCodec() string {
 	return d.Compression.Codec
 }
 
-
 //NewDatafile returns a new datafile
 func NewDatafile(URL string, compression *config.Compression) *Datafile {
 	return &Datafile{URL: URL, Compression: compression}

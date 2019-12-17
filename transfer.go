@@ -8,10 +8,9 @@ import (
 	"smirror/config"
 )
 
-
 //Transfer represents a data transfer
 type Transfer struct {
-	rule *config.Rule
+	rule         *config.Rule
 	partition    string
 	skipChecksum bool
 	Resource     *config.Resource
@@ -37,7 +36,7 @@ func (t *Transfer) getReader() (reader io.Reader, err error) {
 	if t.Dest.CompressionCodec() == config.GZipCodec {
 		buffer := new(bytes.Buffer)
 		gzipWriter := gzip.NewWriter(buffer)
-		if _, err = io.Copy(gzipWriter, reader);err != nil {
+		if _, err = io.Copy(gzipWriter, reader); err != nil {
 			return nil, err
 		}
 		if err := gzipWriter.Flush(); err == nil {

@@ -1,11 +1,11 @@
 package config
 
 import (
-	"compress/gzip"
+	"context"
 	"fmt"
+	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
-	"io"
 	"path"
 	"smirror/base"
 	"smirror/job"
@@ -15,15 +15,15 @@ import (
 
 //Rule represent matching resource route rule
 type Rule struct {
-	Info    base.Info
-	Disabled bool  `json:",omitempty"`
-	Dest    *Resource
-	Source  *Resource
-	Replace []*Replace `json:",omitempty"`
-	Recover *Recover
-
-	Streaming *Streaming
-	Split *Split `json:",omitempty"`
+	Info       base.Info
+	Disabled   bool `json:",omitempty"`
+	Dest       *Resource
+	Source     *Resource
+	Replace    []*Replace   `json:",omitempty"`
+	Recover    *Recover     `json:",omitempty"`
+	Transcoder *Transcoding `json:",omitempty"`
+	Streaming  *Streaming   `json:",omitempty"`
+	Split      *Split       `json:",omitempty"`
 	job.Actions
 	*Compression
 	//PreserveDepth  - preserves specified folder depth in dest URL
@@ -46,27 +46,9 @@ func (r *Rule) NewReplacer() *strings.Replacer {
 	return strings.NewReplacer(pairs...)
 }
 
-
-
-//NewReader returns a reader for a rule
-func (r *Rule) NewReader(reader io.Reader, sourceURL string) (io.Reader, error) {
-	compression := r.SourceCompression(sourceURL)
-	var err error
-	if compression != nil && compression.Codec == GZipCodec {
-		if reader, err =  gzip.NewReader(reader);err != nil {
-			return reader, err
-		}
-	}
-	if ! r.HasTransformer() {
-		 return reader, nil
-	}
-	return NewTransformer(reader, r)
-}
-
-
 //HasTransformer returns true if rule has recover or replace option
 func (r *Rule) HasTransformer() bool {
-	return r.Recover != nil || len(r.Replace) > 0
+	return r.Recover != nil || len(r.Replace) > 0 || r.Transcoder != nil
 }
 
 //HasSplit returns true if rule has split defined
@@ -105,7 +87,6 @@ func (r *Rule) ArchiveWalkURL(URL string) string {
 
 //Validate checks if route is valid
 func (r *Rule) Validate() error {
-	r.Init()
 	if r.Source == nil {
 		return fmt.Errorf("source was empty")
 	}
@@ -115,8 +96,8 @@ func (r *Rule) Validate() error {
 	return nil
 }
 
-//Init initialises routes
-func (r *Rule) Init() {
+//Load initialises routes
+func (r *Rule) Init(ctx context.Context, fs afs.Service) error {
 	if r.HasSplit() || r.HasTransformer() {
 		if r.Compression == nil {
 			r.Compression = &Compression{}
@@ -126,6 +107,10 @@ func (r *Rule) Init() {
 	if r.Streaming != nil {
 		r.Streaming.Init()
 	}
+	if r.Transcoder != nil {
+		return r.Transcoder.Init(ctx, fs)
+	}
+	return nil
 }
 
 //SourceCompression returns compression for URL

@@ -61,7 +61,6 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 	if response.Error == "" {
 		return response
 	}
-
 	if IsNotFound(response.Error) {
 		response.Status = base.StatusNoFound
 		response.Error = ""
@@ -75,7 +74,7 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 }
 
 func (s *service) mirror(ctx context.Context, request *contract.Request, response *contract.Response) (err error) {
-		_, err = s.config.Mirrors.ReloadIfNeeded(ctx, s.cfs)
+	_, err = s.config.Mirrors.ReloadIfNeeded(ctx, s.cfs)
 	if err != nil {
 		return err
 	}
@@ -173,7 +172,7 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 
 func (s *service) transferStream(ctx context.Context, reader io.Reader, URL string, rule *config.Rule, response *contract.Response) (err error) {
 
-	reader, err = rule.NewReader(reader, URL)
+	reader, err = NewReader(rule, reader, URL)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
 	}
@@ -181,7 +180,7 @@ func (s *service) transferStream(ctx context.Context, reader io.Reader, URL stri
 	destURL := url.Join(rule.Dest.URL, destName)
 	destCompression := rule.Compression
 
-	if path.Ext(URL) == path.Ext(destURL) && ! rule.HasTransformer() {
+	if path.Ext(URL) == path.Ext(destURL) && !rule.HasTransformer() {
 		destCompression = nil
 	}
 
@@ -196,7 +195,7 @@ func (s *service) transferStream(ctx context.Context, reader io.Reader, URL stri
 }
 
 func (s *service) transferChunkStream(ctx context.Context, reader io.Reader, URL string, rule *config.Rule, response *contract.Response) (err error) {
-	reader, err = rule.NewReader(reader, URL)
+	reader, err = NewReader(rule, reader, URL)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
 	}
@@ -279,7 +278,7 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 	return nil
 }
 
-//Init initialises this service
+//Load initialises this service
 func (s *service) Init(ctx context.Context) error {
 	return s.config.Init(ctx, s.cfs)
 }
