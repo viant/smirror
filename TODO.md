@@ -1,5 +1,2 @@
-- Cross data format transcoder/spliter/merger i.e CSV to Avro
+- AVRO split
 - Add cloud run integration
-- Add merger
-- Add e2e cases for sqs/sns and pubsub proxy
-- Add deployment workflow
