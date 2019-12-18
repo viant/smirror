@@ -23,7 +23,7 @@ func translateToLogicalTime(schema *schma.Schema) schma.Translator {
 			if strings.Contains(val, "T") {
 				layout = time.RFC3339Nano
 			}
-			if ts, err = toolbox.ToTime(ts, layout); err != nil {
+			if ts, err = toolbox.ToTime(val, layout); err != nil {
 				return err
 			}
 		case *time.Time:

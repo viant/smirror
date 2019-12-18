@@ -10,15 +10,17 @@ import (
 
 //Codec represents transcoding
 type Codec struct {
-	Format     string
-	Fields     []string
-	Delimiter  string
-	LazyQuotes bool
-	SchemaURL  string
-	Schema     string
-	isCSV      *bool
-	isJSON     *bool
-	isAvro     *bool
+	Format         string
+	Fields         []string
+	HasHeader      bool
+	Delimiter      string
+	LazyQuotes     bool
+	SchemaURL      string
+	RecordPerBlock int64
+	Schema         string
+	isCSV          *bool
+	isJSON         *bool
+	isAvro         *bool
 }
 
 func (c *Codec) LoadSchema(ctx context.Context, fs afs.Service) (string, error) {

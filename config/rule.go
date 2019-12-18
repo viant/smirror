@@ -48,7 +48,7 @@ func (r *Rule) NewReplacer() *strings.Replacer {
 
 //HasTransformer returns true if rule has recover or replace option
 func (r *Rule) HasTransformer() bool {
-	return r.Recover != nil || len(r.Replace) > 0 || r.Transcoder != nil
+	return r.Recover != nil || len(r.Replace) > 0
 }
 
 //HasSplit returns true if rule has split defined
@@ -161,6 +161,7 @@ func (r *Rule) Name(URL string) string {
 	_, location := url.Base(URL, file.Scheme)
 	parent, name := path.Split(location)
 	ext := path.Ext(name)
+
 	if r.Compression != nil && r.Compression.Codec != "" {
 		switch r.Compression.Codec {
 		case GZipCodec:
@@ -173,6 +174,14 @@ func (r *Rule) Name(URL string) string {
 			name = string(name[:len(name)-len(ext)])
 		}
 	}
+
+	if r.Transcoder != nil && r.Transcoder.Dest.IsAvro() {
+		if ext != AVROExtension {
+			name = string(name[:len(name)-len(ext)])
+			name += AVROExtension
+		}
+	}
+
 	depth := r.GetPreserveDepth()
 	if depth == 0 && r.HasPreserveDepth() {
 		return name

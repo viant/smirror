@@ -1,0 +1,49 @@
+init:
+  expect: $Cat('${parent.path}/data/expect/events.json')
+pipeline:
+
+  cleanUp:
+    action: storage:remove
+    sleepTimeMs: 1000
+    assets:
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/_.cache'
+        credentials: $gcpCredentials
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.json'
+        credentials: $gcpCredentials
+      - URL: 'gs://${gsDestBucket}/data/p16/events.avro'
+        credentials: $gcpCredentials
+
+  setupRule:
+    init:
+      parentIndex: ${parent.index}
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/rule/
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/
+
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 20000
+    source:
+      URL: ${parent.path}/data/prepare/events.csv
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsTriggerBucket}/data/p16/events.csv
+
+
+  downloadAvro:
+    action: storage:download
+    udf: AvroReader
+    source:
+      credentials: $gcpCredentials
+      URL: gs://${gsDestBucket}/data/p16/events.avro
+    destKey: actual
+
+  validate:
+    action: validator:assert
+    actual: $AsData($actual)
+    expect: $expect
+

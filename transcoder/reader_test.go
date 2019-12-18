@@ -51,7 +51,8 @@ func TestReader_Read(t *testing.T) {
 					Fields: []string{"id", "name", "description"},
 				},
 				Dest: transcoding.Codec{
-					Format: "AVRO",
+					RecordPerBlock: 2,
+					Format:         "AVRO",
 					Schema: `{
 		"namespace": "my.namespace.com",
 		"type":	"record",
@@ -183,7 +184,7 @@ func TestReader_Read(t *testing.T) {
 
 	for _, useCase := range useCases {
 
-		reader, err := NewReader(strings.NewReader(useCase.input), &useCase.Transcoding)
+		reader, err := NewReader(strings.NewReader(useCase.input), &useCase.Transcoding, 0)
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}

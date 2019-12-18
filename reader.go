@@ -5,7 +5,6 @@ import (
 	"io"
 	"smirror/config"
 	"smirror/config/recover"
-	"smirror/transcoder"
 )
 
 //NewReader returns a reader for a rule
@@ -24,9 +23,6 @@ func NewReader(rule *config.Rule, reader io.Reader, sourceURL string) (io.Reader
 		if reader, err = recover.NewReader(reader, rule); err != nil {
 			return nil, err
 		}
-	}
-	if rule.Transcoder != nil {
-		reader, err = transcoder.NewReader(reader, rule.Transcoder)
 	}
 	return reader, err
 }

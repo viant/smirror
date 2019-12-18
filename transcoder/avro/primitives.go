@@ -5,6 +5,7 @@ import (
 	"github.com/viant/toolbox"
 	"io"
 	"math"
+	"strings"
 )
 
 var UnionNull = int64(0)
@@ -20,6 +21,9 @@ func translateToString(value interface{}, w io.Writer) error {
 }
 
 func translateToLong(value interface{}, w io.Writer) error {
+	if text, ok := value.(string); ok {
+		value = strings.TrimSpace(text)
+	}
 	v, err := toolbox.ToInt(value)
 	if err != nil {
 		return errors.Wrapf(err, "failed to convert to float: %v", value)
@@ -28,6 +32,9 @@ func translateToLong(value interface{}, w io.Writer) error {
 }
 
 func translateToDouble(value interface{}, w io.Writer) error {
+	if text, ok := value.(string); ok {
+		value = strings.TrimSpace(text)
+	}
 	v, err := toolbox.ToFloat(value)
 	if err != nil {
 		return errors.Wrapf(err, "failed to convert to float: %v", value)
@@ -36,6 +43,9 @@ func translateToDouble(value interface{}, w io.Writer) error {
 }
 
 func translateToFloat(value interface{}, w io.Writer) error {
+	if text, ok := value.(string); ok {
+		value = strings.TrimSpace(text)
+	}
 	v, err := toolbox.ToFloat(value)
 	if err != nil {
 		return errors.Wrapf(err, "failed to convert to float: %v", value)
@@ -44,6 +54,9 @@ func translateToFloat(value interface{}, w io.Writer) error {
 }
 
 func translateToBoolean(value interface{}, w io.Writer) error {
+	if text, ok := value.(string); ok {
+		value = strings.TrimSpace(text)
+	}
 	v, err := toolbox.ToBoolean(value)
 	if err != nil {
 		return errors.Wrapf(err, "failed to convert to float: %v", value)

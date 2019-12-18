@@ -7,6 +7,8 @@ import (
 	"smirror/config/transcoding"
 )
 
+const defaultRecordPerBlock = 40
+
 //Transcoding represents transcoding
 type Transcoding struct {
 	Source      transcoding.Codec
@@ -14,7 +16,7 @@ type Transcoding struct {
 	PathMapping transcoding.Mappings
 }
 
-//Load intialise transcoding
+//Init intialise transcoding
 func (t *Transcoding) Init(ctx context.Context, fs afs.Service) error {
 	if t.Dest.SchemaURL == "" {
 		return nil
@@ -22,6 +24,9 @@ func (t *Transcoding) Init(ctx context.Context, fs afs.Service) error {
 	if t.Dest.Schema == "" {
 		_, err := t.Dest.LoadSchema(ctx, fs)
 		return err
+	}
+	if t.Dest.RecordPerBlock == 0 {
+		t.Dest.RecordPerBlock = defaultRecordPerBlock
 	}
 	return nil
 }
@@ -31,7 +36,7 @@ func (t *Transcoding) Validate() error {
 	if !t.Source.IsJSON() && !t.Source.IsCSV() {
 		return errors.Errorf("unsupported source format: %v", t.Source.Format)
 	}
-	if t.Source.IsCSV() && len(t.Source.Fields) == 0 {
+	if t.Source.IsCSV() && len(t.Source.Fields) == 0 && !t.Source.HasHeader {
 		return errors.Errorf("source fields were empty: for %v format", t.Source.Format)
 	}
 	if !t.Dest.IsAvro() {

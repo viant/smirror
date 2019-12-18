@@ -324,16 +324,17 @@ func (s *service) initRule(ctx context.Context, rule *config.Rule) (err error) {
 
 func (s *service) chunkWriter(ctx context.Context, URL string, rule *config.Rule, counter *int32, waitGroup *sync.WaitGroup, response *contract.Response) func(partition interface{}) io.WriteCloser {
 	return func(partition interface{}) io.WriteCloser {
-		splitCount := atomic.AddInt32(counter, 1)
-		destName := rule.Split.Name(rule, URL, splitCount, partition)
+		splitCounter := atomic.AddInt32(counter, 1)
+		destName := rule.Split.Name(rule, URL, splitCounter, partition)
 		destURL := url.Join(rule.Dest.URL, destName)
 		return NewWriter(rule, func(writer *Writer) error {
 			if writer.Reader == nil {
-				return fmt.Errorf("Writer reader was empty")
+				return fmt.Errorf("reader was empty")
 			}
 			waitGroup.Add(1)
 			defer waitGroup.Done()
 			dataCopy := &Transfer{
+				splitCounter: splitCounter,
 				partition:    fmt.Sprintf("%v", partition),
 				skipChecksum: response.ChecksumSkip,
 				Resource:     rule.Dest,

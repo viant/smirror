@@ -30,16 +30,6 @@ const (
 	//DestEnvKey destination env key
 	DestEnvKey = "DEST"
 
-	//ProxyMethod proxy method env key
-	ProxyMethod = "METHOD"
-
-	//ProxyMethodCall call operation
-	ProxyMethodCall = "call"
-	//ProxyMethodCopy copy operation
-	ProxyMethodCopy = "copy"
-	//ProxyMethodMove move operation
-	ProxyMethodMove = "move"
-
 	//App
 	App = "StorageMirror"
 

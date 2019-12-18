@@ -8,6 +8,9 @@ const (
 	//GZIPExtension gzip extension
 	GZIPExtension = ".gz"
 
+	//AVROExtension avro extension
+	AVROExtension = ".avro"
+
 	//ZipCodec zip code
 	ZipCodec = "zip"
 	//ZIPExtension zip extension
