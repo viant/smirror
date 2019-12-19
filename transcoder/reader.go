@@ -30,29 +30,34 @@ type reader struct {
 	avroWriter   *container.Writer
 	record       map[string]interface{}
 	count        int
-	eof          bool
+	readEOF      bool
+	writeEOF     bool
 	pending      bool
 }
 
 func (t *reader) Read(p []byte) (n int, err error) {
-	if t.eof {
+	if t.writeEOF {
 		return 0, io.EOF
 	}
-
-	for t.pending && !t.eof {
+	for t.pending && !t.readEOF {
 		err := t.transform()
 		if err != nil {
 			return 0, err
 		}
 	}
 	read, err := t.buffer.Read(p)
-	if err == io.EOF && !t.eof {
-		t.pending = true
-		err = nil
+	if err == io.EOF || read == 0 {
+		if t.readEOF {
+			t.writeEOF = true
+		} else {
+			t.pending = true
+			err = nil
+		}
 	}
-
 	return read, err
 }
+
+
 
 func (t *reader) next() error {
 	line := t.scanner.Bytes()
@@ -118,26 +123,30 @@ func (t *reader) transform() error {
 }
 
 func (t *reader) transformToAVRO() error {
-
-	for !t.eof {
-		err := t.transformRecordToAVRO()
+	var err error
+	for !t.readEOF {
+		err = t.transformRecordToAVRO()
 		if err != nil || t.count%int(t.Dest.RecordPerBlock) == 0 {
 			return err
 		}
 	}
 	t.pending = t.buffer.Len() > 0
-	return nil
+	return err
 }
 
 func (t *reader) transformRecordToAVRO() error {
 	hasMore := t.scanner.Scan()
 	if !hasMore {
-		t.eof = true
+		t.readEOF = true
 		return t.avroWriter.Flush()
 	}
 
 	if err := t.nextRecord(); err != nil {
 		return err
+	}
+
+	if len(t.record) == 0 {
+		return nil
 	}
 	t.avroRecord.Data = t.record
 	t.count++
@@ -187,6 +196,7 @@ func NewReader(r io.Reader, transcoding *config.Transcoding, splitCounter int32)
 		}
 		recordPerBlock := transcoding.Dest.RecordPerBlock
 		result.avroWriter, err = container.NewWriter(result.buffer, container.Snappy, recordPerBlock, rawSchema)
+
 	}
 	return result, nil
 }

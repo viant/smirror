@@ -20,6 +20,19 @@ func translateToString(value interface{}, w io.Writer) error {
 	return writeString(v, w)
 }
 
+func translateToBytes(value interface{}, w io.Writer) error {
+	v, ok := value.([]byte)
+	if ! ok {
+		text, ok := value.(string)
+		if ! ok {
+			return errors.Errorf("failed to cast %T to []byte", value)
+		}
+		v = []byte(text)
+	}
+
+	return writeBytes(v, w)
+}
+
 func translateToLong(value interface{}, w io.Writer) error {
 	if text, ok := value.(string); ok {
 		value = strings.TrimSpace(text)
@@ -195,15 +208,24 @@ func writeNull(_ io.Writer) error {
 	return nil
 }
 
-func writeString(r string, w io.Writer) error {
+func writeBytes(r []byte, w io.Writer) error {
 	err := writeLong(int64(len(r)), w)
 	if err != nil {
 		return err
 	}
+	_, err = w.Write(r)
+	return err
+}
+
+func writeString(text string, w io.Writer) error {
+	err := writeLong(int64(len(text)), w)
+	if err != nil {
+		return err
+	}
 	if sw, ok := w.(StringWriter); ok {
-		_, err = sw.WriteString(r)
+		_, err = sw.WriteString(text)
 	} else {
-		_, err = w.Write([]byte(r))
+		_, err = w.Write([]byte(text))
 	}
 	return err
 }

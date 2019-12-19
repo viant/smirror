@@ -11,7 +11,8 @@ func translateToRecord(schema *schma.Schema) schma.Translator {
 		record := toolbox.AsMap(value)
 		for _, field := range schema.Fields {
 			val := record[field.Name]
-			if err := field.Type.Write(val, w); err != nil {
+			err := field.Type.Write(val, w)
+			if err != nil {
 				return err
 			}
 		}

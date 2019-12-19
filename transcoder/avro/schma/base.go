@@ -13,6 +13,7 @@ type Base struct {
 	isLong      *bool
 	isFloat     *bool
 	isDouble    *bool
+	isBytes     *bool
 	isBoolean   *bool
 	isNull      *bool
 }
@@ -75,9 +76,17 @@ func (b *Base) IsString() bool {
 	return isString
 }
 
+
+
 func (b *Base) IsBytes() bool {
-	return b.Type == typeBytes
+	if b.isBytes != nil {
+		return *b.isBytes
+	}
+	isBytes := b.Type == typeBytes
+	b.isBytes = &isBytes
+	return isBytes
 }
+
 
 func (b *Base) IsInt() bool {
 	if b.isInt != nil {

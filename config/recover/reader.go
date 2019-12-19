@@ -24,7 +24,8 @@ type reader struct {
 	buf       *bytes.Buffer
 	transient *bytes.Buffer
 	pending   int
-	eof       bool
+	readEOF   bool
+	writeEOF  bool
 }
 
 func (t *reader) buffer() *bytes.Buffer {
@@ -33,7 +34,7 @@ func (t *reader) buffer() *bytes.Buffer {
 
 func (t *reader) transform() error {
 	if !t.scanner.Scan() {
-		t.eof = true
+		t.readEOF = true
 	}
 	data := t.scanner.Bytes()
 
@@ -98,17 +99,25 @@ func (t *reader) recoverCSV(data []byte) []byte {
 }
 
 func (t *reader) Read(p []byte) (n int, err error) {
-	if t.eof && t.pending == 0 {
+	if t.writeEOF {
 		return 0, io.EOF
 	}
 	expect := len(p)
-	for t.pending < expect && !t.eof {
+	for t.pending < expect && !t.readEOF {
 		err := t.transform()
 		if err != nil {
 			return 0, err
 		}
 	}
+
 	read, err := t.buffer().Read(p)
+	if err == io.EOF || read == 0 {
+		if t.readEOF {
+			t.writeEOF = true
+		} else {
+			err = nil
+		}
+	}
 	t.pending -= read
 	return read, err
 }

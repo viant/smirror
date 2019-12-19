@@ -91,7 +91,7 @@ func newSchema(schemaValue interface{}) (*Schema, error) {
 		}
 
 		if elemType.IsRecord() && len(elemType.Fields) > 0 {
-			for i := range elemType.Fields {
+			for i   := range elemType.Fields {
 				elemType.Fields[i].Type, err = New(elemType.Fields[i].AnyType)
 				if err != nil {
 					return nil, err
