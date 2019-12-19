@@ -7,8 +7,6 @@ import (
 	"github.com/viant/assertly"
 	"github.com/viant/toolbox"
 	"io/ioutil"
-	"os"
-	"path"
 	"smirror/config"
 	"smirror/config/transcoding"
 	"smirror/transcoder/avro/schma"
@@ -23,168 +21,165 @@ func TestReader_Read(t *testing.T) {
 		config.Transcoding
 		expect interface{}
 	}{
-//		{
-//			description: "CSV to avro",
-//
-//			input: `1,name 1,desc 1
-//2,name 2,desc 2,
-//3,name 3,desc 3`,
-//
-//			expect: []map[string]interface{}{
-//				{
-//					"id":          1,
-//					"name":        "name 1",
-//					"description": "desc 1",
-//				},
-//				{
-//					"id":          2,
-//					"name":        "name 2",
-//					"description": "desc 2",
-//				},
-//				{
-//					"id":          3,
-//					"name":        "name 3",
-//					"description": "desc 3",
-//				},
-//			},
-//			Transcoding: config.Transcoding{
-//				Source: transcoding.Codec{
-//					Format: "CSV",
-//					Fields: []string{"id", "name", "description"},
-//				},
-//				Dest: transcoding.Codec{
-//					RecordPerBlock: 2,
-//					Format:         "AVRO",
-//					Schema: `{
-//		"namespace": "my.namespace.com",
-//		"type":	"record",
-//		"name": "foo",
-//		"fields": [
-//			{ "name": "id", "type": "int"},
-//		    { "name": "name", "type": "string"},
-//			{ "name": "description", "type": "string"}
-//		]
-//	}`,
-//				},
-//			},
-//		},
-//		{
-//			description: "JSON to avro",
-//
-//			input: `{"id":1,"name":"name 1","description":"desc 1"}
-//{"id":2,"name":"name 2","description":"desc 2"}
-//{"id":3,"name":"name 3","description":"desc 3"}`,
-//
-//			expect: []map[string]interface{}{
-//				{
-//					"id":          1,
-//					"name":        "name 1",
-//					"description": "desc 1",
-//				},
-//				{
-//					"id":          2,
-//					"name":        "name 2",
-//					"description": "desc 2",
-//				},
-//				{
-//					"id":          3,
-//					"name":        "name 3",
-//					"description": "desc 3",
-//				},
-//			},
-//			Transcoding: config.Transcoding{
-//				Source: transcoding.Codec{
-//					Format: "JSON",
-//				},
-//				Dest: transcoding.Codec{
-//					Format: "AVRO",
-//					Schema: `{
-//		"namespace": "my.namespace.com",
-//		"type":	"record",
-//		"name": "foo",
-//		"fields": [
-//			{ "name": "id", "type": "int"},
-//		    { "name": "name", "type": "string"},
-//			{ "name": "description", "type": "string"}
-//		]
-//	}`,
-//				},
-//			},
-//		},
-//		{
-//			description: "CSV to avro with mapping",
-//
-//			input: `1,name 1,desc 1
-//2,name 2,desc 2,
-//3,name 3,desc 3`,
-//
-//			expect: []map[string]interface{}{
-//				{
-//					"id": 1,
-//					"attr1": map[string]interface{}{
-//						"name":        "name 1",
-//						"description": "desc 1",
-//					},
-//				},
-//				{
-//					"id": 2,
-//					"attr1": map[string]interface{}{
-//						"name":        "name 2",
-//						"description": "desc 2",
-//					},
-//				},
-//				{
-//					"id": 3,
-//					"attr1": map[string]interface{}{
-//						"name":        "name 3",
-//						"description": "desc 3",
-//					},
-//				},
-//			},
-//			Transcoding: config.Transcoding{
-//				Source: transcoding.Codec{
-//					Format: "CSV",
-//					Fields: []string{"id", "name", "description"},
-//				},
-//				PathMapping: transcoding.Mappings{
-//					{
-//						From: "id",
-//						To:   "id",
-//					},
-//					{
-//						From: "name",
-//						To:   "attr1.name",
-//					},
-//
-//					{
-//						From: "description",
-//						To:   "attr1.description",
-//					},
-//				},
-//				Dest: transcoding.Codec{
-//					Format: "AVRO",
-//					Schema: `{
-//		"namespace": "my.namespace.com",
-//		"type":	"record",
-//		"name": "root",
-//		"fields": [
-//			{ "name": "id", "type": "int"},
-//			{ "name": "attr1", "type": ["null",{
-//				"type":	"record",
-//				"name": "foo",
-//				"fields": [
-//					{ "name": "name", "type": "string"},
-//					{ "name": "description", "type": "string"}
-//				]
-//			}],"default":null}
-//		]
-//	}`,
-//				},
-//			},
-//
-//
-//
-//		},
+		{
+			description: "CSV to avro",
+
+			input: `1,name 1,desc 1
+2,name 2,desc 2,
+3,name 3,desc 3`,
+
+			expect: []map[string]interface{}{
+				{
+					"id":          1,
+					"name":        "name 1",
+					"description": "desc 1",
+				},
+				{
+					"id":          2,
+					"name":        "name 2",
+					"description": "desc 2",
+				},
+				{
+					"id":          3,
+					"name":        "name 3",
+					"description": "desc 3",
+				},
+			},
+			Transcoding: config.Transcoding{
+				Source: transcoding.Codec{
+					Format: "CSV",
+					Fields: []string{"id", "name", "description"},
+				},
+				Dest: transcoding.Codec{
+					RecordPerBlock: 2,
+					Format:         "AVRO",
+					Schema: `{
+		"namespace": "my.namespace.com",
+		"type":	"record",
+		"name": "foo",
+		"fields": [
+			{ "name": "id", "type": "int"},
+		    { "name": "name", "type": "string"},
+			{ "name": "description", "type": "string"}
+		]
+	}`,
+				},
+			},
+		},
+		{
+			description: "JSON to avro",
+
+			input: `{"id":1,"name":"name 1","description":"desc 1"}
+{"id":2,"name":"name 2","description":"desc 2"}
+{"id":3,"name":"name 3","description":"desc 3"}`,
+
+			expect: []map[string]interface{}{
+				{
+					"id":          1,
+					"name":        "name 1",
+					"description": "desc 1",
+				},
+				{
+					"id":          2,
+					"name":        "name 2",
+					"description": "desc 2",
+				},
+				{
+					"id":          3,
+					"name":        "name 3",
+					"description": "desc 3",
+				},
+			},
+			Transcoding: config.Transcoding{
+				Source: transcoding.Codec{
+					Format: "JSON",
+				},
+				Dest: transcoding.Codec{
+					Format: "AVRO",
+					Schema: `{
+		"namespace": "my.namespace.com",
+		"type":	"record",
+		"name": "foo",
+		"fields": [
+			{ "name": "id", "type": "int"},
+		    { "name": "name", "type": "string"},
+			{ "name": "description", "type": "string"}
+		]
+	}`,
+				},
+			},
+		},
+		{
+			description: "CSV to avro with mapping",
+
+			input: `1,name 1,desc 1
+2,name 2,desc 2,
+3,name 3,desc 3`,
+
+			expect: []map[string]interface{}{
+				{
+					"id": 1,
+					"attr1": map[string]interface{}{
+						"name":        "name 1",
+						"description": "desc 1",
+					},
+				},
+				{
+					"id": 2,
+					"attr1": map[string]interface{}{
+						"name":        "name 2",
+						"description": "desc 2",
+					},
+				},
+				{
+					"id": 3,
+					"attr1": map[string]interface{}{
+						"name":        "name 3",
+						"description": "desc 3",
+					},
+				},
+			},
+			Transcoding: config.Transcoding{
+				Source: transcoding.Codec{
+					Format: "CSV",
+					Fields: []string{"id", "name", "description"},
+				},
+				PathMapping: transcoding.Mappings{
+					{
+						From: "id",
+						To:   "id",
+					},
+					{
+						From: "name",
+						To:   "attr1.name",
+					},
+
+					{
+						From: "description",
+						To:   "attr1.description",
+					},
+				},
+				Dest: transcoding.Codec{
+					Format: "AVRO",
+					Schema: `{
+		"namespace": "my.namespace.com",
+		"type":	"record",
+		"name": "root",
+		"fields": [
+			{ "name": "id", "type": "int"},
+			{ "name": "attr1", "type": ["null",{
+				"type":	"record",
+				"name": "foo",
+				"fields": [
+					{ "name": "name", "type": "string"},
+					{ "name": "description", "type": "string"}
+				]
+			}],"default":null}
+		]
+	}`,
+				},
+			},
+		},
 
 
 		{
@@ -253,8 +248,6 @@ func TestReader_Read(t *testing.T) {
 			continue
 		}
 
-		location := path.Join(os.Getenv("HOME"), "myavro.avro")
-		ioutil.WriteFile(location, data, 0644)
 		avroReader, err := goavro.NewOCFReader(bytes.NewReader(data))
 
 		if !assert.Nil(t, err, useCase.description) {

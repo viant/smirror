@@ -12,11 +12,11 @@ import (
 
 //StorageMirror cloud function entry point
 func StorageMirror(ctx context.Context, event event.StorageEvent) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("%v", r)
-		}
-	}()
+	//defer func() {
+	//	if r := recover(); r != nil {
+	//		err = fmt.Errorf("%v", r)
+	//	}
+	//}()
 	_, err = storageMirror(ctx, event)
 	if err != nil {
 
