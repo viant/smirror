@@ -94,10 +94,10 @@ func Split(reader io.Reader, writerProvider func(partition interface{}) io.Write
 	scanner.Buffer(make([]byte, bufferSize), 10*bufferSize)
 	split := rule.Split
 
+	//TODO split avro
 	if split.Partition != nil {
 		return splitWithPartition(scanner, split, writerProvider)
 	}
-
 	if split.MaxSize > 0 {
 		return splitBySize(scanner, split.MaxSize, writerProvider)
 	}

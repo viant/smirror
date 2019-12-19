@@ -20,7 +20,14 @@ type Split struct {
 	//Template has to have %s placeholder for file name, and %d (or padded placeholder i.e. %04d) chunk number, %v is for partition
 	Template string
 
+	//Partition partition rule
 	Partition *Partition
+
+	//Schema format specific schema
+	Schema string
+
+	//SchemaURL format specific schema location
+	SchemaURL string
 
 	//MaxSize max size, if file larger then splits
 	MaxSize int
