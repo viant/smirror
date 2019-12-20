@@ -311,6 +311,21 @@ _where_:
 - **Split.Partition.Mod**: optional moulo value for numeric partition value   
 
 
+**Data Transcoding**
+- **Transcoding.Source** transcoding source
+- **Transcoding.Dest** transcoding destination
+- **Transcoding.PathMapping** optional path mapping
+
+Where Source and Dest support the following attributes:
+
+- **Format**  on of the following: CSV,JSON,AVRO
+- **Fields**         CSV fields (field names are directly mapped to avro unless path mapping is used)
+- **HasHeader**      flag is CSV has header
+- **Delimiter**      CSV delimiter
+- **LazyQuotes**     flag to use CSV lazy quotes
+- **SchemaURL**      avro schema URL
+- **RecordPerBlock** avro setting
+
 
 **Source path dest naming settings:**
 
