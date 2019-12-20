@@ -114,6 +114,9 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 	if resource.CustomKey != nil && resource.CustomKey.AES256Key != nil {
 		result = append(result, resource.CustomKey.AES256Key)
 	}
+	if resource.Proxy != nil {
+		result = append(result, resource.Proxy)
+	}
 	if resource.URL == "" {
 		return result, nil
 	}

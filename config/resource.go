@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/viant/afs/matcher"
+	"github.com/viant/afs/option"
 	"smirror/auth"
 	"strings"
 )
@@ -15,8 +16,9 @@ type Resource struct {
 	Region      string            `json:",omitempty"`
 	CustomKey   *CustomKey        `json:",omitempty"`
 	Credentials *auth.Credentials `json:",omitempty"`
-	Topic       string            `json:",omitempty"`
-	Queue       string            `json:",omitempty"`
+	Proxy       *option.Proxy
+	Topic       string `json:",omitempty"`
+	Queue       string `json:",omitempty"`
 	//Optional pubsub project ID, otherwise it uses default one.
 	ProjectID string `json:",omitempty"`
 }

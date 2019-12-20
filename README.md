@@ -260,6 +260,15 @@ Typical rule defines the following matching Source and mirror destination which 
 - **Dest.CustomKey**: optional server side encryption AES key
 
 
+**Destination Proxy settings:**
+
+- **Dest.Proxy**: optional http proxy
+ 
+- **Dest.Proxy.URL**: http proxy URL
+- **Dest.Proxy.Fallback**: flag to fallback to regular client if proxy error
+- **Dest.Proxy.TimeoutMs**: connection timeout
+    
+
 _Message bus destination_
 
 - **Dest.Topic**: pubsub topic
@@ -271,6 +280,7 @@ For example if original resource xx://mybucket/data/p11/events.csv is divided in
 with data payload and /data/p11/0001_events.csv and /data/p11/0002_events.csv source attribute respectively.
 
 Both topic and queue support **$partition** variable to expanded ir with partition when Split.Partition setting is used. 
+
 
 
 
