@@ -445,6 +445,8 @@ The following global config settings controls streaming behaviour:
 - **Streaming.PartSizeMb**: download stream part/chunk size
 - **ChecksumSkipThresholdMb**: skiping checksum on upload threshold
 
+Streaming can be also applied on the rule level.
+
 
 ## Deployment
 
@@ -554,6 +556,7 @@ cd smirror/e2e
 ### Update mirrors bucket for both S3, Google Storage in e2e/run.yaml (gsTriggerBucket, s3TriggerBucket)
 endly 
 ```
+
 
 
 ## Code Coverage
