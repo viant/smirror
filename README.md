@@ -284,7 +284,7 @@ Both topic and queue support **$partition** variable to expanded ir with partiti
 
 ##### Payload recovery
 
-The following attribute control payload recover. For JSON format any line with
+The following attribute control payload recovery. For JSON format any line with
 invalid JSON get excluded. For CSV each line is adjusted (expadnded/truncated) to specified 
 number columns.
 
