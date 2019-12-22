@@ -245,7 +245,7 @@ Global config delegates a mirror rules to a separate location,
 
 Typical rule defines the following matching Source and mirror destination which are defined are [Resource](config/resource.go)
 
-**Source settings:**
+##### Source settings
 
 - **Source.Prefix**: optional matching prefix
 - **Source.Suffix**: optional matching suffix
@@ -253,14 +253,14 @@ Typical rule defines the following matching Source and mirror destination which 
 - **Source.Credentials**: optional source credentials
 - **Source.CustomKey**: optional server side encryption AES key
 
-**Destination settings:**
+#####  Destination settings
 
 - **Dest.URL**: destination base location 
 - **Dest.Credentials**: optional dest credentials
 - **Dest.CustomKey**: optional server side encryption AES key
 
 
-**Destination Proxy settings:**
+######  Destination Proxy settings
 
 - **Dest.Proxy**: optional http proxy
  
@@ -269,7 +269,7 @@ Typical rule defines the following matching Source and mirror destination which 
 - **Dest.Proxy.TimeoutMs**: connection timeout
     
 
-_Message bus destination_
+##### Message bus destination
 
 - **Dest.Topic**: pubsub topic
 - **Dest.Queue**: simple message queue
@@ -282,13 +282,23 @@ with data payload and /data/p11/0001_events.csv and /data/p11/0002_events.csv so
 Both topic and queue support **$partition** variable to expanded ir with partition when Split.Partition setting is used. 
 
 
+##### Payload recovery
+
+The following attribute control payload recover. For JSON format any line with
+invalid JSON get excluded. For CSV each line is adjusted (expadnded/truncated) to specified 
+number columns.
+
+- **Recover.Format** (CSV or JSON)
+- **Recover.Delimiter**  
+- **Recover.LazyQuotes** 
+- **Recover.FieldCount** 
 
 
-**Payload substitution:**
+##### Payload substitution
 
 - **Replace** collection on replacement rules
 
-**Splitting source payload:**
+##### Splitting payload into smaller parts
 
 Optionally mirror process can split source content lines by size or max line count.
 
@@ -311,7 +321,8 @@ _where_:
 - **Split.Partition.Mod**: optional moulo value for numeric partition value   
 
 
-**Data Transcoding**
+##### Data Transcoding
+
 - **Transcoding.Source** transcoding source
 - **Transcoding.Dest** transcoding destination
 - **Transcoding.PathMapping** optional path mapping
@@ -327,7 +338,7 @@ Where Source and Dest support the following attributes:
 - **RecordPerBlock** avro setting
 
 
-**Source path dest naming settings:**
+##### Source path dest naming settings
 
 By default source the whole source path is copied to destination
 
@@ -347,7 +358,7 @@ To see preserve depth control assume the following:
 | -1 | yy://myYYBucket/zzz/subfolder/grandsubfolder/asset.txt | source path 1 element truncated from root side  |
 
 
-**Compression options**
+##### Compression options
 
 By default is not split or replacement rules is specified, source is copied to destination without decompressing source archive.
 
@@ -357,7 +368,7 @@ mirror individual archive assets.
 
 
 
-**Secrets options**
+##### Secrets options
 
 A secrets data use KMS to decypt/encrypt GCP/AWS/Slack secrets or credentials.
 
@@ -366,13 +377,16 @@ A secrets data use KMS to decypt/encrypt GCP/AWS/Slack secrets or credentials.
 - **Credentials.Parameter**: aws system manager parameters name storing encrypted secrets
 - **Credentials.URL**: location for encrypted secrets 
 
+
 See how to secure:
 - [AWS Credentials](deployment/README.md#securing-aws-credentials) 
 - [GCP Google Secrets](deployment/README.md#secure-gcp-credentials-google-secrets)
 - [Slack Token](deployment/README.md#securing-slack-credentials)
  
 
-**Server-Side Encryption with Customer-Provided Encryption Keys (AES-256)** 
+##### Server-Side Encryption 
+
+Server side encryption with Customer-Provided Encryption Keys (AES-256)
 
 - **CustomKey.Key**: KMS key or alias name
 - **CustomKey.Parameter**: aws system manager parameters name storing encrypted secrets
