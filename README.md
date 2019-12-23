@@ -17,7 +17,7 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
    * [S3 To Simple Message Queue](#s3-to-simple-message-queue)
    * [Partitioning](#partitioning)
 - [Configuration](#configuration)
-   * [Rule](#rule))
+   * [Rule](#rule)
         - [Post Action](#post-actions)
    * [Slack Credentials](#slack-credentials)
    * [Streaming settings](#streaming-settings)
