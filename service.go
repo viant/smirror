@@ -334,7 +334,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, rule *config.Rule
 			waitGroup.Add(1)
 			defer waitGroup.Done()
 			dataCopy := &Transfer{
-				rule:rule,
+				rule:         rule,
 				splitCounter: splitCounter,
 				partition:    fmt.Sprintf("%v", partition),
 				skipChecksum: response.ChecksumSkip,

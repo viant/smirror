@@ -57,8 +57,6 @@ func (t *reader) Read(p []byte) (n int, err error) {
 	return read, err
 }
 
-
-
 func (t *reader) next() error {
 	line := t.scanner.Bytes()
 	if t.Source.HasHeader && t.splitCounter == 0 {

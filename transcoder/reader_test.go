@@ -181,7 +181,6 @@ func TestReader_Read(t *testing.T) {
 			},
 		},
 
-
 		{
 			description: "tsv log to avro",
 
@@ -191,27 +190,27 @@ func TestReader_Read(t *testing.T) {
 			expect: []map[string]interface{}{
 				{
 					"backend_status_code": 200,
-					"request": "GET https://tabc.comm:443/d/rt/pixel?rtsite_id=23762\u0026uuid=8cd4f7f5-6b0a-4697-87eb-db4556736c57\u0026rr=1936727420 HTTP/1.1",
-					"timestamp": 1576540538199,
-					"user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Mobile/15E148 Safari/604.1",
+					"request":             "GET https://tabc.comm:443/d/rt/pixel?rtsite_id=23762\u0026uuid=8cd4f7f5-6b0a-4697-87eb-db4556736c57\u0026rr=1936727420 HTTP/1.1",
+					"timestamp":           1576540538199,
+					"user_agent":          "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Mobile/15E148 Safari/604.1",
 				},
 				{
 					"backend_status_code": 200,
-					"request": "GET https://tabc.com.com:443/d/track/video?zid=googleadx_1_0_1\u0026sid=87ddc05f-205f-11ea-a9c6-55bf429b7234\u0026crid=19841312\u0026adid=54517\u0026oid=1114112\u0026cid=172922\u0026spid=282\u0026pubid=45\u0026site_id=442320\u0026auid=1452372\u0026algid=0\u0026algrev=0\u0026offpc=0\u0026maxbid=0.000\u0026optpc=0\u0026cstpc=0\u0026ez_p=\u0026eid=2 HTTP/1.1",
-					"timestamp": 1576540538206,
-					"user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBDV/iPhone10,2;FBMD/iPhone;FBSN/iOS;FBSV/12.4.1;FBSS/3;FBID/phone;FBLC/en_US;FBOP/5;FBCR/Verizon]",
+					"request":             "GET https://tabc.com.com:443/d/track/video?zid=googleadx_1_0_1\u0026sid=87ddc05f-205f-11ea-a9c6-55bf429b7234\u0026crid=19841312\u0026adid=54517\u0026oid=1114112\u0026cid=172922\u0026spid=282\u0026pubid=45\u0026site_id=442320\u0026auid=1452372\u0026algid=0\u0026algrev=0\u0026offpc=0\u0026maxbid=0.000\u0026optpc=0\u0026cstpc=0\u0026ez_p=\u0026eid=2 HTTP/1.1",
+					"timestamp":           1576540538206,
+					"user_agent":          "Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBDV/iPhone10,2;FBMD/iPhone;FBSN/iOS;FBSV/12.4.1;FBSS/3;FBID/phone;FBLC/en_US;FBOP/5;FBCR/Verizon]",
 				},
 			},
 			Transcoding: config.Transcoding{
 				Source: transcoding.Codec{
-					Format: "CSV",
-					Delimiter:" ",
+					Format:    "CSV",
+					Delimiter: " ",
 					Fields: []string{"timestamp", "elb", "client_port", "backend_port", "request_processing_time", "backend_processing_time", "response_processing_time", "elb_status_code", "backend_status_code",
-						"received_bytes","sent_bytes","request","user_agent","ssl_cipher","ssl_protocol",
+						"received_bytes", "sent_bytes", "request", "user_agent", "ssl_cipher", "ssl_protocol",
 					},
 				},
 				Dest: transcoding.Codec{
-					RecordPerBlock:1,
+					RecordPerBlock: 1,
 					Format:         "AVRO",
 					Schema: `{
 		"namespace": "my.namespace.com",
@@ -227,8 +226,6 @@ func TestReader_Read(t *testing.T) {
 				},
 			},
 		},
-
-
 	}
 
 	for _, useCase := range useCases {
