@@ -1,1 +1,0 @@
-s3://${s3TriggerBucket}/data/p9/* to gs

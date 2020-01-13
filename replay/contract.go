@@ -14,7 +14,6 @@ const (
 
 type Request struct {
 	TriggerURL                string
-	ReplayBucket              string
 	UnprocessedDuration       string
 	unprocessedModifiedBefore *time.Time
 }
@@ -40,12 +39,8 @@ func (r *Request) Init() (err error) {
 }
 
 func (r *Request) Validate() error {
-	if r.ReplayBucket == "" {
-		return errors.New("replayBucket was empty")
-	}
 	if r.TriggerURL == "" {
 		return errors.New("triggerURL was empty")
 	}
-
 	return nil
 }

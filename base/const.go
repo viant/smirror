@@ -12,6 +12,9 @@ const (
 	//StatusNoFound status no found
 	StatusNoFound = "notFound"
 
+	//StatusPartial partial match (waiting for done marker)
+	StatusPartial = "partial"
+
 	//StatusDisabled status disabled
 	StatusDisabled = "disabled"
 
@@ -35,6 +38,9 @@ const (
 
 	//LambdaScheme represents lambda schem
 	LambdaScheme = "lambda"
+
+	//YAMLExt yaml extension
+	YAMLExt = ".yaml"
 
 	//CloudFunctionScheme represents clud function scheme
 	CloudFunctionScheme = "cloudfunction"

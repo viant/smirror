@@ -57,30 +57,22 @@ or partitioned all driven by declarative mirroring rules.
 To mirror data from google storage that matches /data/ prefix and '.csv.gz' suffix to s3://destBucket/data
 the following rule can be used 
 
-[@gs://$configBucket/StorageMirror/Rules/rule.json](usage/gs_to_s3/rule.json)
-```json
-[
-  {
-    "Source": {
-      "Prefix": "/data/",
-      "Suffix": ".csv.gz"
-    },
-    "Dest": {
-      "URL": "s3://destBucket/data",
-      "Credentials": {
-        "URL": "gs://sourceBucket/secret/s3-cred.json.enc",
-        "Key": "projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key"
-      }
-    },
-    "Codec": "gzip",
-    "Info": {
-      "Workflow": "My workflow name here",
-      "Description": "my description",
-      "ProjectURL": "JIRA/WIKi or any link referece",
-      "LeadEngineer": "my@dot.com"
-    }
-  }
-]
+[@gs://$configBucket/StorageMirror/Rules/rule.yaml](usage/gs_to_s3/rule.yaml)
+```yaml
+Source:
+  Prefix: "/data/"
+  Suffix: ".csv.gz"
+Dest:
+  URL: s3://destBucket/data
+  Credentials:
+    URL: gs://sourceBucket/secret/s3-cred.json.enc
+    Key: projects/my_project/locations/us-central1/keyRings/my_ring/cryptoKeys/my_key
+Codec: gzip
+Info:
+  Workflow: My workflow name here
+  Description: my description
+  ProjectURL: JIRA/WIKi or any link referece
+  LeadEngineer: my@dot.com
 ```
 
 
@@ -245,6 +237,7 @@ Global config delegates a mirror rules to a separate location,
 
 Typical rule defines the following matching Source and mirror destination which are defined are [Resource](config/resource.go)
 
+
 ##### Source settings
 
 - **Source.Prefix**: optional matching prefix
@@ -253,14 +246,21 @@ Typical rule defines the following matching Source and mirror destination which 
 - **Source.Credentials**: optional source credentials
 - **Source.CustomKey**: optional server side encryption AES key
 
-#####  Destination settings
+##### Destination settings
 
 - **Dest.URL**: destination base location 
 - **Dest.Credentials**: optional dest credentials
 - **Dest.CustomKey**: optional server side encryption AES key
 
+##### Done Marker
 
-######  Destination Proxy settings
+- **DoneMarker**: optional file name that trigger transfer of the holder folder.
+
+When done marker is specified a file can only be mirrored if done marker file is present.
+Once done marker is uploader the holding folder individual file are re-triggered.
+
+
+###### Destination Proxy settings
 
 - **Dest.Proxy**: optional http proxy
  
@@ -292,7 +292,6 @@ number columns.
 - **Recover.Delimiter**  
 - **Recover.LazyQuotes** 
 - **Recover.FieldCount** 
-
 
 ##### Payload substitution
 
@@ -486,7 +485,7 @@ The following are used by storage mirror services:
 - _$configBucket_: bucket storing storage mirror configuration and mirror rules
 - _$triggerBucket_: bucket storing data that needs to be mirror, event triggered by GCP
 - _$opsBucket_: bucket string error, processed mirrors
--  Mirrors.BaseURL: location storing routes rules as JSON Array
+-  Mirrors.BaseURL: location storing routes rules in YAML or JSON format.
 
 The following [Deployment](deployment/mirror/README.md) details storage mirror generic deployment.
 

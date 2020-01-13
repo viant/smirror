@@ -6,9 +6,7 @@ import (
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/option"
 	"github.com/viant/afs/storage"
-	"github.com/viant/afs/url"
 	"smirror/base"
-	"strings"
 	"time"
 )
 
@@ -45,31 +43,15 @@ func (s *service) replay(ctx context.Context, request *Request, response *Respon
 		return err
 	}
 	objects, err := s.list(ctx, request.TriggerURL, request.unprocessedModifiedBefore)
+	replayer := base.NewReplayer(s.fs)
+	replayer.Run(ctx, 10)
 	for i := range objects {
 		if objects[i].IsDir() {
 			continue
 		}
-		sourceURL := objects[i].URL()
-		sourceBucket := url.Host(sourceURL)
-
-		destURL := strings.Replace(sourceURL, sourceBucket, request.ReplayBucket, 1)
-		replayedURL := destURL + replayExtension
-		if exists, _ := s.fs.Exists(ctx, replayedURL); exists {
-			continue
-		}
-
-		if err := s.fs.Move(ctx, sourceURL, destURL); err != nil {
-			return err
-		}
-		if err := s.fs.Move(ctx, destURL, sourceURL); err != nil {
-			return err
-		}
-		response.Replayed = append(response.Replayed, sourceURL)
-		if err := s.fs.Upload(ctx, replayedURL, 0644, strings.NewReader(sourceURL)); err != nil {
-			return err
-		}
+		replayer.Schedule(objects[i].URL())
 	}
-	return nil
+	return replayer.Wait()
 }
 
 func (s *service) list(ctx context.Context, URL string, modifiedBefore *time.Time) ([]storage.Object, error) {

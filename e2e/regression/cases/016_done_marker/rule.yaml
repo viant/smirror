@@ -1,0 +1,8 @@
+Source:
+  Prefix: /data/p016/
+  Suffix: ".csv"
+Dest:
+  URL: gs://${gsDestBucket}/
+DoneMarker: sucess.txt
+OnSuccess:
+  - Action: delete

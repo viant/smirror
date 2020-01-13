@@ -31,6 +31,9 @@ type Rule struct {
 
 	//Group defines group of rule to be matched, otherwise multi match is invalid
 	Group string `json:",omitempty"`
+
+	//Name of the file that is done flag, in that case all file will be replayed
+	DoneMarker string `json:",omitempty"`
 }
 
 //NewReplacer create a replaced for the rule
@@ -140,6 +143,9 @@ func (r *Rule) HasMatch(URL string) bool {
 	}
 	location := url.Path(URL)
 	parent, name := path.Split(location)
+	if r.DoneMarker != "" && name == r.DoneMarker && strings.HasPrefix(location, r.Source.Prefix) {
+		return true
+	}
 	return r.Source.Match(parent, file.NewInfo(name, 0, 0644, time.Now(), false))
 }
 

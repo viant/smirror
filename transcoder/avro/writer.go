@@ -43,11 +43,11 @@ func SetWriter(schema *schma.Schema) error {
 		schema.SetTranslator(translateToLogicalTime(schema))
 		return nil
 	}
-	if schema.IsString()  {
+	if schema.IsString() {
 		schema.SetTranslator(translateToString)
 		return nil
 	}
-	if schema.IsBytes()  {
+	if schema.IsBytes() {
 		schema.SetTranslator(translateToBytes)
 		return nil
 	}

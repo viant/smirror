@@ -20,5 +20,5 @@ require (
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.28.0
 	google.golang.org/api v0.7.0
-	gopkg.in/yaml.v2 v2.2.2 // indirect
+	gopkg.in/yaml.v2 v2.2.2
 )

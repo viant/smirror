@@ -88,6 +88,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		JSON, _ := json.Marshal(matched)
 		return errors.Errorf("multi rule match currently not supported: %s", JSON)
 	}
+
 	response.TotalRules = len(s.config.Mirrors.Rules)
 	if rule == nil {
 		response.Status = base.StatusNoMatch
@@ -97,6 +98,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		response.Status = base.StatusDisabled
 		return nil
 	}
+
 	if err := s.initRule(ctx, rule); err != nil {
 		return errors.Wrapf(err, "railed to initialise rule: %v", rule.Info.Workflow)
 	}
@@ -112,6 +114,20 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		return nil
 	}
 	response.FileSize = object.Size()
+
+	if rule.DoneMarker != "" {
+		parentURL, _ := url.Split(request.URL, file.Scheme)
+		if object.Name() == rule.DoneMarker {
+			return s.replay(ctx, parentURL, rule.DoneMarker)
+		}
+		//Check if marker file is present, otherwise delay transfer
+		markerURL := url.Join(parentURL, rule.DoneMarker)
+		if exists, _ := s.fs.Exists(ctx, markerURL, option.NewObjectKind(true)); !exists {
+			response.Status = base.StatusPartial
+			return nil
+		}
+	}
+
 	var streaming = &s.config.Streaming
 	if rule.Streaming != nil {
 		streaming = rule.Streaming
@@ -345,6 +361,22 @@ func (s *service) chunkWriter(ctx context.Context, URL string, rule *config.Rule
 			return s.transfer(ctx, dataCopy, response)
 		})
 	}
+}
+
+func (s *service) replay(ctx context.Context, parentURL, doneMarker string) error {
+	objects, err := s.fs.List(ctx, parentURL)
+	if err != nil {
+		return err
+	}
+	replayer := base.NewReplayer(s.fs)
+	replayer.Run(ctx, 5)
+	for _, object := range objects {
+		if object.IsDir() || object.Name() == doneMarker {
+			continue
+		}
+		replayer.Schedule(object.URL())
+	}
+	return replayer.Wait()
 }
 
 //NewSlack creates a new mirror service

@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
-	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/option"
 	"github.com/viant/afs/storage"
+	"github.com/viant/toolbox"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"path"
 	"smirror/base"
 	"strings"
 	"sync/atomic"
@@ -92,8 +95,7 @@ func (c *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 	if err != nil || !exists {
 		return err
 	}
-	suffixMatcher, _ := matcher.NewBasic("", ".json", "", nil)
-	routesObject, err := fs.List(ctx, c.BaseURL, suffixMatcher, option.NewRecursive(true))
+	routesObject, err := fs.List(ctx, c.BaseURL, option.NewRecursive(true))
 	if err != nil {
 		return err
 	}
@@ -114,10 +116,15 @@ func (c *Ruleset) loadResources(ctx context.Context, fs afs.Service, object stor
 	defer func() {
 		_ = reader.Close()
 	}()
-	rules := make([]*Rule, 0)
-	err = json.NewDecoder(reader).Decode(&rules)
+
+	data, err := ioutil.ReadAll(reader)
 	if err != nil {
-		return errors.Wrapf(err, "failed to decode: %v", object.URL())
+		return err
+	}
+
+	rules, err := loadRules(data, path.Ext(object.Name()))
+	if err != nil {
+		return errors.Wrapf(err, "failed to load rules: %v", object.URL())
 	}
 	transientRoutes := Ruleset{Rules: rules}
 	if err := transientRoutes.Init(ctx, fs); err != nil {
@@ -152,4 +159,33 @@ func (r *Ruleset) initRules() error {
 		}
 	}
 	return nil
+}
+
+func loadRules(data []byte, ext string) ([]*Rule, error) {
+	var rules = make([]*Rule, 0)
+	switch ext {
+	case base.YAMLExt:
+		ruleMap := map[string]interface{}{}
+		if err := yaml.Unmarshal(data, &ruleMap); err != nil {
+			rulesMap := []map[string]interface{}{}
+			err = json.Unmarshal(data, &rulesMap)
+			if err != nil {
+				return nil, err
+			}
+			err = toolbox.DefaultConverter.AssignConverted(&rules, rulesMap)
+			return rules, err
+		}
+		rule := &Rule{}
+		err := toolbox.DefaultConverter.AssignConverted(&rule, ruleMap)
+		rules = append(rules, rule)
+		return rules, err
+	default:
+		rule := &Rule{}
+		if err := json.Unmarshal(data, rule); err != nil {
+			err = json.Unmarshal(data, &rules)
+			return rules, err
+		}
+		rules = append(rules, rule)
+	}
+	return rules, nil
 }

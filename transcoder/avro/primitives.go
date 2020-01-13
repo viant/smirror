@@ -22,9 +22,9 @@ func translateToString(value interface{}, w io.Writer) error {
 
 func translateToBytes(value interface{}, w io.Writer) error {
 	v, ok := value.([]byte)
-	if ! ok {
+	if !ok {
 		text, ok := value.(string)
-		if ! ok {
+		if !ok {
 			return errors.Errorf("failed to cast %T to []byte", value)
 		}
 		v = []byte(text)
