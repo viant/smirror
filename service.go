@@ -63,8 +63,8 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 	}
 	if IsNotFound(response.Error) {
 		response.Status = base.StatusNoFound
-		response.Error = ""
 		response.NotFoundError = response.Error
+		response.Error = ""
 	} else if IsRetryError(response.Error) {
 		if request.Attempt < s.config.MaxRetries {
 			return s.Mirror(ctx, request)
