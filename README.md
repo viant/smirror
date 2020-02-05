@@ -292,6 +292,16 @@ number columns.
 - **Recover.Delimiter**  
 - **Recover.LazyQuotes** 
 - **Recover.FieldCount** 
+- **Recover.Fields**:  field collection data type adjustment settings
+
+
+###### Payload recovery filed:
+
+- **Name** json field name
+- **Position** csv filed position
+- **DataType** adjustment data type (time, float, int, boolean, int, string)
+- **SourceDateFormat** date format in source filed
+- **TargetDateFormat*** target adjustment date format 
 
 ##### Payload substitution
 

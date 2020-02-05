@@ -52,9 +52,23 @@ func (t *reader) transform() error {
 		}
 		if t.recover.IsCSV() {
 			data = t.recoverCSV(data)
+
 		}
 	}
-
+	if t.recover.IsJSON() && len(t.recover.Fields) > 0 {
+		record := map[string]interface{}{}
+		json.Unmarshal(data, record)
+		for _, field:= range t.recover.Fields {
+			value, ok := record[field.Name]
+			if ! ok {
+				continue
+			}
+			record[field.Name] = field.AdjustValue(value)
+		}
+		if updated, err := json.Marshal(record);err == nil {
+			data = updated
+		}
+	}
 	if len(data) == 0 {
 		return nil
 	}
@@ -76,7 +90,10 @@ func (t *reader) recoverCSV(data []byte) []byte {
 	if err != nil {
 		return nil
 	}
+
+
 	if len(record) == t.recover.FieldCount {
+		t.adjustCSVDataType(record)
 		return data
 	}
 	if len(record) > t.recover.FieldCount {
@@ -86,6 +103,8 @@ func (t *reader) recoverCSV(data []byte) []byte {
 			record = append(record, "")
 		}
 	}
+
+
 	writer := csv.NewWriter(t.transient)
 	writer.Comma = csvReader.Comma
 	writer.UseCRLF = false
@@ -121,6 +140,26 @@ func (t *reader) Read(p []byte) (n int, err error) {
 	t.pending -= read
 	return read, err
 }
+
+
+
+func (t *reader) adjustCSVDataType(record []string) {
+	if len(t.recover.Fields) == 0 {
+		return
+	}
+	for _, field := range t.recover.Fields {
+		if field.Position == nil {
+			continue
+		}
+		index := *field.Position
+		if index >= len(record) {
+			continue
+		}
+		record[index] = field.AdjustText(record[index])
+	}
+}
+
+
 
 func NewReader(r io.Reader, rule *config.Rule) (io.Reader, error) {
 	scanner := bufio.NewScanner(r)

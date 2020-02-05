@@ -13,6 +13,7 @@ type Recover struct {
 	FieldCount int
 	isJSON     *bool
 	isCSV      *bool
+	Fields     []*Field
 }
 
 func (r *Recover) IsJSON() bool {

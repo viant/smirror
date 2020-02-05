@@ -110,6 +110,11 @@ func (r *Rule) Init(ctx context.Context, fs afs.Service) error {
 	if r.Streaming != nil {
 		r.Streaming.Init()
 	}
+	if r.Recover != nil && len(r.Recover.Fields) > 0 {
+		for i := range r.Recover.Fields {
+			r.Recover.Fields[i].Init()
+		}
+	}
 	if r.Transcoder != nil {
 		return r.Transcoder.Init(ctx, fs)
 	}
