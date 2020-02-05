@@ -301,7 +301,7 @@ number columns.
 - **Position** csv filed position
 - **DataType** adjustment data type (time, float, int, boolean, int, string)
 - **SourceDateFormat** date format in source filed
-- **TargetDateFormat*** target adjustment date format 
+- **TargetDateFormat** target adjustment date format 
 
 ##### Payload substitution
 
