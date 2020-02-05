@@ -33,6 +33,7 @@ func (t *reader) buffer() *bytes.Buffer {
 }
 
 func (t *reader) transform() error {
+
 	if !t.scanner.Scan() {
 		t.readEOF = true
 	}
@@ -54,19 +55,19 @@ func (t *reader) transform() error {
 			data = t.recoverCSV(data)
 
 		}
-	}
-	if t.recover.IsJSON() && len(t.recover.Fields) > 0 {
-		record := map[string]interface{}{}
-		json.Unmarshal(data, record)
-		for _, field:= range t.recover.Fields {
-			value, ok := record[field.Name]
-			if ! ok {
-				continue
+		if t.recover.IsJSON() && len(t.recover.Fields) > 0 {
+			record := map[string]interface{}{}
+			json.Unmarshal(data, record)
+			for _, field:= range t.recover.Fields {
+				value, ok := record[field.Name]
+				if ! ok {
+					continue
+				}
+				record[field.Name] = field.AdjustValue(value)
 			}
-			record[field.Name] = field.AdjustValue(value)
-		}
-		if updated, err := json.Marshal(record);err == nil {
-			data = updated
+			if updated, err := json.Marshal(record);err == nil {
+				data = updated
+			}
 		}
 	}
 	if len(data) == 0 {
