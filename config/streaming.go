@@ -2,7 +2,7 @@ package config
 
 const (
 	megaBytes              = 1024 * 1024
-	defaultStreamThreshold = 1024
+	defaultStreamThreshold = 512
 	defaultPartSize        = 64
 )
 

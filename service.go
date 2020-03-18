@@ -133,7 +133,6 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	if rule.Streaming != nil {
 		streaming = rule.Streaming
 	}
-
 	response.ChecksumSkip = int(object.Size()) > streaming.ChecksumSkipThreshold()
 	if int(object.Size()) > streaming.Threshold() {
 		response.StreamOption = option.NewStream(streaming.PartSize(), int(object.Size()))
@@ -289,7 +288,7 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 		options = append(options, option.NewSkipChecksum(true))
 	}
 
-	writer := s.fs.NewWriter(ctx, transfer.Dest.URL, file.DefaultFileOsMode,  options...)
+	writer := s.fs.NewWriter(ctx, transfer.Dest.URL, file.DefaultFileOsMode, options...)
 	response.AddURL(transfer.Dest.URL)
 
 	if transfer.Dest.CompressionCodec() == config.GZipCodec {
@@ -302,11 +301,13 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 		}
 
 	} else {
-		if _, err = io.Copy(writer, reader);err != nil {
+		if _, err = io.Copy(writer, reader); err != nil {
 			return err
 		}
 	}
-	return writer.Close()
+	err = writer.Close()
+	fmt.Printf("uploaded %v\n", transfer.Dest.URL)
+	return err
 }
 
 //Load initialises this service
