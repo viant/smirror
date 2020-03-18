@@ -26,7 +26,6 @@ type serviceUseCase struct {
 	sourceContent string
 	config        *Config
 	compress      bool
-
 	expectResponse  interface{}
 	expectedURLs    map[string]int
 	hasServiceError bool
@@ -39,7 +38,7 @@ func TestService_Mirror(t *testing.T) {
 	var useCases = []*serviceUseCase{
 
 		{
-			description: "compress unchanges",
+			description: "compress - no changes",
 			compress:    true,
 			sourceURL:   "mem://localhost/folder/subfolder/file1.txt.gz",
 			sourceContent: `line1,

@@ -33,8 +33,6 @@ const (
 	//DestEnvKey destination env key
 	DestEnvKey = "DEST"
 
-	//App
-	App = "StorageMirror"
 
 	//LambdaScheme represents lambda schem
 	LambdaScheme = "lambda"
@@ -44,4 +42,8 @@ const (
 
 	//CloudFunctionScheme represents clud function scheme
 	CloudFunctionScheme = "cloudfunction"
+
+	//InMemoryStorageBaseURL in memory storage URL
+	InMemoryStorageBaseURL = "mem://localhost/"
+
 )

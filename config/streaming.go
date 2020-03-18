@@ -9,33 +9,49 @@ const (
 //Streaming represents streaming option
 type Streaming struct {
 	ThresholdMb             int
-	Threshold               int
-	PartSize                int
+	threshold               int
+	partSize                int
 	PartSizeMb              int
 	ChecksumSkipThresholdMb int
-	ChecksumSkipThreshold   int
+	checksumSkipThreshold   int
 }
 
+//Threshold returns download/upload streaming
+func (c *Streaming) Threshold() int {
+	return c.threshold
+}
+
+//PartSize download part size
+func (c *Streaming)  PartSize() int {
+	return c.partSize
+}
+
+//ChecksumSkipThreshold upload checksum skip threshold
+func (c *Streaming) ChecksumSkipThreshold() int {
+	return c.checksumSkipThreshold
+}
+
+//Init initialises streaming
 func (c *Streaming) Init() {
 	if c.ThresholdMb == 0 {
 		c.ThresholdMb = defaultStreamThreshold
 	}
-	if c.Threshold == 0 {
-		c.Threshold = c.ThresholdMb * megaBytes
+	if c.threshold == 0 {
+		c.threshold = c.ThresholdMb * megaBytes
 	}
 
 	if c.PartSizeMb == 0 {
 		c.PartSizeMb = defaultPartSize
 	}
 
-	if c.PartSize == 0 {
-		c.PartSize = c.PartSizeMb * megaBytes
+	if c.partSize == 0 {
+		c.partSize = c.PartSizeMb * megaBytes
 	}
 
 	if c.ChecksumSkipThresholdMb == 0 {
 		c.ChecksumSkipThresholdMb = defaultStreamThreshold
 	}
-	if c.ChecksumSkipThreshold == 0 {
-		c.ChecksumSkipThreshold = c.ChecksumSkipThresholdMb * megaBytes
+	if c.checksumSkipThreshold == 0 {
+		c.checksumSkipThreshold = c.ChecksumSkipThresholdMb * megaBytes
 	}
 }

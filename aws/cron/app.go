@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/viant/afsc/logger"
 	"smirror/base"
 	"smirror/cron"
+	"smirror/shared"
 )
 
 func main() {
@@ -20,16 +19,11 @@ func main() {
 }
 
 func handleRequest(ctx context.Context) (*cron.Response, error) {
-	//if base.IsLoggingEnabled() {
-	logger.Logf = logger.StdoutLogger
-	//}
 	service, err := cron.NewFromEnv(ctx, base.ConfigEnvKey)
 	if err != nil {
 		return nil, err
 	}
 	response := service.Tick(ctx)
-	if data, err := json.Marshal(response); err == nil {
-		fmt.Printf("%s\n", data)
-	}
+	shared.LogLn(response)
 	return response, nil
 }

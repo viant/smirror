@@ -9,16 +9,17 @@ require (
 	github.com/aws/aws-sdk-go v1.21.4
 	github.com/go-errors/errors v1.0.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/jessevdk/go-flags v1.4.0
 	github.com/linkedin/goavro v2.1.0+incompatible
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
 	github.com/nlopes/slack v0.6.0
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.3.0
 	github.com/twmb/murmur3 v1.0.0
-	github.com/viant/afs v0.12.0
-	github.com/viant/afsc v0.12.0
+	github.com/viant/afs v0.16.0
+	github.com/viant/afsc v0.15.0
 	github.com/viant/assertly v0.5.1
-	github.com/viant/toolbox v0.28.0
+	github.com/viant/toolbox v0.30.0
 	google.golang.org/api v0.7.0
 	gopkg.in/yaml.v2 v2.2.2
 )

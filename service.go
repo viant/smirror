@@ -1,6 +1,7 @@
 package smirror
 
 import (
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -133,9 +134,9 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		streaming = rule.Streaming
 	}
 
-	response.ChecksumSkip = int(object.Size()) > streaming.ChecksumSkipThreshold
-	if int(object.Size()) > streaming.Threshold {
-		response.StreamOption = option.NewStream(streaming.PartSize, int(object.Size()))
+	response.ChecksumSkip = int(object.Size()) > streaming.ChecksumSkipThreshold()
+	if int(object.Size()) > streaming.Threshold() {
+		response.StreamOption = option.NewStream(streaming.PartSize(), int(object.Size()))
 	}
 
 	err = s.mirrorAsset(ctx, rule, request.URL, response)
@@ -287,11 +288,25 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 	if transfer.skipChecksum {
 		options = append(options, option.NewSkipChecksum(true))
 	}
-	if err = s.fs.Upload(ctx, transfer.Dest.URL, file.DefaultFileOsMode, reader, options...); err != nil {
-		return errors.Wrapf(err, "failed to upload %v", transfer.Dest.URL)
-	}
+
+	writer := s.fs.NewWriter(ctx, transfer.Dest.URL, file.DefaultFileOsMode,  options...)
 	response.AddURL(transfer.Dest.URL)
-	return nil
+
+	if transfer.Dest.CompressionCodec() == config.GZipCodec {
+		gzipWriter := gzip.NewWriter(writer)
+		if _, err = io.Copy(gzipWriter, reader); err != nil {
+			return err
+		}
+		if err := gzipWriter.Flush(); err == nil {
+			err = gzipWriter.Close()
+		}
+
+	} else {
+		if _, err = io.Copy(writer, reader);err != nil {
+			return err
+		}
+	}
+	return writer.Close()
 }
 
 //Load initialises this service

@@ -29,6 +29,17 @@ type Ruleset struct {
 }
 
 //Match returns the first match route
+func (r Ruleset) Rule(URL string) *Rule {
+	for i := range r.Rules {
+		if r.Rules[i].Info.URL == URL {
+			return r.Rules[i]
+		}
+	}
+	return nil
+}
+
+
+//Match returns the first match route
 func (r Ruleset) Match(URL string) (matched []*Rule) {
 	for i := range r.Rules {
 		if r.Rules[i].HasMatch(URL) {

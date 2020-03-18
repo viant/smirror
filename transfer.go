@@ -1,8 +1,6 @@
 package smirror
 
 import (
-	"bytes"
-	"compress/gzip"
 	"fmt"
 	"io"
 	"smirror/config"
@@ -39,18 +37,6 @@ func (t *Transfer) getReader() (reader io.Reader, err error) {
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	if t.Dest.CompressionCodec() == config.GZipCodec {
-		buffer := new(bytes.Buffer)
-		gzipWriter := gzip.NewWriter(buffer)
-		if _, err = io.Copy(gzipWriter, reader); err != nil {
-			return nil, err
-		}
-		if err := gzipWriter.Flush(); err == nil {
-			err = gzipWriter.Close()
-		}
-		return buffer, err
 	}
 	return reader, err
 }
