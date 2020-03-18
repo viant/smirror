@@ -2,12 +2,12 @@ package smirror
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
 	"smirror/base"
 	"smirror/contract"
 	"smirror/event"
+	"smirror/shared"
 )
 
 //StorageMirror cloud function entry point
@@ -32,9 +32,7 @@ func storageMirror(ctx context.Context, event event.StorageEvent) (response *con
 		return nil, fmt.Errorf("failed to create storage mirror: %v", err)
 	}
 	response = service.Mirror(ctx, contract.NewRequest(event.URL()))
-	if data, err := json.Marshal(response); err == nil {
-		fmt.Printf("%v\n", string(data))
-	}
+	shared.LogLn(response)
 	if response.Error != "" {
 		return nil, fmt.Errorf(response.Error)
 	}

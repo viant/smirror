@@ -306,7 +306,6 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 		}
 	}
 	err = writer.Close()
-	fmt.Printf("uploaded %v\n", transfer.Dest.URL)
 	return err
 }
 
