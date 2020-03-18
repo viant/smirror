@@ -16,7 +16,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.3.0
 	github.com/twmb/murmur3 v1.0.0
-	github.com/viant/afs v0.16.0
+	github.com/viant/afs v0.16.1
 	github.com/viant/afsc v0.15.0
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.30.0
