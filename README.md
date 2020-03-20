@@ -282,26 +282,29 @@ with data payload and /data/p11/0001_events.csv and /data/p11/0002_events.csv so
 Both topic and queue support **$partition** variable to expanded ir with partition when Split.Partition setting is used. 
 
 
-##### Payload validation
+##### Payload Schema Validation
 
-The following attribute control payload Validationy. For JSON format any line with
-invalid JSON get excluded. For CSV each line is adjusted (expadnded/truncated) to specified 
-number columns.
-
-- **Validation.Format** (CSV or JSON)
-- **Validation.Delimiter**  
-- **Validation.LazyQuotes** 
-- **Validation.FieldCount** 
-- **Validation.Fields**:  field collection data type adjustment settings
+The following attribute control payload Schema. 
+For JSON format any line with invalid JSON get excluded. 
 
 
-###### Payload Validationy filed:
+- **Schema.Format** (CSV or JSON)
+- **Schema.Delimiter**  
+- **Schema.LazyQuotes** 
+- **Schema.FieldCount** an optional setting for CSV, where each line is adjusted (expand/truncated) to specified  number columns.
+- **Schema.MaxBadRecords** an optional setting to control max allowed bad records (if not specified, all bad records are excluded)
+
+
+- **Schema.Fields**:  field collection data type adjustment settings
+
+###### Payload Schema filed:
 
 - **Name** json field name
-- **Position** csv filed position
+- **Position** csv filed position (if not specified filed validation, conversion is ignored)
 - **DataType** adjustment data type (time, float, int, boolean, int, string)
-- **SourceDateFormat** date format in source filed
+- **SourceDateFormat** date format in source filed (java style date format: yyyy-MM-dd hh:mm:ss)
 - **TargetDateFormat** target adjustment date format 
+
 
 ##### Payload substitution
 
