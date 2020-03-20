@@ -20,7 +20,7 @@ type Rule struct {
 	Dest       *Resource
 	Source     *Resource
 	Replace    []*Replace   `json:",omitempty"`
-	Recover    *Recover     `json:",omitempty"`
+	Schema     *Schema      `json:",omitempty"`
 	Transcoder *Transcoding `json:",omitempty"`
 	Streaming  *Streaming   `json:",omitempty"`
 	Split      *Split       `json:",omitempty"`
@@ -51,7 +51,7 @@ func (r *Rule) NewReplacer() *strings.Replacer {
 
 //HasTransformer returns true if rule has recover or replace option
 func (r *Rule) HasTransformer() bool {
-	return r.Recover != nil || len(r.Replace) > 0
+	return r.Schema != nil || len(r.Replace) > 0
 }
 
 //HasSplit returns true if rule has split defined
@@ -110,9 +110,9 @@ func (r *Rule) Init(ctx context.Context, fs afs.Service) error {
 	if r.Streaming != nil {
 		r.Streaming.Init()
 	}
-	if r.Recover != nil && len(r.Recover.Fields) > 0 {
-		for i := range r.Recover.Fields {
-			r.Recover.Fields[i].Init()
+	if r.Schema != nil && len(r.Schema.Fields) > 0 {
+		for i := range r.Schema.Fields {
+			r.Schema.Fields[i].Init()
 		}
 	}
 	if r.Transcoder != nil {

@@ -282,20 +282,20 @@ with data payload and /data/p11/0001_events.csv and /data/p11/0002_events.csv so
 Both topic and queue support **$partition** variable to expanded ir with partition when Split.Partition setting is used. 
 
 
-##### Payload recovery
+##### Payload validation
 
-The following attribute control payload recovery. For JSON format any line with
+The following attribute control payload Validationy. For JSON format any line with
 invalid JSON get excluded. For CSV each line is adjusted (expadnded/truncated) to specified 
 number columns.
 
-- **Recover.Format** (CSV or JSON)
-- **Recover.Delimiter**  
-- **Recover.LazyQuotes** 
-- **Recover.FieldCount** 
-- **Recover.Fields**:  field collection data type adjustment settings
+- **Validation.Format** (CSV or JSON)
+- **Validation.Delimiter**  
+- **Validation.LazyQuotes** 
+- **Validation.FieldCount** 
+- **Validation.Fields**:  field collection data type adjustment settings
 
 
-###### Payload recovery filed:
+###### Payload Validationy filed:
 
 - **Name** json field name
 - **Position** csv filed position

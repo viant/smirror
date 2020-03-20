@@ -1,4 +1,4 @@
 - AVRO split
-- Add data casting in JSON recovery mode
+- Add data casting in JSON validation mode
 - Add cloud run integration
  

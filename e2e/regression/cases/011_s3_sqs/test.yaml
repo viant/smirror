@@ -1,7 +1,7 @@
 init:
   part1: $Cat('${parent.path}/data/expect/events_00001.csv')
   part2: $Cat('${parent.path}/data/expect/events_00002.csv')
-  events: $Cat('${parent.path}/data/expect/events.json')
+  events: $Cat('${parent.path}/data/expect/events.csv')
   exepct: $AsData($events)
 
 pipeline:

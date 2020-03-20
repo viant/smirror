@@ -10,7 +10,7 @@ init:
 
   part1: $Cat('pubsub/events_00001.csv')
   part2: $Cat('pubsub/events_00002.csv')
-  events: $Cat('pubsub/events.json')
+  events: $Cat('pubsub/events.csv')
   exepct: $AsData($events)
 
 pipeline:

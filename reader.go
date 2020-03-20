@@ -4,7 +4,7 @@ import (
 	"compress/gzip"
 	"io"
 	"smirror/config"
-	"smirror/config/recover"
+	"smirror/config/schema"
 )
 
 //NewReader returns a reader for a rule
@@ -19,8 +19,8 @@ func NewReader(rule *config.Rule, reader io.Reader, sourceURL string) (io.Reader
 	if !rule.HasTransformer() {
 		return reader, nil
 	}
-	if rule.Recover != nil || len(rule.Replace) > 0 {
-		if reader, err = recover.NewReader(reader, rule); err != nil {
+	if rule.Schema != nil || len(rule.Replace) > 0 {
+		if reader, err = schema.NewReader(reader, rule); err != nil {
 			return nil, err
 		}
 	}

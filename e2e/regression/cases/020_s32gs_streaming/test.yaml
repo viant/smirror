@@ -1,0 +1,40 @@
+pipeline:
+
+
+  cleanUp:
+    action: storage:remove
+    sleepTimeMs: 1000
+    assets:
+      - URL: 'gs://${s3ConfigBucket}/StorageMirror/_.cache'
+        credentials: $gcpCredentials
+      - URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.json
+        credentials: $awsCredentials
+
+
+  setupRule:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/rule.json
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.json
+
+
+  trigger:
+    action: storage:generate
+    sleepTimeMs: 60000
+    sizeInMb: 270
+    dest:
+      URL: s3://${s3TriggerBucket}/data/p20/asset.txt
+      credentials: $awsCredentials
+
+
+  validate:
+    action: storage:exists
+    assets:
+      - URL: gs://${gsDestBucket}/data/p20/asset.txt
+        credentials: $gcpCredentials
+
+    expect:
+      'gs://${gsDestBucket}/data/p20/asset.txt': true

@@ -1,0 +1,41 @@
+init:
+  expect: $Cat('${parent.path}/data/expect/events.json')
+
+pipeline:
+
+  cleanUp:
+    action: storage:remove
+    sleepTimeMs: 1000
+    assets:
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/_.cache'
+        credentials: $gcpCredentials
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.yaml'
+        credentials: $gcpCredentials
+
+
+  setupRule:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/rule.yaml
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.yaml
+
+
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 20000
+    source:
+      URL: ${parent.path}/data/prepare/
+    dest:
+      credentials: $gcpCredentials
+      URL: gs://${gsTriggerBucket}/data/p17/
+
+
+  validate:
+    action: storage:download
+    source:
+      URL: gs://${gsDestBucket}/data/p17/events.json
+      credentials: $gcpCredentials
+    expect: $expect

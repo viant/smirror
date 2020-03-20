@@ -1,6 +1,6 @@
 #### Scenario:
 
-Source is CSV file, with **Recover** option set with CSV format,all record will be adjusted to specified filed count and mirrored to destination. 
+Source is CSV file, with **Schema** option set with CSV format,all record will be adjusted to specified filed count and mirrored to destination. 
   
  
 #### Input:
@@ -21,7 +21,7 @@ Configuration:
     "Dest": {
       "URL": "gs://${gsDestBucket}/"
     },
-    "Recover": {
+    "Schema": {
         "Format": "CSV",
         "FieldCount": 3
     },

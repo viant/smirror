@@ -1,6 +1,6 @@
 #### Scenario:
 
-Source file is in new line delimitered JSON, with **Recover** option set with JSON format, only valid JSON line will be mirrored to destination.
+Source file is in new line delimitered JSON, with **Schema** option set with JSON format, only valid JSON line will be mirrored to destination.
   
  
 #### Input:
@@ -21,7 +21,7 @@ Configuration:
     "Dest": {
       "URL": "gs://${gsDestBucket}/"
     },
-    "Recover": {
+    "Schema": {
         "Format": "JSON"
     },
     "OnSuccess": [

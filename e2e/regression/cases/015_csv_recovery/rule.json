@@ -7,7 +7,7 @@
     "Dest": {
       "URL": "gs://${gsDestBucket}/"
     },
-    "Recover": {
+    "Schema": {
         "Format": "CSV",
         "FieldCount": 3
     },
