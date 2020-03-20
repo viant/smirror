@@ -285,8 +285,6 @@ Both topic and queue support **$partition** variable to expanded ir with partiti
 ##### Payload Schema Validation
 
 The following attribute control payload Schema. 
-For JSON format any line with invalid JSON get excluded. 
-
 
 - **Schema.Format** (CSV or JSON)
 - **Schema.Delimiter**  
