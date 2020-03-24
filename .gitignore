@@ -4,5 +4,8 @@ vendor/
 logs/
 *.zip
 smirror
+smirrorsns
+smirrorcron
+smirrorsqs
 local_test.go
 
