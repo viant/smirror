@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
+	"smirror/base"
 	"smirror/config"
 	"strings"
 	"unsafe"
@@ -59,7 +60,7 @@ func (t *reader) transform() error {
 			data, err = t.adjustJSONValues(data, err)
 		}
 	}
-	if err = t.faileIfTooManyBadRecords(err); err != nil {
+	if err = t.failIfTooManyBadRecords(err); err != nil {
 		return err
 	}
 	if len(data) == 0 {
@@ -78,7 +79,7 @@ func (t *reader) transform() error {
 func (t *reader) reportBrokenJSON(data []byte) (err error) {
 	record := map[string]interface{}{}
 	err = json.Unmarshal(data, &record)
-	if err = t.faileIfTooManyBadRecords(err); err != nil {
+	if err = t.failIfTooManyBadRecords(err); err != nil {
 		return err
 	}
 	return nil
@@ -105,13 +106,13 @@ func (t *reader) adjustJSONValues(data []byte, err error) ([]byte, error) {
 	return data, err
 }
 
-func (t *reader) faileIfTooManyBadRecords(err error) error {
+func (t *reader) failIfTooManyBadRecords(err error) error {
 	if err == nil || t.schema.MaxBadRecords == nil {
 		return nil
 	}
 	t.badRecords++
 	if t.badRecords >= *t.schema.MaxBadRecords {
-		return errors.Wrapf(err, "too many bad records: %v", t.badRecords)
+		return base.NewSchemaError(errors.Wrapf(err, "too many bad records: %v", t.badRecords))
 	}
 	return nil
 }

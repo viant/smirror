@@ -230,6 +230,9 @@ func (s *service) transfer(ctx context.Context, transfer *Transfer, response *co
 	}
 	if transfer.Resource.URL != "" {
 		err := s.upload(ctx, transfer, response)
+		if base.IsSchemaError(err) {
+			response.SchemaError = err.Error()
+		}
 		if err != nil {
 			return errors.Wrapf(err, "failed to transfer to: %v", transfer.Dest.URL)
 		}
@@ -296,7 +299,7 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 		if _, err = io.Copy(gzipWriter, reader); err != nil {
 			return err
 		}
-		if err := gzipWriter.Flush(); err == nil {
+		if err = gzipWriter.Flush(); err == nil {
 			err = gzipWriter.Close()
 		}
 
@@ -306,6 +309,10 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 		}
 	}
 	err = writer.Close()
+	if err != nil {
+		//if errors mirroring delete dest corrupted transfer
+		s.fs.Delete(ctx, transfer.Dest.URL)
+	}
 	return err
 }
 

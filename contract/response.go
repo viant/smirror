@@ -20,6 +20,7 @@ type Response struct {
 	TotalRules    int
 	Status        string
 	Error         string `json:",omitempty"`
+	SchemaError   string `json:",omitempty"`
 	NotFoundError string `json:",omitempty"`
 	StartTime     time.Time
 	Triggered     map[string]string `json:",omitempty"`

@@ -33,7 +33,8 @@ func storageMirror(ctx context.Context, event event.StorageEvent) (response *con
 	}
 	response = service.Mirror(ctx, contract.NewRequest(event.URL()))
 	shared.LogLn(response)
-	if response.Error != "" {
+	//Schema error
+	if response.Error != "" && response.SchemaError == ""{
 		return nil, fmt.Errorf(response.Error)
 	}
 	return response, nil
