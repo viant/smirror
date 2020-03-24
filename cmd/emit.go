@@ -1,9 +1,21 @@
 package cmd
 
+import (
+	"context"
+	"github.com/viant/afs/storage"
+	"github.com/viant/afs/url"
+	"smirror/cmd/history"
+	"smirror/cmd/mirror"
+	"smirror/contract"
+	"time"
+)
 
-
-func (s *service) emit(ctx context.Context, object storage.Object, response *tail.Response) error {
+func (s *service) emit(ctx context.Context, object storage.Object, req *mirror.Request, response *mirror.Response) error {
 	if object.IsDir() {
+		eventsHistory, err := history.FromURL(ctx, req.HistoryPathURL(object.URL()), s.fs)
+		defer func() {
+			eventsHistory.Persist(ctx, s.fs)
+		}()
 		objects, err := s.fs.List(ctx, object.URL())
 		if err != nil {
 			return err
@@ -12,24 +24,23 @@ func (s *service) emit(ctx context.Context, object storage.Object, response *tai
 			if url.Equals(object.URL(), objects[i].URL()) {
 				continue
 			}
-			if err := s.emit(ctx, objects[i], response); err != nil {
+
+			if ! object.IsDir()  && ! eventsHistory.Put(history.NewSource(object.URL(), object.ModTime())) {
+				continue
+			}
+			if err := s.emit(ctx, objects[i], req, response); err != nil {
 				return err
 			}
 		}
 		return nil
 	}
+
 	request := &contract.Request{
-		EventID:   fmt.Sprintf("%v", nextEventID()),
-		SourceURL: object.URL(),
+		URL: object.URL(),
+		Timestamp:time.Now(),
 	}
-	atomic.AddInt32(&response.Info.Published, 1)
+	response.AddDataURLs(object.URL())
 	response.IncrementPending(1)
 	s.requestChan <- request
 	return nil
 }
-
-func nextEventID() uint64 {
-	rand.Seed((time.Now().UTC().UnixNano()))
-	return rand.Uint64() / 1000
-}
-

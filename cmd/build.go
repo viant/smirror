@@ -5,14 +5,15 @@ import (
 	"context"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/mem"
+	"github.com/viant/afs/option"
 	"github.com/viant/afs/url"
 	"gopkg.in/yaml.v2"
 	"os"
+	"path"
 	"smirror/base"
 	"smirror/cmd/build"
 	"smirror/config"
 )
-
 
 func (s *service) Build(ctx context.Context, request *build.Request) error {
 	request.Init(s.config)
@@ -21,9 +22,9 @@ func (s *service) Build(ctx context.Context, request *build.Request) error {
 	}
 	rule := &config.Rule{
 		Dest: &config.Resource{
-			URL:request.DestinationURL,
+			URL: request.DestinationURL,
 		},
-		Source:&config.Resource{
+		Source: &config.Resource{
 			URL: request.SourceURL,
 		},
 		Info: base.Info{
@@ -31,16 +32,24 @@ func (s *service) Build(ctx context.Context, request *build.Request) error {
 			LeadEngineer: os.Getenv("USER"),
 		},
 	}
+
 	if request.MatchPrefix != "" {
 		rule.Source.Prefix = request.MatchPrefix
 	}
 	if request.MatchSuffix != "" {
-		rule.Source.Prefix = request.MatchSuffix
+		rule.Source.Suffix = request.MatchSuffix
 	}
 	if request.MatchPattern != "" {
 		rule.Source.Filter = request.MatchPattern
 	}
 
+	hasMatcher := rule.Source.Prefix != "" || rule.Source.Suffix != "" || rule.Source.Filter != ""
+	if request.SourceURL != "" && hasMatcher {
+		if files, _ := s.fs.List(ctx, request.SourceURL, option.NewRecursive(true)); len(files) > 0 {
+			rule.Source.Prefix, _ = url.Split(files[0].URL(), file.Scheme)
+			rule.Source.Suffix = path.Ext(files[0].Name())
+		}
+	}
 	rule.Streaming = &config.Streaming{
 		ThresholdMb:             300,
 		PartSizeMb:              15,

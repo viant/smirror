@@ -18,6 +18,9 @@ const (
 	//StatusDisabled status disabled
 	StatusDisabled = "disabled"
 
+	//StatusPending status pending
+	StatusPending = "pending"
+
 	//StatusUnProcess status for unprocessed file
 	StatusUnProcess = "unprocessed"
 
