@@ -16,6 +16,10 @@ init:
   
   configLocation: config/config.json
   configText: $Cat('$configLocation')
+  target:
+    URL: ssh://127.0.0.1/
+    credentials: localhost
+
 
 pipeline:
 
@@ -48,7 +52,7 @@ pipeline:
     set_sdk:
       action: sdk.set
       target: $target
-      sdk: go:1.12
+      sdk: go:1.14
 
 
     package:
