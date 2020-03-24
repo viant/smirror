@@ -3,42 +3,42 @@
     "event_type": "1         ",
     "id": 1,
     "timestamp": {
-      "long.timestamp-millis": "2019-07-25T01:03:22Z"
+      "long": 1564016602000
     }
   },
   {
     "event_type": "2         ",
     "id": 3,
     "timestamp": {
-      "long.timestamp-millis": "2019-07-25T01:03:23Z"
+      "long": 1564016603000
     }
   },
   {
     "event_type": "1         ",
     "id": 5,
     "timestamp": {
-      "long.timestamp-millis": "2019-07-25T01:03:25Z"
+      "long": 1564016605000
     }
   },
   {
     "event_type": "2         ",
     "id": 7,
     "timestamp": {
-      "long.timestamp-millis": "2019-07-25T01:03:26Z"
+      "long": 1564016606000
     }
   },
   {
     "event_type": "4         ",
     "id": 9,
     "timestamp": {
-      "long.timestamp-millis": "2019-07-25T01:03:26Z"
+      "long": 1564016606000
     }
   },
   {
     "event_type": "4         ",
     "id": 9,
     "timestamp": {
-      "long.timestamp-millis": "2019-07-25T01:03:26Z"
+      "long": 1564016606000
     }
   }
 ]

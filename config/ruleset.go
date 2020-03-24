@@ -111,7 +111,7 @@ func (c *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 		return err
 	}
 	for _, object := range routesObject {
-		if object.IsDir() {
+		if object.IsDir()  || ! (path.Ext(object.Name()) != ".json" || path.Ext(object.Name()) != ".yaml") {
 			continue
 		}
 		if err = c.loadResources(ctx, fs, object); err != nil {

@@ -1,5 +1,5 @@
 init:
-  expect: $Cat('${parent.path}/data/expect/events.csv')
+  expect: $Cat('${parent.path}/data/expect/events.json')
 pipeline:
 
   cleanUp:
@@ -10,7 +10,7 @@ pipeline:
         credentials: $gcpCredentials
       - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.json'
         credentials: $gcpCredentials
-      - URL: 'gs://${gsDestBucket}/data/p16/events.avro'
+      - URL: 'gs://${gsDestBucket}/data/p09/events.avro'
         credentials: $gcpCredentials
 
   setupRule:
@@ -31,7 +31,7 @@ pipeline:
       URL: ${parent.path}/data/prepare/events.csv
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsTriggerBucket}/data/p16/events.csv
+      URL: gs://${gsTriggerBucket}/data/p09/events.csv
 
 
   downloadAvro:
@@ -39,7 +39,7 @@ pipeline:
     udf: AvroReader
     source:
       credentials: $gcpCredentials
-      URL: gs://${gsDestBucket}/data/p16/events.avro
+      URL: gs://${gsDestBucket}/data/p09/events.avro
     destKey: actual
 
   validate:
@@ -47,3 +47,6 @@ pipeline:
     actual: $AsData($actual)
     expect: $expect
 
+  info:
+    action: print
+    message: $AsJSON($validate)

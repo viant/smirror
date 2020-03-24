@@ -2,7 +2,6 @@ init:
   part1: $Cat('${parent.path}/data/expect/events_00001.csv')
   part2: $Cat('${parent.path}/data/expect/events_00002.csv')
   events: $Cat('${parent.path}/data/expect/events.csv')
-  exepct: $AsData($events)
 
 pipeline:
 
@@ -44,4 +43,13 @@ pipeline:
       vendor: gcp
       credentials: $gcpCredentials
     count: 2
-    expect: $exepct
+    expect:
+      '@indexBy@': Attributes.Source
+      '/p6/0001_events.csv':
+        Data: $part1
+      '/p6/0002_events.csv':
+        Data: $part2
+
+  info:
+    action: print
+    message: $AsJSON($validate)
