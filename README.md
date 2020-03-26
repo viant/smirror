@@ -236,10 +236,10 @@ Destination topic is dynamically evaluated based on parition value.
     smirror -r=myrule.yaml  -V
     
     ## to mirror from s3 to gs
-    bqtail -s=s3://mybucket/folder  -d=gs://myBucket/data
+    smirror -s=s3://mybucket/folder  -d=gs://myBucket/data
 
     ## to test rule localy 
-    bqtail -s=/tmp/data  -r='myrule.yaml'
+    smirror -s=/tmp/data  -r='myrule.yaml'
 
 ```
 
