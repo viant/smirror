@@ -8,4 +8,7 @@ smirrorsns
 smirrorcron
 smirrorsqs
 local_test.go
+*.tar.gz
+*.zip
+
 
