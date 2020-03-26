@@ -3,6 +3,7 @@ package option
 import (
 	"crypto/md5"
 	"encoding/base64"
+	"fmt"
 	"github.com/viant/afs/url"
 	"os"
 	"path"
@@ -12,7 +13,6 @@ import (
 )
 
 type Options struct {
-
 	RuleURL string `short:"r" long:"rule" description:"rule URL"`
 
 	Validate bool `short:"V" long:"validate" description:"run validation"`
@@ -35,9 +35,12 @@ type Options struct {
 
 	ProjectID string `short:"p" long:"project" description:"Google Cloud Project"`
 
+	PreserveDepth int `short:"D" long:"depth" description:"path preservation depth"`
+
+	Topic string `short:"t" long:"topic" description:"Google Cloud Pub/Sub topic"`
+
+	Queue string `short:"q" long:"queue" description:"AWS SQS queue"`
 }
-
-
 
 //HistoryPathURL return history URL
 func (r *Options) HistoryPathURL(URL string) string {
@@ -47,17 +50,12 @@ func (r *Options) HistoryPathURL(URL string) string {
 	return url.Join(r.HistoryURL, historyName)
 }
 
-//Hash returns fnv fnvHash value
-func md5Hash(key string) string {
-	h := md5.New()
-	_, _ = h.Write([]byte(key))
-	data := h.Sum(nil)
-	return base64.StdEncoding.EncodeToString(data)
-}
-
 func (r *Options) Init(config *smirror.Config) {
 	if r.SourceURL != "" {
 		r.SourceURL = normalizeLocation(r.SourceURL)
+	}
+	if r.DestinationURL != "" {
+		r.DestinationURL = normalizeLocation(r.DestinationURL)
 	}
 	if r.RuleURL != "" {
 		r.RuleURL = normalizeLocation(r.RuleURL)
@@ -67,6 +65,14 @@ func (r *Options) Init(config *smirror.Config) {
 		r.HistoryURL = normalizeLocation(r.HistoryURL)
 	}
 	r.initHistoryURL()
+}
+
+//Hash returns fnv fnvHash value
+func md5Hash(key string) string {
+	h := md5.New()
+	_, _ = h.Write([]byte(key))
+	data := h.Sum(nil)
+	return base64.StdEncoding.EncodeToString(data)
 }
 
 func (r *Options) initHistoryURL() {
@@ -79,14 +85,19 @@ func (r *Options) initHistoryURL() {
 	}
 }
 
-
 func normalizeLocation(location string) string {
+	if location == "" {
+		return ""
+	}
 	if strings.HasPrefix(location, "~/") {
 		location = strings.Replace(location, "~/", os.Getenv("HOME"), 1)
 	}
+
 	if url.Scheme(location, "") == "" && !strings.HasPrefix(location, "/") {
 		currentDirectory, _ := os.Getwd()
+		fmt.Printf("%v\n", currentDirectory)
 		return path.Join(currentDirectory, location)
 	}
+	fmt.Printf("normailized %v\n", location)
 	return location
 }

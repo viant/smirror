@@ -16,10 +16,10 @@ import (
 )
 
 func (s *service) Mirror(ctx context.Context, request *mirror.Request) (*mirror.Response, error) {
-	if request.RuleURL != "" {
+	if request.RuleURL == "" {
 		return nil, errors.New("ruleURL was empty")
 	}
-
+	request.Init(s.config)
 	rule, err := s.loadRule(ctx, request.RuleURL)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (s *service) loadDatafiles(waitGroup *sync.WaitGroup, ctx context.Context, 
 	}
 }
 
-func (s *service) scanFiles(ctx context.Context, waitGroup *sync.WaitGroup, object storage.Object,  request *mirror.Request, response *mirror.Response) {
+func (s *service) scanFiles(ctx context.Context, waitGroup *sync.WaitGroup, object storage.Object, request *mirror.Request, response *mirror.Response) {
 	defer waitGroup.Done()
 	if err := s.emit(ctx, object, request, response); err != nil {
 		response.AddError(err)
@@ -90,8 +90,15 @@ func (s *service) handleResponse(ctx context.Context, response *mirror.Response)
 				response.AddError(errors.New(resp.Error))
 				return
 			}
+
+			if len(resp.MessageIDs) > 0 {
+				response.AddMessageIDs(resp.MessageIDs)
+			}
+			if resp.BadRecords > 0 {
+				atomic.AddUint64(&response.BadRecords, uint64(resp.BadRecords))
+			}
 			response.IncrementPending(-1)
-			switch  resp.Status {
+			switch resp.Status {
 			case base.StatusOK:
 				response.AddMirrored(resp.TriggeredBy)
 			case base.StatusError:

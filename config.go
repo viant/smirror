@@ -30,6 +30,7 @@ type Config struct {
 //Load initialises routes
 func (c *Config) Init(ctx context.Context, fs afs.Service) (err error) {
 	c.Config.Init()
+
 	if err = c.Mirrors.Load(ctx, fs); err != nil {
 		return err
 	}

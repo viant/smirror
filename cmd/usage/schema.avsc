@@ -1,0 +1,10 @@
+{
+    "namespace": "my.namespace.com",
+    "type":	"record",
+    "name": "root",
+    "fields": [
+        { "name": "id", "type": "int"},
+        { "name": "event_type", "type": "string"},
+        { "name": "timestamp", "type":["null",{"type":"long","logicalType":"timestamp-millis"}]}
+    ]
+}

@@ -1,0 +1,8 @@
+Source:
+  Prefix: "/tmp/data/"
+  Suffix: ".zip"
+Uncompress: true
+Dest:
+  URL: /tmp/transformed/
+Codec: gzip
+PreserveDepth: -1

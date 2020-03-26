@@ -1,0 +1,26 @@
+Source:
+  Prefix: "/tmp/data/"
+  Suffix: ".csv"
+Dest:
+  URL: '/tmp//transformed'
+Schema:
+  MaxBadRecords: 10
+  Format: CSV
+  Fields:
+    - Name: id
+      Position: 0
+      DataType: int
+    - Name: Name
+      Position: 1
+      DataType: string
+    - Name: Timestamp
+      Position: 2
+      DataType: time
+      SourceDateFormat: 'yyyy-MM-dd hh:mm:ss'
+    - Name: segement
+      Position: 3
+      DataType: int
+PreserveDepth: 0
+OnSuccess:
+  - Action: delete
+

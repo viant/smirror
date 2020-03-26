@@ -24,6 +24,7 @@ func (s *service) loadRule(ctx context.Context, URL string) (*config.Rule, error
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to update rule: %v", ruleURL)
 	}
+
 	//add sleep to refresh
 	time.Sleep(1 * time.Millisecond)
 	_, err = s.config.Mirrors.ReloadIfNeeded(ctx, s.fs)

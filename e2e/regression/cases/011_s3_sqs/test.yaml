@@ -1,8 +1,6 @@
 init:
   part1: $Cat('${parent.path}/data/expect/events_00001.csv')
   part2: $Cat('${parent.path}/data/expect/events_00002.csv')
-  events: $Cat('${parent.path}/data/expect/events.csv')
-  exepct: $AsData($events)
 
 pipeline:
 
@@ -42,4 +40,10 @@ pipeline:
       vendor: aws
       credentials: $awsCredentials
     count: 2
-    expect: $exepct
+    expect:
+      "@indexBy@": "Attributes.Source"
+      "/data/p11/0001_events.csv":
+        Data: "$part1"
+      "/data/p11/0002_events.csv":
+        Data: "$part2"
+

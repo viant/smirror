@@ -19,6 +19,7 @@ type Resource struct {
 	Proxy       *option.Proxy
 	Topic       string `json:",omitempty"`
 	Queue       string `json:",omitempty"`
+	Vendor      string `json:",omitempty"`
 	//Optional pubsub project ID, otherwise it uses default one.
 	ProjectID string `json:",omitempty"`
 }

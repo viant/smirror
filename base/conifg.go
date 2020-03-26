@@ -1,8 +1,10 @@
 package base
 
 import (
+	"context"
 	"github.com/viant/afsc/gs"
 	"github.com/viant/afsc/s3"
+	"golang.org/x/oauth2/google"
 	"os"
 )
 
@@ -28,6 +30,11 @@ func (c *Config) Init() {
 
 		} else if os.Getenv("AWS_LAMBDA_FUNCTION_NAME") != "" {
 			c.SourceScheme = s3.Scheme
+		}
+	}
+	if c.ProjectID == "" {
+		if credentials, err := google.FindDefaultCredentials(context.Background()); err == nil {
+			c.ProjectID = credentials.ProjectID
 		}
 	}
 }

@@ -6,12 +6,14 @@ import (
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
+	"os"
 	"path"
 	"smirror/base"
 	"smirror/job"
 	"strings"
 	"time"
 )
+
 
 //Rule represent matching resource route rule
 type Rule struct {
@@ -116,9 +118,30 @@ func (r *Rule) Init(ctx context.Context, fs afs.Service) error {
 		}
 	}
 	if r.Transcoder != nil {
+
+		if r.Transcoder.Dest.SchemaURL != "" {
+			r.Transcoder.Dest.SchemaURL = normalizeURL(ctx, fs, r.Transcoder.Dest.SchemaURL, r.Info.URL)
+		}
+
 		return r.Transcoder.Init(ctx, fs)
 	}
 	return nil
+}
+
+func normalizeURL(ctx context.Context, fs afs.Service, URL, parentURL string) string {
+	if url.Scheme(URL, "") != "" || strings.HasPrefix(URL, "/") {
+		return URL
+	}
+	currentDirectory, _ := os.Getwd()
+	ownerParent, _ := url.Split(parentURL, file.Scheme)
+	for _, baseURL := range []string{fmt.Sprintf("%v://%v", file.Scheme,currentDirectory), ownerParent} {
+		URL := url.Join(baseURL, URL)
+		fmt.Printf("%v\n", URL)
+		if exists, _ := fs.Exists(ctx, URL); exists {
+			return URL
+		}
+	}
+	return URL
 }
 
 //SourceCompression returns compression for URL

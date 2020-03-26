@@ -9,32 +9,21 @@ Configuration:
 * Global Config: [@config,json](../../../config/gs.json)
 * Rule
 
-[@rule.json](rule.json)
-```json
-[
-  {
-    "Prefix": "/data/p6",
-    "Suffix": ".csv",
-    "Dest": {
-      "Topic": "${gsPrefix}_storage_mirror"
-    },
-    "Split": {
-      "MaxLines": 10
-    },
-    "OnSuccess": [
-      {
-        "Action": "delete"
-      }
-    ],
-    "OnFailure": [
-      {
-        "Action": "move",
-        "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
-      }
-    ],
-    "PreserveDepth": 1
-  }
-]
+[@rule.yaml](rule.yaml)
+```yaml
+Source:
+  Prefix: "/data/p6"
+  Suffix: ".csv"
+Dest:
+  Topic: "${gsPrefix}_storage_mirror"
+Split:
+  MaxLines: 10
+OnSuccess:
+  - Action: delete
+OnFailure:
+  - Action: move
+    URL: gs:///${gsOpsBucket}/StorageMirror/errors/
+PreserveDepth: 1
 ```
 
 * Trigger:

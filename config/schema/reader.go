@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"smirror/base"
 	"smirror/config"
+	"smirror/contract"
 	"strings"
 	"unsafe"
 )
@@ -19,6 +20,7 @@ const bufferSize = 1024 * 1024
 var lineBreak = []byte{'\n'}
 
 type reader struct {
+	response   *contract.Response
 	count      int32
 	schema     *config.Schema
 	replacer   *strings.Replacer
@@ -111,6 +113,9 @@ func (t *reader) failIfTooManyBadRecords(err error) error {
 		return nil
 	}
 	t.badRecords++
+	if t.response != nil {
+		t.response.BadRecords++
+	}
 	if t.badRecords >= *t.schema.MaxBadRecords {
 		return base.NewSchemaError(errors.Wrapf(err, "too many bad records: %v", t.badRecords))
 	}
@@ -196,10 +201,11 @@ func (t *reader) adjustCSVDataType(record []string) error {
 	return err
 }
 
-func NewReader(r io.Reader, rule *config.Rule) (io.Reader, error) {
+func NewReader(r io.Reader, rule *config.Rule, response *contract.Response) (io.Reader, error) {
 	scanner := bufio.NewScanner(r)
 	scanner.Buffer(make([]byte, bufferSize), 10*bufferSize)
 	return &reader{
+		response:  response,
 		schema:    rule.Schema,
 		transient: new(bytes.Buffer),
 		buf:       new(bytes.Buffer),

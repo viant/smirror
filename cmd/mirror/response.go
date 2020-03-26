@@ -8,15 +8,17 @@ import (
 
 //Response represents response
 type Response struct {
-	Status   string
-	Errors   []string
-	DataURLs []string
-	Mirrored []string
-	NoMatch []string
-	Failed []string
+	Status      string
+	Errors      []string
+	DataURLs    []string
+	Mirrored    []string
+	NoMatch     []string
+	MessageIDs  []string
+	Failed      []string
+	BadRecords  uint64
 	historyURLs []string
-	mux sync.Mutex
-	pending int32
+	mux         sync.Mutex
+	pending     int32
 }
 
 //History returns events history
@@ -48,7 +50,6 @@ func (r *Response) AddMirrored(URL string) {
 	r.Mirrored = append(r.Mirrored, URL)
 }
 
-
 //AddFailed adds trigger URL
 func (r *Response) AddFailed(URL string) {
 	r.mux.Lock()
@@ -63,7 +64,6 @@ func (r *Response) AddNoMatch(URL string) {
 	r.NoMatch = append(r.NoMatch, URL)
 }
 
-
 //AddDataURLs adds trigger URL
 func (r *Response) AddDataURLs(URL string) {
 	r.mux.Lock()
@@ -71,20 +71,25 @@ func (r *Response) AddDataURLs(URL string) {
 	r.DataURLs = append(r.DataURLs, URL)
 }
 
-
+//AddMessageIDs adds trigger URL
+func (r *Response) AddMessageIDs(ids []string) {
+	r.mux.Lock()
+	defer r.mux.Unlock()
+	r.MessageIDs = append(r.MessageIDs, ids...)
+}
 
 //NewResponse creates a response
 func NewResponse() *Response {
 	return &Response{
-		Status: base.StatusOK,
-		Errors: make([]string, 0),
-		DataURLs:make([]string, 0),
-		Mirrored:make([]string, 0),
-		NoMatch:make([]string, 0),
-		Failed:make([]string, 0),
+		Status:     base.StatusOK,
+		Errors:     make([]string, 0),
+		DataURLs:   make([]string, 0),
+		Mirrored:   make([]string, 0),
+		NoMatch:    make([]string, 0),
+		Failed:     make([]string, 0),
+		MessageIDs: make([]string, 0),
 	}
 }
-
 
 //AddError adds response error
 func (r *Response) AddError(err error) {

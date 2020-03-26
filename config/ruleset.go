@@ -111,9 +111,10 @@ func (c *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 		return err
 	}
 	for _, object := range routesObject {
-		if object.IsDir()  || ! (path.Ext(object.Name()) != ".json" || path.Ext(object.Name()) != ".yaml") {
+		if object.IsDir()  || ! (path.Ext(object.Name()) == ".json" || path.Ext(object.Name()) == ".yaml") {
 			continue
 		}
+
 		if err = c.loadResources(ctx, fs, object); err != nil {
 			//Report error, let the other rules work fine
 			fmt.Println(err)
@@ -132,12 +133,12 @@ func (c *Ruleset) loadResources(ctx context.Context, fs afs.Service, object stor
 	if err != nil {
 		return err
 	}
-
 	rules, err := loadRules(data, path.Ext(object.Name()))
 	if err != nil {
 		return errors.Wrapf(err, "failed to load rules: %v", object.URL())
 	}
 	transientRoutes := Ruleset{Rules: rules}
+	transientRoutes.Rules[0].Info.URL = object.URL()
 	if err := transientRoutes.Init(ctx, fs); err != nil {
 		return errors.Wrapf(err, "invalid rule: %v", object.URL())
 	}
@@ -173,6 +174,9 @@ func (r *Ruleset) initRules() error {
 }
 
 func loadRules(data []byte, ext string) ([]*Rule, error) {
+	if ext == "" {
+		return nil, nil
+	}
 	var rules = make([]*Rule, 0)
 	switch ext {
 	case base.YAMLExt:

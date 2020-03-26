@@ -7,6 +7,7 @@ init:
   privilegePolicy: privilege-policy.json
   privilegePolicyCron: privilege-policy-cron.json
   privilegePolicySQS: privilege-policy-sqs.json
+  AppVersion: $Cat(${fnAppPath}/Version)
 
 
 pipeline:
@@ -38,7 +39,13 @@ pipeline:
       - cd ../../aws/sns
       - go build -o smirrorsns
       - zip -j smirrorsns.zip smirrorsns
-
+      - cd ../../cmd/app
+      - go build -o smirror -ldflags "-X main.Version=${AppVersion}"
+      - tar cvzf smirror_linux_${AppVersion}.tar.gz smirror
+      - export GOOS=darwin
+      - go build -o smirror -ldflags "-X main.Version=${AppVersion}"
+      - tar cvzf smirror_osx_${AppVersion}.tar.gz smirror
+      - cp smirror /usr/local/bin
 
   deployCludFunction:
     action: gcp/cloudfunctions:deploy

@@ -5,10 +5,11 @@ import (
 	"io"
 	"smirror/config"
 	"smirror/config/schema"
+	"smirror/contract"
 )
 
 //NewReader returns a reader for a rule
-func NewReader(rule *config.Rule, reader io.Reader, sourceURL string) (io.Reader, error) {
+func NewReader(rule *config.Rule, reader io.Reader, response *contract.Response, sourceURL string) (io.Reader, error) {
 	compression := rule.SourceCompression(sourceURL)
 	var err error
 	if compression != nil && compression.Codec == config.GZipCodec {
@@ -20,7 +21,7 @@ func NewReader(rule *config.Rule, reader io.Reader, sourceURL string) (io.Reader
 		return reader, nil
 	}
 	if rule.Schema != nil || len(rule.Replace) > 0 {
-		if reader, err = schema.NewReader(reader, rule); err != nil {
+		if reader, err = schema.NewReader(reader, rule, response); err != nil {
 			return nil, err
 		}
 	}

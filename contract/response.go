@@ -23,6 +23,7 @@ type Response struct {
 	SchemaError   string `json:",omitempty"`
 	NotFoundError string `json:",omitempty"`
 	StartTime     time.Time
+	BadRecords    int               `json:",omitempty"`
 	Triggered     map[string]string `json:",omitempty"`
 	ChecksumSkip  bool              `json:",omitempty"`
 	StreamOption  *option.Stream    `json:",omitempty"`

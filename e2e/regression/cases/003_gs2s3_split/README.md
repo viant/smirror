@@ -10,38 +10,27 @@ Configuration:
 
 * Rule
 
-[@config,json](../../../config/gs.json)
-```json
- {
-      "Prefix": "/data/p3",
-      "Suffix": ".csv",
-      "Dest": {
-        "URL": "s3://${s3TriggerBucket}/data",
-        "Credentials": {
-          "URL": "gs://${gsConfigBucket}/Secrets/s3-mirror.json.enc",
-           "Key": "projects/${gcpProject}/locations/us-central1/keyRings/${gsPrefix}_ring/cryptoKeys/${gsPrefix}_key"
-        }
-      },
-      "Split": {
-        "MaxLines": 10,
-        "Template": "%s_%05d"
-      },
-      "OnCompletion": {
-        "OnSuccess": [
-          {
-            "Action": "delete"
-          }
-        ],
-        "OnError": [
-          {
-            "Action": "move",
-            "URL": "gs:///${gsOpsBucket}/StorageMirror/errors/"
-          }
-        ]
-      },
-      "PreserveDepth": 1
-    }
-```
+[@rule.yaml](rule.yaml)
+```yaml
+Source:
+  Prefix: "/data/p3"
+  Suffix: ".csv"
+Dest:
+  URL: s3://${s3DestBucket}/data
+  Credentials:
+    URL: gs://${gsConfigBucket}/Secrets/s3-mirror.json.enc
+    Key: projects/${gcpProject}/locations/us-central1/keyRings/${gsPrefix}_ring/cryptoKeys/${gsPrefix}_key
+Split:
+  MaxLines: 10
+  Template: "%s_%05d"
+OnSuccess:
+  - Action: delete
+OnFailure:
+  - Action: move
+    URL: gs:///${gsOpsBucket}/StorageMirror/errors/
+PreserveDepth: 1
+
+````
  
 
 * Trigger:

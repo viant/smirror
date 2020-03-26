@@ -1,0 +1,20 @@
+Source:
+  Prefix: "/tmp/data/"
+  Suffix: ".csv"
+Dest:
+  URL: '/tmp//transformed'
+Transcoder:
+  Source:
+    Format: CSV
+    Fields:
+      - id
+      - event_type
+      - timestamp
+    HasHeader: true
+  Dest:
+    Format: AVRO
+    SchemaURL: schema.avsc
+    RecordPerBlock: 10
+OnSuccess:
+  - Action: delete
+PreserveDepth: 1

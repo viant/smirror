@@ -26,7 +26,7 @@ func RunClient(Version string, args []string) {
 		shared.LogF("SMirror: Version: %v\n", Version)
 		return
 	}
-	canBuildRule := options.DestinationURL != ""
+	canBuildRule :=  options.DestinationURL != ""
 	canMirror := options.SourceURL != ""
 	if !(canMirror || options.Validate || canBuildRule) && len(args) == 1 {
 		os.Exit(1)
@@ -36,9 +36,7 @@ func RunClient(Version string, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	ctx := context.Background()
-
 	if options.RuleURL == "" || canBuildRule {
 		err = srv.Build(ctx, &build.Request{Options: options})
 		if err != nil {

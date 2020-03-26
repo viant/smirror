@@ -1,0 +1,10 @@
+Source:
+  Prefix: "/tmp/data/"
+  Suffix: ".csv"
+Dest:
+  Topic: "mytopic"
+Split:
+  MaxLines: 10
+OnSuccess:
+  - Action: delete
+PreserveDepth: 1

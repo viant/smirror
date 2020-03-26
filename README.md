@@ -16,6 +16,7 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
    * [S3 to Google Storage](#s3-to-google-storage)
    * [S3 To Simple Message Queue](#s3-to-simple-message-queue)
    * [Partitioning](#partitioning)
+- [Getting Started](#getting-started)
 - [Configuration](#configuration)
    * [Rule](#rule)
         - [Post Action](#post-actions)
@@ -224,6 +225,22 @@ Destination topic is dynamically evaluated based on parition value.
     "PreserveDepth": 1
   }
 ]
+```
+
+## Getting started
+
+[Smirror](cmd/README.md) command is great place to start to start building and validating transfer/transformer rules locally.
+
+```bash
+    ## to validate
+    smirror -r=myrule.yaml  -V
+    
+    ## to mirror from s3 to gs
+    bqtail -s=s3://mybucket/folder  -d=gs://myBucket/data
+
+    ## to test rule localy 
+    bqtail -s=/tmp/data  -r='myrule.yaml'
+
 ```
 
 ## Configuration

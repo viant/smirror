@@ -20,6 +20,7 @@ require (
 	github.com/viant/afsc v0.15.0
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.30.0
+	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	google.golang.org/api v0.7.0
 	gopkg.in/yaml.v2 v2.2.2
 )

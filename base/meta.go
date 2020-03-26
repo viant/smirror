@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
-	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/option"
 	"github.com/viant/afs/storage"
+	"path"
 	"sync"
 	"time"
 )
@@ -32,6 +32,9 @@ func (m *Meta) hasChanges(routes []storage.Object) bool {
 		return true
 	}
 	for _, route := range routes {
+		if route.IsDir() {
+			continue
+		}
 		modTime, ok := m.routes[route.URL()]
 		if !ok {
 			return true
@@ -53,11 +56,7 @@ func (m *Meta) HasChanged(ctx context.Context, fs afs.Service) (bool, error) {
 		return false, nil
 	}
 
-	basicMatcher, err := matcher.NewBasic("", ".json", "", nil)
-	if err != nil {
-		return false, err
-	}
-	routes, err := fs.List(ctx, m.baseURL, basicMatcher.Match, option.NewRecursive(true))
+	routes, err := fs.List(ctx, m.baseURL,  option.NewRecursive(true))
 	if err != nil {
 		return false, errors.Wrapf(err, "failed to load rules %v", m.baseURL)
 	}
@@ -68,6 +67,9 @@ func (m *Meta) HasChanged(ctx context.Context, fs afs.Service) (bool, error) {
 	defer m.mutex.Unlock()
 	m.routes = make(map[string]time.Time)
 	for _, route := range routes {
+		if route.IsDir() || !(path.Ext(route.Name()) == ".json" || path.Ext(route.Name()) == ".yaml") {
+			continue
+		}
 		m.routes[route.URL()] = route.ModTime()
 	}
 	return true, nil

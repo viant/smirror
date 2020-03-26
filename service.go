@@ -26,6 +26,7 @@ import (
 	"smirror/msgbus/pubsub"
 	"smirror/msgbus/sqs"
 	"smirror/secret"
+	"smirror/shared"
 	"smirror/slack"
 	"strings"
 	"sync"
@@ -46,6 +47,7 @@ type service struct {
 	cfs      afs.Service
 	secret   secret.Service
 	msgbus   msgbus.Service
+	msgbusVendor string
 	notifier slack.Slack
 }
 
@@ -188,7 +190,7 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 
 func (s *service) transferStream(ctx context.Context, reader io.Reader, URL string, rule *config.Rule, response *contract.Response) (err error) {
 
-	reader, err = NewReader(rule, reader, URL)
+	reader, err = NewReader(rule, reader,response, URL)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
 	}
@@ -211,7 +213,7 @@ func (s *service) transferStream(ctx context.Context, reader io.Reader, URL stri
 }
 
 func (s *service) transferChunkStream(ctx context.Context, reader io.Reader, URL string, rule *config.Rule, response *contract.Response) (err error) {
-	reader, err = NewReader(rule, reader, URL)
+	reader, err = NewReader(rule, reader,response,  URL)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
 	}
@@ -252,8 +254,8 @@ func (s *service) publish(ctx context.Context, transfer *Transfer, response *con
 		return err
 	}
 
-	switch s.config.SourceScheme {
-	case gs.Scheme, s3.Scheme:
+	switch s.msgbusVendor {
+	case shared.VendorPubsub, shared.VendorSQS:
 		attributes := make(map[string]interface{})
 		attributes[base.SourceAttribute] = transfer.Dest.URL
 		dest := transfer.Resource.Topic
@@ -275,7 +277,7 @@ func (s *service) publish(ctx context.Context, transfer *Transfer, response *con
 		response.MessageIDs = append(response.MessageIDs, pubResponse.MessageIDs...)
 		return nil
 	}
-	return fmt.Errorf("unsupported message msgbus %v", s.config.SourceScheme)
+	return fmt.Errorf("unsupported message vendor %v", s.msgbusVendor)
 }
 
 func (s *service) upload(ctx context.Context, transfer *Transfer, response *contract.Response) error {
@@ -344,17 +346,34 @@ func (s *service) initRule(ctx context.Context, rule *config.Rule) (err error) {
 	}
 
 	if s.config.UseMessageDest() && s.msgbus == nil {
-		switch s.config.SourceScheme {
-		case gs.Scheme:
-			if s.msgbus, err = pubsub.New(ctx, s.config.ProjectID); err != nil {
-				return errors.Wrapf(err, "unable to create pubsub publisher for %v", s.config.SourceScheme)
+		if rule.Dest.Vendor == "" {
+			switch s.config.SourceScheme {
+			case gs.Scheme:
+				rule.Dest.Vendor = shared.VendorPubsub
+			case s3.Scheme:
+				rule.Dest.Vendor = shared.VendorSQS
+			default:
+				if rule.Dest.Topic != "" {
+					rule.Dest.Vendor = shared.VendorPubsub
+				}
+				if rule.Dest.Queue != "" {
+					rule.Dest.Vendor = shared.VendorSQS
+				}
 			}
-		case s3.Scheme:
+
+		}
+		s.msgbusVendor = rule.Dest.Vendor
+		switch rule.Dest.Vendor {
+		case shared.VendorPubsub:
+			if s.msgbus, err = pubsub.New(ctx, s.config.ProjectID); err != nil {
+				return errors.Wrapf(err, "unable to create pubsub publisher for %v", rule.Dest.Vendor)
+			}
+		case shared.VendorSQS:
 			if s.msgbus, err = sqs.New(ctx); err != nil {
-				return errors.Wrapf(err, "unable to create sqs publisher for %v", s.config.SourceScheme)
+				return errors.Wrapf(err, "unable to create sqs publisher for %v", rule.Dest.Vendor)
 			}
 		default:
-			return errors.Errorf("unsupported scheme for publisher: '%v'", s.config.SourceScheme)
+			return errors.Errorf("unsupported message bus vendor: '%v'", rule.Dest.Vendor)
 		}
 	}
 	return nil

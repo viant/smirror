@@ -44,7 +44,6 @@ func (s *service) publish(ctx context.Context, request *msgbus.Request, response
 
 	topic := s.topicInProject(request.Dest)
 	publishCall := pubsub.NewProjectsService(s.Service).Topics.Publish(topic, publishRequest)
-
 	publishCall.Context(ctx)
 	callResponse, err := publishCall.Do()
 	if err == nil {

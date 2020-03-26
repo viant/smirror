@@ -1,0 +1,11 @@
+Source:
+  Prefix: "/tmp/data/"
+  Suffix: ".csv"
+Dest:
+  URL: '/tmp/transformed'
+Split:
+  MaxLines: 10
+  Template: "%s_%05d"
+OnSuccess:
+  - Action: delete
+PreserveDepth: 1
