@@ -18,6 +18,8 @@ usage/
 logs
 logs/**
 logs/
+cmd/**
+cmd
 images/
 images/**
 aws/
