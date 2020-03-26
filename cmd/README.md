@@ -15,16 +15,19 @@ By default only streaming mode stores history file in file:///${env.HOME}/.smirr
 
 ##### OSX
 
+```bash
 wget https://github.com/viant/smirror/releases/download/v1.0.0/smirror_osx_1.0.0.tar.gz
 tar -xvzf smirror_osx_1.0.0.tar.gz
 cp smirror /usr/local/bin/
+```
 
 ##### Linux
 
+```bash
 wget https://github.com/viant/smirror/releases/download/v1.0.0/smirror_linux_1.0.0.tar.gz
 tar -xvzf smirror_linux_1.0.0.tar.gz
 cp smirror /usr/local/bin/
-
+```
 
 ### Usage  
 
