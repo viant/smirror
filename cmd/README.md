@@ -61,7 +61,7 @@ Source:
   Prefix: "/tmp/data/"
   Suffix: ".csv"
 Dest:
-  URL: '/tmp//transformed'
+  URL: '/tmp/transformed'
 Split:
   MaxLines: 10
   Template: "%s_%05d"
@@ -83,7 +83,7 @@ Source:
   Prefix: "/tmp/data/"
   Suffix: ".csv"
 Dest:
-  URL: '/tmp//transformed'
+  URL: '/tmp/transformed'
 Schema:
   MaxBadRecords: 10
   Format: CSV
@@ -121,7 +121,7 @@ Source:
   Prefix: "/tmp/data/"
   Suffix: ".csv"
 Dest:
-  URL: '/tmp//transformed'
+  URL: '/tmp/transformed'
 Transcoder:
   Source:
     Format: CSV

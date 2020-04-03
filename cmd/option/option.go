@@ -21,7 +21,7 @@ type Options struct {
 
 	SourceURL string `short:"s" long:"src" description:"source data URL" `
 
-	DestinationURL string `short:"d" long:"dest" description:"destination table" `
+	DestinationURL string `short:"d" long:"dest" description:"destination URL" `
 
 	MatchPrefix string `short:"P" long:"prefix" description:"source match prefix"`
 
@@ -98,6 +98,5 @@ func normalizeLocation(location string) string {
 		fmt.Printf("%v\n", currentDirectory)
 		return path.Join(currentDirectory, location)
 	}
-	fmt.Printf("normailized %v\n", location)
 	return location
 }
