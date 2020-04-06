@@ -14,7 +14,10 @@ type Transcoding struct {
 	Source      transcoding.Codec
 	Dest        transcoding.Codec
 	PathMapping transcoding.Mappings
+	MaxBadRecords *int
+	Autodetect     bool //detect source schema
 }
+
 
 //Init intialise transcoding
 func (t *Transcoding) Init(ctx context.Context, fs afs.Service) error {

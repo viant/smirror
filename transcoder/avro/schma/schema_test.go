@@ -1,6 +1,8 @@
 package schma
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/assertly"
 	"github.com/viant/toolbox"
@@ -132,7 +134,8 @@ func TestInitSchema(t *testing.T) {
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
-
+		JSON, _ := json.MarshalIndent(schema, "\t", " ")
+		fmt.Printf("%s\n", JSON)
 		if !assertly.AssertValues(t, useCase.expect, schema) {
 			toolbox.DumpIndent(schema, true)
 		}

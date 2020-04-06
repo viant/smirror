@@ -20,10 +20,10 @@ pipeline:
     action: storage:copy
     expand: true
     source:
-      URL: rule.json
+      URL: rule.yaml
     dest:
       credentials: $awsCredentials
-      URL: s3://${configBucket}/StorageMirror/Rules/test-rule.json
+      URL: s3://${configBucket}/StorageMirror/Rules/test-rule.yaml
 
 
   cleanupDest:

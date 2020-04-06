@@ -353,10 +353,11 @@ _where_:
 - **Transcoding.Source** transcoding source
 - **Transcoding.Dest** transcoding destination
 - **Transcoding.PathMapping** optional path mapping
+- **Transcoding.Autodetect** option source scheme detection flag (currently only with XLSX)
 
 Where Source and Dest support the following attributes:
 
-- **Format**  on of the following: CSV,JSON,AVRO
+- **Format**  on of the following: XLSX,CSV,JSON,AVRO
 - **Fields**         CSV fields (field names are directly mapped to avro unless path mapping is used)
 - **HasHeader**      flag is CSV has header
 - **Delimiter**      CSV delimiter

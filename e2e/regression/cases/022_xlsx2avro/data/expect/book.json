@@ -1,0 +1,50 @@
+[
+  {
+    "Active": {
+      "boolean": true
+    },
+    "Count": {
+      "long": 1
+    },
+    "Id": {
+      "long": 1
+    },
+    "Name": {
+      "string": "Name 1"
+    },
+    "Timestamp": {
+      "long": 1550102400000
+    },
+    "Value": {
+      "float": 1.2
+    }
+  },
+  {
+    "Count": {
+      "long": 3
+    },
+    "Id": {
+      "long": 2
+    },
+    "Name": {
+      "string": "Name 2"
+    },
+    "Value": {
+      "float": 4.3
+    }
+  },
+  {
+    "Count": {
+      "long": 4
+    },
+    "Id": {
+      "long": 3
+    },
+    "Name": {
+      "string": "Name 3"
+    },
+    "Timestamp": {
+      "long": 1550102400000
+    }
+  }
+]

@@ -13,6 +13,7 @@ import (
 	"smirror/config"
 	"smirror/transcoder/avro"
 	"smirror/transcoder/avro/schma"
+	"smirror/transcoder/xlsx"
 )
 
 const (
@@ -20,11 +21,13 @@ const (
 )
 
 type reader struct {
+	badRecords int
 	*config.Transcoding
 	splitCounter int32
 	fileds       []string
 	reader       io.Reader
 	scanner      *bufio.Scanner
+	xlsDecoder   *xlsx.Decoder
 	buffer       *bytes.Buffer
 	avroRecord   *avro.Record
 	avroWriter   *container.Writer
@@ -35,7 +38,7 @@ type reader struct {
 	pending      bool
 }
 
-func (t *reader) Read(p []byte) (n int, err error) {
+func (t *reader) Read(p []byte) (int, error) {
 	if t.writeEOF {
 		return 0, io.EOF
 	}
@@ -58,6 +61,10 @@ func (t *reader) Read(p []byte) (n int, err error) {
 }
 
 func (t *reader) next() error {
+
+	if t.xlsDecoder != nil {
+		return t.xlsDecoder.NextRecord(t.record)
+	}
 	line := t.scanner.Bytes()
 	if t.Source.HasHeader && t.splitCounter == 0 {
 		reader := t.csvReader(bytes.NewReader(line))
@@ -97,6 +104,7 @@ func (t *reader) next() error {
 
 func (t *reader) nextRecord() error {
 	err := t.next()
+
 	if err != nil || len(t.Transcoding.PathMapping) == 0 {
 		return err
 	}
@@ -132,17 +140,25 @@ func (t *reader) transformToAVRO() error {
 	return err
 }
 
+func (t *reader) hasMore() bool {
+	if t.scanner != nil {
+		return t.scanner.Scan()
+	}
+	return t.xlsDecoder.HasMore()
+}
+
 func (t *reader) transformRecordToAVRO() error {
-	hasMore := t.scanner.Scan()
+	hasMore := t.hasMore()
 	if !hasMore {
 		t.readEOF = true
 		return t.avroWriter.Flush()
 	}
-
 	if err := t.nextRecord(); err != nil {
-		return err
+		t.badRecords++
+		if t.Transcoding.MaxBadRecords != nil && t.badRecords >= *t.Transcoding.MaxBadRecords {
+			return errors.Wrapf(err, "too many bad records: %v, max allowed: %v", t.badRecords, *t.Transcoding.MaxBadRecords)
+		}
 	}
-
 	if len(t.record) == 0 {
 		return nil
 	}
@@ -162,9 +178,20 @@ func (t *reader) csvReader(reader io.Reader) *csv.Reader {
 
 //NewReader creates a transcoding reader
 func NewReader(r io.Reader, transcoding *config.Transcoding, splitCounter int32) (io.Reader, error) {
-	scanner := bufio.NewScanner(r)
-	scanner.Buffer(make([]byte, bufferSize), 10*bufferSize)
+	var err error
+	var scanner *bufio.Scanner
+	var xlsDecoder *xlsx.Decoder
+	if transcoding.Source.IsCSV() || transcoding.Source.IsJSON() {
+		scanner = bufio.NewScanner(r)
+		scanner.Buffer(make([]byte, bufferSize), 10*bufferSize)
+	} else if transcoding.Source.IsXLSX() {
+		xlsDecoder, err = xlsx.NewDecoder(r)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to open xls decoder")
+		}
+	}
 	result := &reader{
+		xlsDecoder:   xlsDecoder,
 		splitCounter: splitCounter,
 		Transcoding:  transcoding,
 		reader:       r,
@@ -176,6 +203,10 @@ func NewReader(r io.Reader, transcoding *config.Transcoding, splitCounter int32)
 	if transcoding.Dest.IsAvro() {
 		result.buffer = new(bytes.Buffer)
 		rawSchema := transcoding.Dest.Schema
+
+		if  transcoding.Source.IsXLSX() {
+			rawSchema = xlsDecoder.Schema()
+		}
 		if rawSchema == "" {
 			return nil, errors.Errorf("avro schema was empty, %v", transcoding.Dest.SchemaURL)
 		}

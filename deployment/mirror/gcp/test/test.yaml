@@ -16,10 +16,10 @@ pipeline:
     action: storage:copy
     expand: true
     source:
-      URL: rule.json
+      URL: rule.yaml
     dest:
       credentials: $gcpCredentials
-      URL: gs://${configBucket}/StorageMirror/Rules/test-rule.json
+      URL: gs://${configBucket}/StorageMirror/Rules/test-rule.yaml
 
   cleanupDest:
     action: storage:remove

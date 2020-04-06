@@ -1,0 +1,14 @@
+Source:
+  Prefix: "/data/p022/"
+  Suffix: ".xlsx"
+Dest:
+  URL: gs://${gsDestBucket}/data
+Transcoder:
+  Source:
+    Format: XLSX
+  Dest:
+    Format: AVRO
+Autodetect: true
+OnSuccess:
+  - Action: delete
+PreserveDepth: 1

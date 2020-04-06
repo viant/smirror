@@ -42,7 +42,7 @@ pipeline:
       URL: rule_cron.json
     dest:
       credentials: $awsCredentials
-      URL: s3://${configBucket}/StorageMirror/Rules/test-cron-rule.json
+      URL: s3://${configBucket}/StorageMirror/Rules/test-cron-rule.yaml
 
 
   cleanupDest:

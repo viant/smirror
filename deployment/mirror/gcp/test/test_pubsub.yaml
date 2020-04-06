@@ -39,7 +39,7 @@ pipeline:
       URL: rule_pubsub.json
     dest:
       credentials: $gcpCredentials
-      URL: gs://${configBucket}/StorageMirror/Rules/test-pubsub-rule.json
+      URL: gs://${configBucket}/StorageMirror/Rules/test-pubsub-rule.yaml
 
 
   trigger:

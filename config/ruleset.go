@@ -28,6 +28,7 @@ type Ruleset struct {
 	inited       int32
 }
 
+
 //Match returns the first match route
 func (r Ruleset) Rule(URL string) *Rule {
 	for i := range r.Rules {
@@ -41,13 +42,20 @@ func (r Ruleset) Rule(URL string) *Rule {
 
 //Match returns the first match route
 func (r Ruleset) Match(URL string) (matched []*Rule) {
+	ruleURL := "."
 	for i := range r.Rules {
 		if r.Rules[i].HasMatch(URL) {
+			if ruleURL == r.Rules[i].Info.URL {
+				continue
+			}
+			ruleURL = r.Rules[i].Info.URL
 			matched = append(matched, r.Rules[i])
 		}
 	}
 	return matched
 }
+
+
 
 func (r Ruleset) Validate() error {
 	if len(r.Rules) == 0 {

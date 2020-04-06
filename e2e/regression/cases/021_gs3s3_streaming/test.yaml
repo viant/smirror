@@ -6,7 +6,7 @@ pipeline:
     assets:
       - URL: 'gs://${gsConfigBucket}/StorageMirror/_.cache'
         credentials: $gcpCredentials
-      - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.json'
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.yaml'
         credentials: $gcpCredentials
 
 
@@ -14,10 +14,10 @@ pipeline:
     action: storage:copy
     expand: true
     source:
-      URL: ${parent.path}/rule.json
+      URL: ${parent.path}/rule.yaml
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.json
+      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.yaml
 
 
   trigger:

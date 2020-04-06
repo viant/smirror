@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/viant/toolbox"
 	"io"
+	"runtime/debug"
 	"strings"
 )
 
@@ -22,7 +23,6 @@ type Schema struct {
 	*Array
 	*Enum
 	*Fixed
-
 	translator Translator
 }
 
@@ -40,11 +40,15 @@ func (t *Schema) Write(value interface{}, w io.Writer) error {
 
 func New(schemaValue interface{}) (*Schema, error) {
 	result, err := newSchema(schemaValue)
-	if err != nil {
+	if err != nil  {
 		return nil, err
 	}
+
+	if result == nil {
+		debug.PrintStack()
+	}
 	if result.Type == "" {
-		return nil, fmt.Errorf("type was empty for %s", schemaValue)
+		return nil, fmt.Errorf("type was empty for '%s'", schemaValue)
 	}
 	return result, err
 }
@@ -73,6 +77,9 @@ func newSchema(schemaValue interface{}) (*Schema, error) {
 			aMap := map[string]interface{}{}
 			if err := json.Unmarshal(val, &aMap); err != nil {
 				return nil, err
+			}
+			if len(aMap) == 0 {
+				return nil, nil
 			}
 			return New(aMap)
 		}

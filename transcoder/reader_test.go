@@ -7,26 +7,74 @@ import (
 	"github.com/viant/assertly"
 	"github.com/viant/toolbox"
 	"io/ioutil"
+	"path"
 	"smirror/config"
 	"smirror/config/transcoding"
 	"smirror/transcoder/avro/schma"
-	"strings"
+	"smirror/transcoder/xlsx"
 	"testing"
 )
 
 func TestReader_Read(t *testing.T) {
+
+	baseDir := toolbox.CallerDirectory(3)
+	xlsData, err := ioutil.ReadFile(path.Join(baseDir, "test", "book.xlsx"))
+	if ! assert.Nil(t, err) {
+		return
+	}
+	
 	var useCases = []struct {
 		description string
-		input       string
+		 isXls bool
+		input       []byte
 		config.Transcoding
 		expect interface{}
 	}{
+		
 		{
-			description: "CSV to avro",
+			isXls:true,
+			description:"XLS to AVRO",
+			input:xlsData,
+			Transcoding: config.Transcoding{
+				Source: transcoding.Codec{
+					Format: "XLSX",
+				},
+				Dest: transcoding.Codec{
+					Format:"AVRO",
+					RecordPerBlock: 20,
+				},
+				Autodetect:true,
+			},
+			expect: []map[string]interface{}{
+				{
+					"Active": true,
+					"Count": 1,
+					"Id": 1,
+					"Name": "Name 1",
+					"Timestamp": 1550102400000,
+					"Value": 1.2000000476837158,
+				},
+				{
+					"Count": 3,
+					"Id": 2,
+					"Name": "Name 2",
+					"Value": 4.3,
+				},
+				{
+					"Count": 4,
+					"Id": 3,
+					"Name": "Name 3",
+					"Timestamp": 1550102400000,
+				},
+			},
+		},
+		
+		{
+			description: "CSV to AVRO",
 
-			input: `1,name 1,desc 1
+			input:[]byte( `1,name 1,desc 1
 2,name 2,desc 2,
-3,name 3,desc 3`,
+3,name 3,desc 3`),
 
 			expect: []map[string]interface{}{
 				{
@@ -67,11 +115,11 @@ func TestReader_Read(t *testing.T) {
 			},
 		},
 		{
-			description: "JSON to avro",
+			description: "JSON to AVRO",
 
-			input: `{"id":1,"name":"name 1","description":"desc 1"}
+			input:[]byte( `{"id":1,"name":"name 1","description":"desc 1"}
 {"id":2,"name":"name 2","description":"desc 2"}
-{"id":3,"name":"name 3","description":"desc 3"}`,
+{"id":3,"name":"name 3","description":"desc 3"}`),
 
 			expect: []map[string]interface{}{
 				{
@@ -110,11 +158,11 @@ func TestReader_Read(t *testing.T) {
 			},
 		},
 		{
-			description: "CSV to avro with mapping",
+			description: "CSV to AVRO with mapping",
 
-			input: `1,name 1,desc 1
+			input: []byte(`1,name 1,desc 1
 2,name 2,desc 2,
-3,name 3,desc 3`,
+3,name 3,desc 3`),
 
 			expect: []map[string]interface{}{
 				{
@@ -182,10 +230,10 @@ func TestReader_Read(t *testing.T) {
 		},
 
 		{
-			description: "tsv log to avro",
+			description: "tsv log to AVRO",
 
-			input: `2019-12-16T23:55:38.199597Z ci-ad-vpc-east 107.77.216.9:55151 10.55.8.61:8080 0.000027 0.00059 0.000025 200 200 0 631 "GET https://tabc.comm:443/d/rt/pixel?rtsite_id=23762&uuid=8cd4f7f5-6b0a-4697-87eb-db4556736c57&rr=1936727420 HTTP/1.1" "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Mobile/15E148 Safari/604.1" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2
-2019-12-16T23:55:38.206419Z ci-ad-vpc-east 47.212.89.174:52566 10.55.8.44:8080 0.000026 0.000463 0.000026 200 200 0 0 "GET https://tabc.com.com:443/d/track/video?zid=googleadx_1_0_1&sid=87ddc05f-205f-11ea-a9c6-55bf429b7234&crid=19841312&adid=54517&oid=1114112&cid=172922&spid=282&pubid=45&site_id=442320&auid=1452372&algid=0&algrev=0&offpc=0&maxbid=0.000&optpc=0&cstpc=0&ez_p=&eid=2 HTTP/1.1" "Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBDV/iPhone10,2;FBMD/iPhone;FBSN/iOS;FBSV/12.4.1;FBSS/3;FBID/phone;FBLC/en_US;FBOP/5;FBCR/Verizon]" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2`,
+			input: []byte(`2019-12-16T23:55:38.199597Z ci-ad-vpc-east 107.77.216.9:55151 10.55.8.61:8080 0.000027 0.00059 0.000025 200 200 0 631 "GET https://tabc.comm:443/d/rt/pixel?rtsite_id=23762&uuid=8cd4f7f5-6b0a-4697-87eb-db4556736c57&rr=1936727420 HTTP/1.1" "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Mobile/15E148 Safari/604.1" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2
+2019-12-16T23:55:38.206419Z ci-ad-vpc-east 47.212.89.174:52566 10.55.8.44:8080 0.000026 0.000463 0.000026 200 200 0 0 "GET https://tabc.com.com:443/d/track/video?zid=googleadx_1_0_1&sid=87ddc05f-205f-11ea-a9c6-55bf429b7234&crid=19841312&adid=54517&oid=1114112&cid=172922&spid=282&pubid=45&site_id=442320&auid=1452372&algid=0&algrev=0&offpc=0&maxbid=0.000&optpc=0&cstpc=0&ez_p=&eid=2 HTTP/1.1" "Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBDV/iPhone10,2;FBMD/iPhone;FBSN/iOS;FBSV/12.4.1;FBSS/3;FBID/phone;FBLC/en_US;FBOP/5;FBCR/Verizon]" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2`),
 
 			expect: []map[string]interface{}{
 				{
@@ -228,14 +276,21 @@ func TestReader_Read(t *testing.T) {
 		},
 	}
 
-	for _, useCase := range useCases {
+	for _, useCase := range useCases[:1] {
 
-		reader, err := NewReader(strings.NewReader(useCase.input), &useCase.Transcoding, 0)
+		reader, err := NewReader(bytes.NewReader(useCase.input), &useCase.Transcoding, 0)
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 
-		schema, err := schma.New(useCase.Transcoding.Dest.Schema)
+
+		rawSchema := useCase.Transcoding.Dest.Schema
+		if useCase.isXls {
+			decoder, _ := xlsx.NewDecoder(bytes.NewReader(useCase.input))
+			rawSchema = decoder.Schema()
+		}
+
+		schema, err := schma.New(rawSchema)
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
@@ -245,17 +300,17 @@ func TestReader_Read(t *testing.T) {
 			continue
 		}
 
-		avroReader, err := goavro.NewOCFReader(bytes.NewReader(data))
+		AVROReader, err := goavro.NewOCFReader(bytes.NewReader(data))
 
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 
-		assert.Nil(t, avroReader.Err(), useCase.description)
+		assert.Nil(t, AVROReader.Err(), useCase.description)
 		var actual = make([]interface{}, 0)
-		for avroReader.Scan() {
+		for AVROReader.Scan() {
 
-			actualRecords, err := avroReader.Read()
+			actualRecords, err := AVROReader.Read()
 			if !assert.Nil(t, err, useCase.description) {
 				continue
 			}
@@ -264,7 +319,7 @@ func TestReader_Read(t *testing.T) {
 			actual = append(actual, actualMap)
 		}
 
-		assert.Nil(t, avroReader.Err(), useCase.description)
+		assert.Nil(t, AVROReader.Err(), useCase.description)
 
 		if !assertly.AssertValues(t, useCase.expect, actual, useCase.description) {
 			toolbox.DumpIndent(actual, true)

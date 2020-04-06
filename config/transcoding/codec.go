@@ -19,6 +19,7 @@ type Codec struct {
 	RecordPerBlock int64
 	Schema         string
 	isCSV          *bool
+	isXLSX         *bool
 	isJSON         *bool
 	isAvro         *bool
 }
@@ -51,6 +52,16 @@ func (c *Codec) IsAvro() bool {
 	isAvro := strings.ToUpper(c.Format) == "AVRO"
 	c.isAvro = &isAvro
 	return isAvro
+}
+
+//IsCSV returns true if XLSX format
+func (c *Codec) IsXLSX() bool {
+	if c.isXLSX != nil {
+		return *c.isXLSX
+	}
+	isXLSX := strings.ToUpper(c.Format) == "XLSX"
+	c.isXLSX = &isXLSX
+	return isXLSX
 }
 
 //IsCSV returns true if CSV format

@@ -1,4 +1,6 @@
 - AVRO split
-- Add data casting in JSON validation mode
-- Add cloud run integration
- 
+- transcoding source schema autodetect
+- Add AVRO schema detector
+- 
+- Optimize JSON performance/memory  with viant/jax (under developement)
+-  Add cloud run integration

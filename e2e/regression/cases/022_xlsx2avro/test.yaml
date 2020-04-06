@@ -1,6 +1,5 @@
 init:
-  expect: $Cat('${parent.path}/data/expect/events.csv')
-
+  expect: $Cat('${parent.path}/data/expect/book.json')
 pipeline:
 
   cleanUp:
@@ -11,31 +10,41 @@ pipeline:
         credentials: $gcpCredentials
       - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.yaml'
         credentials: $gcpCredentials
-
+      - URL: 'gs://${gsDestBucket}/data/p09/book.avro'
+        credentials: $gcpCredentials
 
   setupRule:
+    init:
+      parentIndex: ${parent.index}
     action: storage:copy
     expand: true
     source:
-      URL: ${parent.path}/rule.yaml
+      URL: ${parent.path}/rule/
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.yaml
-
+      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/
 
   trigger:
     action: storage:copy
-    sleepTimeMs: 20000
+    sleepTimeMs: 30000
     source:
-      URL: ${parent.path}/data/prepare/
+      URL: ${parent.path}/data/prepare
     dest:
       credentials: $gcpCredentials
-      URL: gs://${gsTriggerBucket}/data/p14/
+      URL: gs://${gsTriggerBucket}/data/p022/
+
+
+  downloadAvro:
+    action: storage:download
+    udf: AvroReader
+    source:
+      credentials: $gcpCredentials
+      URL: 'gs://${gsDestBucket}/data/p022/book.avro'
+    destKey: actual
 
 
   validate:
-    action: storage:download
-    source:
-      URL: gs://${gsDestBucket}/data/p14/events.json
-      credentials: $gcpCredentials
+    action: validator:assert
+    actual: $AsData($actual)
     expect: $expect
+
