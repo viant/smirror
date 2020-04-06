@@ -1,0 +1,13 @@
+---
+Source:
+  Prefix: "/data/p20"
+Dest:
+  URL: gs://${gsDestBucket}/
+  Credentials:
+    Parameter: storagemirror.gcp
+    Key: alias/smirror
+OnSuccess:
+  - Action: delete
+OnFailure:
+  - Action: move
+    URL: s3:///${s3OpsBucket}/StorageMirror/errors/

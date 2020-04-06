@@ -7,7 +7,7 @@ pipeline:
     assets:
       - URL: 'gs://${s3ConfigBucket}/StorageMirror/_.cache'
         credentials: $gcpCredentials
-      - URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.json
+      - URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.yaml
         credentials: $awsCredentials
 
 
@@ -18,7 +18,7 @@ pipeline:
       URL: ${parent.path}/rule.yaml
     dest:
       credentials: $awsCredentials
-      URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.json
+      URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.yaml
 
 
   trigger:

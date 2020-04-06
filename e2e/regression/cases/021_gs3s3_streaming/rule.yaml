@@ -1,0 +1,15 @@
+---
+Source:
+  Prefix: "/data/p21/"
+Dest:
+  URL: s3://${s3DestBucket}/
+  Credentials:
+    URL: gs://${gsConfigBucket}/Secrets/s3-mirror.json.enc
+    Key: projects/${gcpProject}/locations/us-central1/keyRings/${gsPrefix}_ring/cryptoKeys/${gsPrefix}_key
+OnSuccess:
+  - Action: delete
+OnFailure:
+  - Action: move
+    URL: gs://${gsOpsBucket}/StorageMirror/errors/
+Info:
+  Workflow: e2e test case 1

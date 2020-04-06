@@ -17,7 +17,7 @@ pipeline:
     action: storage:copy
     expand: true
     source:
-      URL: ${parent.path}/rule.yaml
+      URL: ${parent.path}/rule.json
     dest:
       credentials: $awsCredentials
       URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.json

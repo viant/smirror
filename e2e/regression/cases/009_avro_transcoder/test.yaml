@@ -8,7 +8,7 @@ pipeline:
     assets:
       - URL: 'gs://${gsConfigBucket}/StorageMirror/_.cache'
         credentials: $gcpCredentials
-      - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.yaml'
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.json'
         credentials: $gcpCredentials
       - URL: 'gs://${gsDestBucket}/data/p09/events.avro'
         credentials: $gcpCredentials
