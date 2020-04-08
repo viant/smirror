@@ -2,6 +2,7 @@ package mirror
 
 import (
 	"smirror/base"
+	"strings"
 	"sync"
 	"sync/atomic"
 )
@@ -98,6 +99,10 @@ func (r *Response) AddError(err error) {
 	}
 	r.mux.Lock()
 	defer r.mux.Unlock()
+	//DO NOT report context cancellation again:
+	if strings.Contains(err.Error(), "context canceled") && len(r.Errors) > 0 {
+		return
+	}
 	r.Status = base.StatusError
 	r.Errors = append(r.Errors, err.Error())
 }
