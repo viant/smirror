@@ -1,5 +1,5 @@
 init:
-  expect: $Cat('${parent.path}/data/expect/events.csv')
+  expect: $Cat('${parent.path}/data/expect/events.json')
 
 pipeline:
 
