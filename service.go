@@ -241,8 +241,9 @@ func (s *service) transfer(ctx context.Context, transfer *Transfer, response *co
 		return nil
 	}
 	JSON, _ := json.Marshal(transfer)
-	return fmt.Errorf("invalid transfer: %s", JSON)
+	return fmt.Errorf("dest.URL was empty: invalid transfer: %s: ", JSON)
 }
+
 
 func (s *service) publish(ctx context.Context, transfer *Transfer, response *contract.Response) error {
 	reader, err := transfer.GetReader()

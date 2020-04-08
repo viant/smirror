@@ -45,7 +45,7 @@ func TestDecoder_Schema(t *testing.T) {
 		assert.Nil(t, err)
 		actual := decoder.Schema()
 		if ! assertly.AssertValues(t, useCase.expect, actual, useCase.description) {
-			fmt.Printf("%s\n", actual)
+			fmt.Printf("!!! %s\n", actual)
 		}
 	}
 }

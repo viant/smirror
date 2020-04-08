@@ -30,7 +30,8 @@ func TestReader_Read(t *testing.T) {
 		config.Transcoding
 		expect interface{}
 	}{
-		
+
+
 		{
 			isXls:true,
 			description:"XLS to AVRO",

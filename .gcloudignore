@@ -11,7 +11,9 @@ cron/
 cron/*
 cmd/
 cmd/**
-e2e/
+scratchpad/
+scratchpad/**
+ve2e/
 e2e/**
 usage/**
 usage/

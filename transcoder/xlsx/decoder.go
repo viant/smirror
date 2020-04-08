@@ -2,8 +2,8 @@ package xlsx
 
 import (
 	"fmt"
+	"github.com/adrianwit/xlsx"
 	"github.com/pkg/errors"
-	"github.com/tealeg/xlsx"
 	"github.com/viant/toolbox"
 	"io"
 	"io/ioutil"
@@ -16,6 +16,7 @@ import (
 type Decoder struct {
 	sheet  *xlsx.Sheet
 	fields []*schma.Field
+	Rows   []*xlsx.Row
 	meta   *meta
 }
 
@@ -37,30 +38,35 @@ func (d *Decoder) Schema() string {
 	return schema
 }
 
-
 func (d *Decoder) HasMore() bool {
 	return d.meta.hasMore()
+}
+
+func getCells(row *xlsx.Row) []*xlsx.Cell {
+	cells := []*xlsx.Cell{}
+
+	row.ForEachCell(func(c *xlsx.Cell) error {
+		cells = append(cells, c)
+		return nil
+	})
+	return cells
 }
 
 //NextRecord populate supplied record if has more and returns true
 func (d *Decoder) NextRecord(record map[string]interface{}) error {
 	var err error
-	loop:
-	if 	! d.meta.hasMore() {
+loop:
+	if ! d.meta.hasMore() {
 		return nil
 	}
 
-	row := d.sheet.Rows[d.meta.index]
+	row := d.Rows[d.meta.index]
 	d.meta.index++
 	empty := true
 	for i, field := range d.fields {
 		record[field.Name] = nil
-		if i >= len(row.Cells) {
-			continue
-		}
-
-		cell := row.Cells[i]
-		if cell.Value != "" {
+		cell := row.GetCell(i)
+		if cell == nil || cell.Value != "" {
 			empty = false
 		}
 		var value interface{}
@@ -95,12 +101,21 @@ func (d *Decoder) NextRecord(record map[string]interface{}) error {
 	return nil
 }
 
-
 func (d *Decoder) getMeta() *meta {
 	var index = make(map[int]*meta)
-	rowCount := len(d.sheet.Rows)
+	d.Rows = []*xlsx.Row{}
+
+	for i := 0; i < d.sheet.MaxRow; i++ {
+		row, err := d.sheet.Row(i)
+		if err != nil {
+			break
+		}
+		d.Rows = append(d.Rows, row)
+	}
+
+	rowCount := len(d.Rows)
 	for i := 0; i < rowCount; i++ {
-		rowCells := d.sheet.Rows[i].Cells
+		rowCells := getCells(d.Rows[i])
 		nonEmptyCells := 0
 		for _, cell := range rowCells {
 			if cell.Value != "" {
@@ -112,7 +127,7 @@ func (d *Decoder) getMeta() *meta {
 		}
 		cells := len(rowCells)
 		if _, ok := index[nonEmptyCells]; ! ok {
-			index[nonEmptyCells] = &meta{firstRow: i, cells: cells, nonEmptyCells:nonEmptyCells}
+			index[nonEmptyCells] = &meta{firstRow: i, cells: cells, nonEmptyCells: nonEmptyCells}
 		}
 	}
 	candidates := make(metaSlice, 0)
@@ -121,20 +136,22 @@ func (d *Decoder) getMeta() *meta {
 	}
 	sort.Sort(candidates)
 	result := candidates[len(candidates)-1]
-	result.lastRow = rowCount -1
+	result.lastRow = rowCount - 1
 	result.index = result.firstRow + 1
 	return result
 }
 
 func (d *Decoder) buildSchemaFields() {
 	meta := d.meta
-	rowCount := meta.lastRow - (meta.firstRow + 1)
+	rowCount := len(d.Rows)
 	if rowCount > 100 {
 		rowCount = 100
 	}
-	row := d.sheet.Rows[meta.firstRow]
+	row := d.Rows[meta.firstRow]
 	d.fields = make([]*schma.Field, 0)
-	for i, cell := range row.Cells {
+	rowCells := getCells(row)
+
+	for i, cell := range rowCells {
 		name := normalizeFieldName(cell.Value, i)
 		field := &schma.Field{Name: name, Type: &schma.Schema{Name: d.getFieldType(strings.ToUpper(name), i, meta.firstRow+1, rowCount)}}
 		d.fields = append(d.fields, field)
@@ -144,14 +161,10 @@ func (d *Decoder) buildSchemaFields() {
 func (d *Decoder) getFieldType(name string, cellPosition, offset, rowCount int) string {
 	var typeName = schma.TypeString
 	var typeCount = make(map[string]int)
-	row := d.sheet.Rows[offset]
-	for i := 0; i < rowCount; i++ {
-		if i >= len(row.Cells) {
-			continue
-		}
-		cell :=row.Cells[cellPosition]
-		offset++
-		if cell.Value == "" {
+	for i := offset; i < rowCount; i++ {
+		row := d.Rows[i]
+		cell := row.GetCell(cellPosition)
+		if cell == nil || cell.Value == "" {
 			continue
 		}
 		switch cell.Type() {
