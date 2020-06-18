@@ -40,7 +40,7 @@ func newConfig(ctx context.Context, projectID string) (*smirror.Config, error) {
 	cfg := &smirror.Config{}
 	cfg.ProjectID = projectID
 	cfg.Mirrors.BaseURL = ruleBaseURL
-	cfg.Mirrors.CheckInMs = 1
+	cfg.Mirrors.CheckInMs = 0
 	cfg.MaxRetries = 3
 	cfg.URL = url.Join(configURL, "config.json")
 	return cfg, err
