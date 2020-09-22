@@ -14,7 +14,7 @@ pipeline:
   set_sdk:
     action: sdk.set
     target: $target
-    sdk: go:1.14
+    sdk: go:1.15
 
   package:
     action: exec:run
@@ -55,7 +55,7 @@ pipeline:
     entryPoint: StorageMirror
     serviceAccount: ${gcp.serviceAccount}
     runtime: go111
-    availableMemoryMB: 256
+    availableMemoryMB: 2048
     eventTrigger:
       eventType: google.storage.object.finalize
       resource: projects/_/buckets/${gsTriggerBucket}
