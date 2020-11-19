@@ -10,7 +10,7 @@ pipeline:
         credentials: $gcpCredentials
       - URL: 'gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}/rule.yaml'
         credentials: $gcpCredentials
-      - URL: 'gs://${gsDestBucket}/data/p09/book.avro'
+      - URL: 'gs://${gsDestBucket}/data/p022/book.avro'
         credentials: $gcpCredentials
 
   setupRule:

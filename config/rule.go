@@ -98,9 +98,9 @@ func (r *Rule) Validate() error {
 	if r.Dest == nil {
 		return fmt.Errorf("dest was empty")
 	}
-	if r.Transcoder != nil {
-		return r.Transcoder.Validate()
-	}
+	//if r.Transcoder != nil {
+	//	return r.Transcoder.Validate()
+	//}
 	return nil
 }
 

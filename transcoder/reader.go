@@ -121,15 +121,13 @@ func (t *reader) nextRecord() error {
 }
 
 func (t *reader) transform() error {
-
 	if t.Dest.IsJSON() {
 		return t.transformToJSON()
-
 	}
 	if t.Dest.IsAvro() {
 		return t.transformToAVRO()
 	}
-	return fmt.Errorf("unsupported avro format")
+	return fmt.Errorf("unsupported %v dest format", t.Dest.Format)
 }
 
 func (t *reader) transformToAVRO() error {
