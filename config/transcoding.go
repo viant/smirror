@@ -21,6 +21,9 @@ type Transcoding struct {
 
 //Init intialise transcoding
 func (t *Transcoding) Init(ctx context.Context, fs afs.Service) error {
+	if t.Dest.RecordPerBlock == 0 {
+		t.Dest.RecordPerBlock = defaultRecordPerBlock
+	}
 	if t.Dest.SchemaURL == "" {
 		return nil
 	}
@@ -28,25 +31,24 @@ func (t *Transcoding) Init(ctx context.Context, fs afs.Service) error {
 		_, err := t.Dest.LoadSchema(ctx, fs)
 		return err
 	}
-	if t.Dest.RecordPerBlock == 0 {
-		t.Dest.RecordPerBlock = defaultRecordPerBlock
-	}
 	return nil
 }
 
 //Load check if transcoding is valid
 func (t *Transcoding) Validate() error {
-	if !t.Source.IsJSON() && !t.Source.IsCSV() {
+	if !(t.Source.IsJSON() || t.Source.IsCSV() || t.Source.IsXLSX()) {
 		return errors.Errorf("unsupported source format: %v", t.Source.Format)
 	}
 	if t.Source.IsCSV() && len(t.Source.Fields) == 0 && !t.Source.HasHeader {
 		return errors.Errorf("source fields were empty: for %v format", t.Source.Format)
 	}
-	if !t.Dest.IsAvro() {
+	if !(t.Dest.IsAvro() || t.Dest.IsJSON()) {
 		return errors.Errorf("unsupported dest format: %v", t.Dest.Format)
 	}
-	if t.Dest.Schema == "" {
-		return errors.Errorf("dest schema was empty: %v", t.Dest.SchemaURL)
+	if t.Dest.IsAvro() {
+		if t.Dest.Schema == "" {
+			return errors.Errorf("dest schema was empty: %v", t.Dest.SchemaURL)
+		}
 	}
 	return nil
 }

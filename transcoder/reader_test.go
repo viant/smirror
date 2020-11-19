@@ -1,7 +1,7 @@
 package transcoder
-
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/linkedin/goavro"
 	"github.com/stretchr/testify/assert"
@@ -15,15 +15,12 @@ import (
 	"smirror/transcoder/xlsx"
 	"testing"
 )
-
 func TestReader_Read(t *testing.T) {
-
 	baseDir := toolbox.CallerDirectory(3)
 	xlsData, err := ioutil.ReadFile(path.Join(baseDir, "test", "book.xlsx"))
 	if !assert.Nil(t, err) {
 		return
 	}
-
 	var useCases = []struct {
 		description string
 		isXls       bool
@@ -31,7 +28,6 @@ func TestReader_Read(t *testing.T) {
 		config.Transcoding
 		expect interface{}
 	}{
-
 		{
 			isXls:       true,
 			description: "XLS to AVRO",
@@ -69,14 +65,11 @@ func TestReader_Read(t *testing.T) {
 				},
 			},
 		},
-
 		{
 			description: "CSV to AVRO",
-
-			input: []byte( `1,name 1,desc 1
+			input: []byte(`1,name 1,desc 1
 2,name 2,desc 2,
 3,name 3,desc 3`),
-
 			expect: []map[string]interface{}{
 				{
 					"id":          1,
@@ -117,11 +110,9 @@ func TestReader_Read(t *testing.T) {
 		},
 		{
 			description: "JSON to AVRO",
-
-			input: []byte( `{"id":1,"name":"name 1","description":"desc 1"}
+			input: []byte(`{"id":1,"name":"name 1","description":"desc 1"}
 {"id":2,"name":"name 2","description":"desc 2"}
 {"id":3,"name":"name 3","description":"desc 3"}`),
-
 			expect: []map[string]interface{}{
 				{
 					"id":          1,
@@ -160,11 +151,9 @@ func TestReader_Read(t *testing.T) {
 		},
 		{
 			description: "CSV to AVRO with mapping",
-
 			input: []byte(`1,name 1,desc 1
 2,name 2,desc 2,
 3,name 3,desc 3`),
-
 			expect: []map[string]interface{}{
 				{
 					"id": 1,
@@ -202,7 +191,6 @@ func TestReader_Read(t *testing.T) {
 						From: "name",
 						To:   "attr1.name",
 					},
-
 					{
 						From: "description",
 						To:   "attr1.description",
@@ -229,13 +217,10 @@ func TestReader_Read(t *testing.T) {
 				},
 			},
 		},
-
 		{
 			description: "tsv log to AVRO",
-
 			input: []byte(`2019-12-16T23:55:38.199597Z ci-ad-vpc-east 107.77.216.9:55151 10.55.8.61:8080 0.000027 0.00059 0.000025 200 200 0 631 "GET https://tabc.comm:443/d/rt/pixel?rtsite_id=23762&uuid=8cd4f7f5-6b0a-4697-87eb-db4556736c57&rr=1936727420 HTTP/1.1" "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Mobile/15E148 Safari/604.1" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2
 2019-12-16T23:55:38.206419Z ci-ad-vpc-east 47.212.89.174:52566 10.55.8.44:8080 0.000026 0.000463 0.000026 200 200 0 0 "GET https://tabc.com.com:443/d/track/video?zid=googleadx_1_0_1&sid=87ddc05f-205f-11ea-a9c6-55bf429b7234&crid=19841312&adid=54517&oid=1114112&cid=172922&spid=282&pubid=45&site_id=442320&auid=1452372&algid=0&algrev=0&offpc=0&maxbid=0.000&optpc=0&cstpc=0&ez_p=&eid=2 HTTP/1.1" "Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBDV/iPhone10,2;FBMD/iPhone;FBSN/iOS;FBSV/12.4.1;FBSS/3;FBID/phone;FBLC/en_US;FBOP/5;FBCR/Verizon]" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2`),
-
 			expect: []map[string]interface{}{
 				{
 					"backend_status_code": 200,
@@ -275,22 +260,9 @@ func TestReader_Read(t *testing.T) {
 				},
 			},
 		},
-
 		{
 			description: "JSON to JSON",
-			input: []byte(`{
-  "H_ci_remote_address": "208.102.146.238",
-  "H_x-forwarded-port": "443",
-  "P_deviceId": "e138d479-e3fd-4093-a664-2c84469185dc",
-  "H_x-amzn-trace-id": "Root=1-5fa20738-24f54be85858e13a4d8b5d61",
-  "cu": "6197676b-c660-4a07-a422-e0cee95ea525",
-  "H_accept-encoding": "gzip",
-  "H_x-forwarded-proto": "https",
-  "P_optoutSource": "firstParty",
-  "H_user-agent": "Dalvik/2.1.0 (Linux; U; Android 10; Redmi Note 7 Build/QQ3A.200705.002)",
-  "ts": "1604454200597",
-  "H_host": "my.ipredictive.com"
-}`),
+			input:       []byte(`{"H_ci_remote_address":"208.102.146.238","H_x-forwarded-port":"443","P_deviceId":"e138d479-e3fd-4093-a664-2c84469185dc","H_x-amzn-trace-id":"Root=1-5fa20738-24f54be85858e13a4d8b5d61","cu":"6197676b-c660-4a07-a422-e0cee95ea525","H_accept-encoding":"gzip","H_x-forwarded-proto":"https","P_optoutSource":"firstParty","H_user-agent":"Dalvik/2.1.0 (Linux; U; Android 10; Redmi Note 7 Build/QQ3A.200705.002)","ts":"1604454200597","H_host":"my.ipredictive.com"}`),
 			Transcoding: config.Transcoding{
 				PathMapping: transcoding.Mappings{
 					{
@@ -307,71 +279,60 @@ func TestReader_Read(t *testing.T) {
 					},
 				},
 				Source: transcoding.Codec{
-					Format:    "JSON",
+					Format: "JSON",
 					Fields: []string{"H_ci_remote_address", "H_user-agent", "P_deviceId"},
 				},
 				Dest: transcoding.Codec{
-					Format:    "JSON",
+					Format: "JSON",
 					Fields: []string{"ip", "ua", "uid"},
 				},
 			},
-
-			expect: []map[string]interface{}{
-				{
-					"backend_status_code": 200,
-					"request":             "GET https://tabc.comm:443/d/rt/pixel?rtsite_id=23762\u0026uuid=8cd4f7f5-6b0a-4697-87eb-db4556736c57\u0026rr=1936727420 HTTP/1.1",
-					"timestamp":           1576540538199,
-					"user_agent":          "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Mobile/15E148 Safari/604.1",
-				},
-				{
-					"backend_status_code": 200,
-					"request":             "GET https://tabc.com.com:443/d/track/video?zid=googleadx_1_0_1\u0026sid=87ddc05f-205f-11ea-a9c6-55bf429b7234\u0026crid=19841312\u0026adid=54517\u0026oid=1114112\u0026cid=172922\u0026spid=282\u0026pubid=45\u0026site_id=442320\u0026auid=1452372\u0026algid=0\u0026algrev=0\u0026offpc=0\u0026maxbid=0.000\u0026optpc=0\u0026cstpc=0\u0026ez_p=\u0026eid=2 HTTP/1.1",
-					"timestamp":           1576540538206,
-					"user_agent":          "Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBDV/iPhone10,2;FBMD/iPhone;FBSN/iOS;FBSV/12.4.1;FBSS/3;FBID/phone;FBLC/en_US;FBOP/5;FBCR/Verizon]",
-				},
-			},
+			expect: `{"ip":"208.102.146.238","ua":"Dalvik/2.1.0 (Linux; U; Android 10; Redmi Note 7 Build/QQ3A.200705.002)","uid":"e138d479-e3fd-4093-a664-2c84469185dc"}`,
 		},
 	}
-
 	for _, useCase := range useCases {
-
 		reader, err := NewReader(bytes.NewReader(useCase.input), &useCase.Transcoding, 0)
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
-
 		rawSchema := useCase.Transcoding.Dest.Schema
 		if useCase.isXls {
 			decoder, _ := xlsx.NewDecoder(bytes.NewReader(useCase.input))
 			rawSchema = decoder.Schema()
 		}
-
-
 		data, err := ioutil.ReadAll(reader)
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
-
 		if useCase.Dest.IsJSON() {
-			fmt.Printf("JSONOUTPUT: %s\n", data)
+			var actual map[string]interface{}
+			var expected map[string]interface{}
+			err := json.Unmarshal(data, &actual)
+			if !assert.Nil(t, err, useCase.description) {
+				fmt.Printf("JSONOUTPUT: %s\n", data)
+				continue
+			}
+			err = json.Unmarshal([]byte(useCase.expect.(string)), &expected)
+			if !assert.Nil(t, err, useCase.description) {
+				fmt.Printf("JSONOUTPUT: %s\n", data)
+				continue
+			}
+			if !assertly.AssertValues(t, expected, actual) {
+				continue
+			}
 			continue
 		}
-
-
 		schema, err := schma.New(rawSchema)
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 		AVROReader, err := goavro.NewOCFReader(bytes.NewReader(data))
-
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
-
 		assert.Nil(t, AVROReader.Err(), useCase.description)
 		var actual = make([]interface{}, 0)
 		for AVROReader.Scan() {
-
 			actualRecords, err := AVROReader.Read()
 			if !assert.Nil(t, err, useCase.description) {
 				continue
@@ -380,16 +341,12 @@ func TestReader_Read(t *testing.T) {
 			transformUnions(schema, actualMap)
 			actual = append(actual, actualMap)
 		}
-
 		assert.Nil(t, AVROReader.Err(), useCase.description)
-
 		if !assertly.AssertValues(t, useCase.expect, actual, useCase.description) {
 			toolbox.DumpIndent(actual, true)
 		}
 	}
-
 }
-
 func transformUnions(schema *schma.Schema, actualMap map[string]interface{}) {
 	for _, field := range schema.Fields {
 		if !field.Type.IsUnion() {

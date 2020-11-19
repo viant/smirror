@@ -1,0 +1,28 @@
+Source:
+  Prefix: "/data/p023/"
+  Suffix: ".json"
+Dest:
+  URL: gs://${gsDestBucket}/data
+Transcoder:
+  Source:
+    Format: JSON
+    Fields:
+      - H_ci_remote_address
+      - H_user-agent
+      - P_dd
+  Dest:
+    Format: JSON
+    Fields:
+      - ip
+      - ua
+      - dd
+  PathMapping:
+    - From: H_ci_remote_address
+      To: ip
+    - From: H_user-agent
+      To: ua
+    - From: P_dd
+      To: dd
+OnSuccess:
+  - Action: delete
+PreserveDepth: 1

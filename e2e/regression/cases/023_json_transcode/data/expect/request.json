@@ -1,0 +1,76 @@
+[
+  {
+    "@indexBy@": [
+      "ip",
+      "ua",
+      "dd"
+    ]
+  },
+  {
+    "dd": "e138d479-e3fd-4093-a664-2c84469185dc",
+    "ip": "208.102.146.238",
+    "ua": "Dalvik/2.1.0 (Linux; U; Android 10; Redmi Note 7 Build/QQ3A.200705.002)"
+  },
+  {
+    "dd": "00000000-0000-0000-0000-000000000000",
+    "ip": "172.58.140.213",
+    "ua": "AppChoices/95 CFNetwork/1197 Darwin/20.0.0"
+  },
+  {
+    "dd": "00000000-0000-0000-0000-000000000000",
+    "ip": "67.143.160.214",
+    "ua": "AppChoices/95 CFNetwork/1197 Darwin/20.0.0"
+  },
+  {
+    "dd": "69921847-6e3e-4e10-99fa-4a1498640fa5",
+    "ip": "172.58.75.5",
+    "ua": "Dalvik/2.1.0 (Linux; U; Android 10; SM-N975U1 Build/QP1A.190711.020)"
+  },
+  {
+    "ip": "185.121.69.41",
+    "ua": "Mozilla/5.0 (Android 9; Mobile; rv:78.0) Gecko/20100101 Firefox/78.0"
+  },
+  {
+    "ip": "109.203.229.214",
+    "ua": "Mozilla/5.0 (Linux; Android 10; SM-A105FN) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.110 Mobile Safari/537.36"
+  },
+  {
+    "ip": "24.98.82.164",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
+  },
+  {
+    "ip": "190.115.176.27",
+    "ua": "Mozilla/5.0 (Linux; Android 9; SM-J737T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.96 Mobile Safari/537.36"
+  },
+  {
+    "ip": "37.166.49.144",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36 Edg/86.0.622.61"
+  },
+  {
+    "ip": "212.129.72.224",
+    "ua": "Mozilla/5.0 (Linux; Android 10; SM-G970F Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.110 Mobile Safari/537.36; MyFitnessPal/20.21.2 (mfp-mobile-android-) (Android 10; samsung beyond0 / samsung SM-G970F; eir) (preload=false;locale=en_GB;clientidbase=android-samsung-ss)"
+  },
+  {
+    "ip": "99.225.212.229",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/86.0.4240.93 Mobile/15E148 Safari/604.1"
+  },
+  {
+    "ip": "109.192.236.134",
+    "ua": "Mozilla/5.0 (Linux; Android 10; M2003J15SC) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Mobile Safari/537.36"
+  },
+  {
+    "dd": "1cc36a94-a0ee-4006-8893-77f13e11623e",
+    "ip": "27.125.249.14",
+    "ua": "Dalvik/2.1.0 (Linux; U; Android 9; vivo 1904 Build/PPR1.180610.011)"
+  },
+  {
+    "dd": "232a27dd-a9c7-47c4-9826-c7a194ad300a",
+    "ip": "143.55.26.25",
+    "ua": "Dalvik/2.1.0 (Linux; U; Android 10; LM-K300 Build/QKQ1.200108.002)"
+  },
+  {
+    "dd": "42077b93-6ba3-4481-816b-562398e51366",
+    "ip": "71.30.201.253",
+    "ua": "Dalvik/2.1.0 (Linux; U; Android 10; SM-N981U Build/QP1A.190711.020)"
+  }
+]
