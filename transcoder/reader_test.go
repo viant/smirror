@@ -2,6 +2,7 @@ package transcoder
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/linkedin/goavro"
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/assertly"
@@ -19,61 +20,60 @@ func TestReader_Read(t *testing.T) {
 
 	baseDir := toolbox.CallerDirectory(3)
 	xlsData, err := ioutil.ReadFile(path.Join(baseDir, "test", "book.xlsx"))
-	if ! assert.Nil(t, err) {
+	if !assert.Nil(t, err) {
 		return
 	}
-	
+
 	var useCases = []struct {
 		description string
-		 isXls bool
+		isXls       bool
 		input       []byte
 		config.Transcoding
 		expect interface{}
 	}{
 
-
 		{
-			isXls:true,
-			description:"XLS to AVRO",
-			input:xlsData,
+			isXls:       true,
+			description: "XLS to AVRO",
+			input:       xlsData,
 			Transcoding: config.Transcoding{
 				Source: transcoding.Codec{
 					Format: "XLSX",
 				},
 				Dest: transcoding.Codec{
-					Format:"AVRO",
+					Format:         "AVRO",
 					RecordPerBlock: 20,
 				},
-				Autodetect:true,
+				Autodetect: true,
 			},
 			expect: []map[string]interface{}{
 				{
-					"Active": true,
-					"Count": 1,
-					"Id": 1,
-					"Name": "Name 1",
+					"Active":    true,
+					"Count":     1,
+					"Id":        1,
+					"Name":      "Name 1",
 					"Timestamp": 1550102400000,
-					"Value": 1.2000000476837158,
+					"Value":     1.2000000476837158,
 				},
 				{
 					"Count": 3,
-					"Id": 2,
-					"Name": "Name 2",
+					"Id":    2,
+					"Name":  "Name 2",
 					"Value": 4.3,
 				},
 				{
-					"Count": 4,
-					"Id": 3,
-					"Name": "Name 3",
+					"Count":     4,
+					"Id":        3,
+					"Name":      "Name 3",
 					"Timestamp": 1550102400000,
 				},
 			},
 		},
-		
+
 		{
 			description: "CSV to AVRO",
 
-			input:[]byte( `1,name 1,desc 1
+			input: []byte( `1,name 1,desc 1
 2,name 2,desc 2,
 3,name 3,desc 3`),
 
@@ -118,7 +118,7 @@ func TestReader_Read(t *testing.T) {
 		{
 			description: "JSON to AVRO",
 
-			input:[]byte( `{"id":1,"name":"name 1","description":"desc 1"}
+			input: []byte( `{"id":1,"name":"name 1","description":"desc 1"}
 {"id":2,"name":"name 2","description":"desc 2"}
 {"id":3,"name":"name 3","description":"desc 3"}`),
 
@@ -275,15 +275,70 @@ func TestReader_Read(t *testing.T) {
 				},
 			},
 		},
+
+		{
+			description: "JSON to JSON",
+			input: []byte(`{
+  "H_ci_remote_address": "208.102.146.238",
+  "H_x-forwarded-port": "443",
+  "P_deviceId": "e138d479-e3fd-4093-a664-2c84469185dc",
+  "H_x-amzn-trace-id": "Root=1-5fa20738-24f54be85858e13a4d8b5d61",
+  "cu": "6197676b-c660-4a07-a422-e0cee95ea525",
+  "H_accept-encoding": "gzip",
+  "H_x-forwarded-proto": "https",
+  "P_optoutSource": "firstParty",
+  "H_user-agent": "Dalvik/2.1.0 (Linux; U; Android 10; Redmi Note 7 Build/QQ3A.200705.002)",
+  "ts": "1604454200597",
+  "H_host": "my.ipredictive.com"
+}`),
+			Transcoding: config.Transcoding{
+				PathMapping: transcoding.Mappings{
+					{
+						From: "H_ci_remote_address",
+						To:   "ip",
+					},
+					{
+						From: "H_user-agent",
+						To:   "ua",
+					},
+					{
+						From: "P_deviceId",
+						To:   "uid",
+					},
+				},
+				Source: transcoding.Codec{
+					Format:    "JSON",
+					Fields: []string{"H_ci_remote_address", "H_user-agent", "P_deviceId"},
+				},
+				Dest: transcoding.Codec{
+					Format:    "JSON",
+					Fields: []string{"ip", "ua", "uid"},
+				},
+			},
+
+			expect: []map[string]interface{}{
+				{
+					"backend_status_code": 200,
+					"request":             "GET https://tabc.comm:443/d/rt/pixel?rtsite_id=23762\u0026uuid=8cd4f7f5-6b0a-4697-87eb-db4556736c57\u0026rr=1936727420 HTTP/1.1",
+					"timestamp":           1576540538199,
+					"user_agent":          "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Mobile/15E148 Safari/604.1",
+				},
+				{
+					"backend_status_code": 200,
+					"request":             "GET https://tabc.com.com:443/d/track/video?zid=googleadx_1_0_1\u0026sid=87ddc05f-205f-11ea-a9c6-55bf429b7234\u0026crid=19841312\u0026adid=54517\u0026oid=1114112\u0026cid=172922\u0026spid=282\u0026pubid=45\u0026site_id=442320\u0026auid=1452372\u0026algid=0\u0026algrev=0\u0026offpc=0\u0026maxbid=0.000\u0026optpc=0\u0026cstpc=0\u0026ez_p=\u0026eid=2 HTTP/1.1",
+					"timestamp":           1576540538206,
+					"user_agent":          "Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBDV/iPhone10,2;FBMD/iPhone;FBSN/iOS;FBSV/12.4.1;FBSS/3;FBID/phone;FBLC/en_US;FBOP/5;FBCR/Verizon]",
+				},
+			},
+		},
 	}
 
-	for _, useCase := range useCases[:1] {
+	for _, useCase := range useCases {
 
 		reader, err := NewReader(bytes.NewReader(useCase.input), &useCase.Transcoding, 0)
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
-
 
 		rawSchema := useCase.Transcoding.Dest.Schema
 		if useCase.isXls {
@@ -291,16 +346,22 @@ func TestReader_Read(t *testing.T) {
 			rawSchema = decoder.Schema()
 		}
 
-		schema, err := schma.New(rawSchema)
-		if !assert.Nil(t, err, useCase.description) {
-			continue
-		}
 
 		data, err := ioutil.ReadAll(reader)
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}
 
+		if useCase.Dest.IsJSON() {
+			fmt.Printf("JSONOUTPUT: %s\n", data)
+			continue
+		}
+
+
+		schema, err := schma.New(rawSchema)
+		if !assert.Nil(t, err, useCase.description) {
+			continue
+		}
 		AVROReader, err := goavro.NewOCFReader(bytes.NewReader(data))
 
 		if !assert.Nil(t, err, useCase.description) {

@@ -11,11 +11,11 @@ const defaultRecordPerBlock = 40
 
 //Transcoding represents transcoding
 type Transcoding struct {
-	Source      transcoding.Codec
-	Dest        transcoding.Codec
-	PathMapping transcoding.Mappings
+	Source        transcoding.Codec
+	Dest          transcoding.Codec
+	PathMapping   transcoding.Mappings
 	MaxBadRecords *int
-	Autodetect     bool //detect source schema
+	Autodetect    bool //detect source schema
 }
 
 

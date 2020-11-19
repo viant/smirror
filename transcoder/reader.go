@@ -28,7 +28,7 @@ type reader struct {
 	reader       io.Reader
 	scanner      *bufio.Scanner
 	xlsDecoder   *xlsx.Decoder
-	buffer       *bytes.Buffer
+	output       *bytes.Buffer
 	avroRecord   *avro.Record
 	avroWriter   *container.Writer
 	record       map[string]interface{}
@@ -48,7 +48,7 @@ func (t *reader) Read(p []byte) (int, error) {
 			return 0, err
 		}
 	}
-	read, err := t.buffer.Read(p)
+	read, err := t.output.Read(p)
 	if err == io.EOF || read == 0 {
 		if t.readEOF {
 			t.writeEOF = true
@@ -104,7 +104,6 @@ func (t *reader) next() error {
 
 func (t *reader) nextRecord() error {
 	err := t.next()
-
 	if err != nil || len(t.Transcoding.PathMapping) == 0 {
 		return err
 	}
@@ -122,6 +121,11 @@ func (t *reader) nextRecord() error {
 }
 
 func (t *reader) transform() error {
+
+	if t.Dest.IsJSON() {
+		return t.transformToJSON()
+
+	}
 	if t.Dest.IsAvro() {
 		return t.transformToAVRO()
 	}
@@ -136,7 +140,7 @@ func (t *reader) transformToAVRO() error {
 			return err
 		}
 	}
-	t.pending = t.buffer.Len() > 0
+	t.pending = t.output.Len() > 0
 	return err
 }
 
@@ -176,6 +180,50 @@ func (t *reader) csvReader(reader io.Reader) *csv.Reader {
 	return result
 }
 
+func (t *reader) transformToJSON() error {
+	var err error
+	for !t.readEOF {
+		err = t.transformRecordToJSON()
+		if err != nil {
+			return err
+		}
+	}
+	t.pending = t.output.Len() > 0
+	return err
+
+}
+
+func (t *reader) transformRecordToJSON() error {
+	hasMore := t.hasMore()
+	if !hasMore {
+		t.readEOF = true
+		return nil
+	}
+
+	if err := t.nextRecord(); err != nil {
+		t.badRecords++
+		if t.Transcoding.MaxBadRecords != nil && t.badRecords >= *t.Transcoding.MaxBadRecords {
+			return errors.Wrapf(err, "too many bad records: %v, max allowed: %v", t.badRecords, *t.Transcoding.MaxBadRecords)
+		}
+	}
+	if len(t.record) == 0 {
+		return nil
+	}
+
+	data, err := json.Marshal(t.record)
+	if err != nil {
+		t.badRecords++
+		if t.Transcoding.MaxBadRecords != nil && t.badRecords >= *t.Transcoding.MaxBadRecords {
+			return errors.Wrapf(err, "too many bad records: %v, max allowed: %v", t.badRecords, *t.Transcoding.MaxBadRecords)
+		}
+	}
+	if t.output.Len() > 0 {
+		t.output.WriteString("\n")
+	}
+	_, err =  t.output.Write(data)
+	return err
+}
+
 //NewReader creates a transcoding reader
 func NewReader(r io.Reader, transcoding *config.Transcoding, splitCounter int32) (io.Reader, error) {
 	var err error
@@ -200,11 +248,17 @@ func NewReader(r io.Reader, transcoding *config.Transcoding, splitCounter int32)
 		fileds:       transcoding.Source.Fields,
 		pending:      true,
 	}
+
+	if transcoding.Dest.IsJSON() {
+		result.output = new(bytes.Buffer)
+		return result, nil
+	}
+
 	if transcoding.Dest.IsAvro() {
-		result.buffer = new(bytes.Buffer)
+		result.output = new(bytes.Buffer)
 		rawSchema := transcoding.Dest.Schema
 
-		if  transcoding.Source.IsXLSX() {
+		if transcoding.Source.IsXLSX() {
 			rawSchema = xlsDecoder.Schema()
 		}
 		if rawSchema == "" {
@@ -224,7 +278,7 @@ func NewReader(r io.Reader, transcoding *config.Transcoding, splitCounter int32)
 			transcoding.Dest.RecordPerBlock = 20
 		}
 		recordPerBlock := transcoding.Dest.RecordPerBlock
-		result.avroWriter, err = container.NewWriter(result.buffer, container.Snappy, recordPerBlock, rawSchema)
+		result.avroWriter, err = container.NewWriter(result.output, container.Snappy, recordPerBlock, rawSchema)
 
 	}
 	return result, nil
