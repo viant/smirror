@@ -1,6 +1,7 @@
 Source:
   Prefix: "/data/p1/"
   Suffix: ".csv"
+Codec: gzip
 Dest:
   URL: s3://${s3DestBucket}/data
   Credentials:
@@ -9,12 +10,12 @@ Dest:
 OnSuccess:
   - Action: move
     URL: gs://${gsOpsBucket}/StorageMirror/processed/
-  - Action: notify
-    Title: Transfer $SourceURL done
-    Message: success !!
-    Channels:
-      - "#e2e"
-    Body: "$Response"
+#  - Action: notify
+#    Title: Transfer $SourceURL done
+#    Message: success !!
+#    Channels:
+#      - "#e2e"
+#    Body: "$Response"
 OnFailure:
   - Action: move
     URL: gs://${gsOpsBucket}/StorageMirror/errors/

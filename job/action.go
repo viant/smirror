@@ -68,8 +68,10 @@ func (a Action) Do(context *Context, service afs.Service, notify Notify, info *b
 			Body:        body,
 		})
 	case ActionMove:
-		targetURL := a.DestURL(context.RelativePath)
-		return service.Move(context.Context, URL, targetURL)
+		destURL := a.DestURL(context.RelativePath)
+		_, name := url.Split(URL, file.Scheme)
+		destBaseURL, _ := url.Split(destURL, file.Scheme)
+		return service.Move(context.Context, URL, url.Join(destBaseURL, name))
 	default:
 		err = fmt.Errorf("unsupported action: %v", a.Action)
 	}

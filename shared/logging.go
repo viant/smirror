@@ -76,7 +76,7 @@ func LogLn(message interface{}) {
 		if err != nil {
 			textMessage = fmt.Sprintf("%+v", message)
 		} else {
-			textMessage = "&" + string(JSON)
+			textMessage =  string(JSON)
 		}
 	}
 	if !strings.HasSuffix(textMessage, "\n") {

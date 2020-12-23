@@ -30,8 +30,9 @@ pipeline:
 
   validate:
     action: storage:download
+    Udf: UnzipText
     source:
       credentials: $awsCredentials
-      URL: s3://${s3DestBucket}/data/p1/events.csv
+      URL: s3://${s3DestBucket}/data/p1/events.csv.gz
     destKey: events
     expect: $Cat('${parent.path}/data/expect/events.csv')
