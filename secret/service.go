@@ -141,7 +141,7 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 			}
 			result = append(result, authOpt)
 			if resource.Region != "" {
-				result = append(result, &s3.Region{Name: resource.Region})
+				result = append(result, &option.Region{Name: resource.Region})
 			}
 		default:
 			//do nothing init should take care of validating supported URL scheme

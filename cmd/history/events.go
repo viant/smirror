@@ -66,7 +66,7 @@ func FromURL(ctx context.Context, URL string, fs afs.Service) (*Events, error) {
 		return New(URL), nil
 	}
 	events := &Events{}
-	reader, err := fs.DownloadWithURL(ctx, URL)
+	reader, err := fs.OpenURL(ctx, URL)
 	if err != nil {
 		return nil, err
 	}

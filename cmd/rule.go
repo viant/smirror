@@ -13,7 +13,7 @@ import (
 )
 
 func (s *service) loadRule(ctx context.Context, URL string) (*config.Rule, error) {
-	reader, err := s.fs.DownloadWithURL(ctx, URL)
+	reader, err := s.fs.OpenURL(ctx, URL)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to download rule: %v", URL)
 	}

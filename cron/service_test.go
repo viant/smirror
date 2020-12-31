@@ -106,7 +106,7 @@ func TestService_Tick(t *testing.T) {
 }
 
 func loadMeta(ctx context.Context, fs afs.Service, URL string) (*meta.State, error) {
-	reader, err := fs.DownloadWithURL(ctx, URL)
+	reader, err := fs.OpenURL(ctx, URL)
 	if err != nil {
 		return nil, err
 	}

@@ -18,7 +18,7 @@ type service struct {
 }
 
 func (s *service) downloadBase64(ctx context.Context, URL string) (string, error) {
-	reader, err := s.Service.DownloadWithURL(ctx, URL)
+	reader, err := s.Service.OpenURL(ctx, URL)
 	if err != nil {
 		return "", err
 	}

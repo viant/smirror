@@ -76,7 +76,7 @@ func NewConfigFromJSON(ctx context.Context, payload string) (*Config, error) {
 //NewConfigFromURL creates a new config from env
 func NewConfigFromURL(ctx context.Context, URL string) (*Config, error) {
 	service := cache.Singleton(URL)
-	reader, err := service.DownloadWithURL(ctx, URL)
+	reader, err := service.OpenURL(ctx, URL)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to download: %v", URL)
 	}

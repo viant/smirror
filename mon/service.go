@@ -85,7 +85,7 @@ func (s *service) checkErrors(ctx context.Context, request *Request, response *R
 		hasErrorMessage := strings.HasSuffix(object.URL(), "-error")
 		message := []byte{}
 		if hasErrorMessage {
-			reader, err := s.fs.Download(ctx, object)
+			reader, err := s.fs.Open(ctx, object)
 			if err != nil {
 				return err
 			}
@@ -105,7 +105,7 @@ func (s *service) checkErrors(ctx context.Context, request *Request, response *R
 }
 
 func (s *service) loadRoutes(ctx context.Context, URL string) (*Routes, error) {
-	reader, err := s.fs.DownloadWithURL(ctx, URL)
+	reader, err := s.fs.OpenURL(ctx, URL)
 	if err != nil {
 		return nil, err
 	}

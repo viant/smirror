@@ -178,7 +178,7 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 			return err == nil, err
 		}, options...)
 	}
-	reader, err := s.fs.DownloadWithURL(ctx, URL, options...)
+	reader, err := s.fs.OpenURL(ctx, URL, options...)
 	if err != nil {
 		return errors.Wrapf(err, "failed to download source: %v", URL)
 	}
@@ -294,7 +294,10 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 		options = append(options, option.NewSkipChecksum(true))
 	}
 
-	writer := s.fs.NewWriter(ctx, transfer.Dest.URL, file.DefaultFileOsMode, options...)
+	writer, err := s.fs.NewWriter(ctx, transfer.Dest.URL, file.DefaultFileOsMode, options...)
+	if err != nil {
+		return err
+	}
 	response.AddURL(transfer.Dest.URL)
 
 	if transfer.Dest.CompressionCodec() == config.GZipCodec {

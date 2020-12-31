@@ -78,7 +78,7 @@ func (r *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 }
 
 func (r *Ruleset) loadResources(ctx context.Context, storage afs.Service, object storage.Object) error {
-	reader, err := storage.Download(ctx, object)
+	reader, err := storage.Open(ctx, object)
 	if err != nil {
 		return err
 	}

@@ -28,7 +28,7 @@ func (c *Codec) LoadSchema(ctx context.Context, fs afs.Service) (string, error) 
 	if c.Schema != "" {
 		return c.Schema, nil
 	}
-	reader, err := fs.DownloadWithURL(ctx, c.SchemaURL)
+	reader, err := fs.OpenURL(ctx, c.SchemaURL)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to load avro Schema: %v", c.SchemaURL)
 	}

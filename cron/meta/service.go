@@ -31,7 +31,7 @@ func (s *service) loadState(ctx context.Context) (*State, error) {
 	if !has {
 		return state, nil
 	}
-	reader, err := s.DownloadWithURL(ctx, s.metaURL)
+	reader, err := s.OpenURL(ctx, s.metaURL)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to load meta file: %v", s.metaURL)
 	}
