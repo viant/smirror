@@ -139,7 +139,6 @@ func normalizeURL(ctx context.Context, fs afs.Service, URL, parentURL string) st
 	ownerParent, _ := url.Split(parentURL, file.Scheme)
 	for _, baseURL := range []string{fmt.Sprintf("%v://%v", file.Scheme,currentDirectory), ownerParent} {
 		URL := url.Join(baseURL, URL)
-		fmt.Printf("%v\n", URL)
 		if exists, _ := fs.Exists(ctx, URL); exists {
 			return URL
 		}
