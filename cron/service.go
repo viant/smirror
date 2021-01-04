@@ -2,7 +2,6 @@ package cron
 
 import (
 	"context"
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
@@ -179,11 +178,8 @@ func (s *service) Init(ctx context.Context, fs afs.Service) error {
 	if s.config.SourceScheme == "" {
 		s.config.SourceScheme = url.Scheme(s.config.MetaURL, "")
 	}
-
-	cfg, err := proxy.NewConfig(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to crate proxy config: %w", err)
-	}
+	var err error
+	cfg, _ := proxy.NewConfig(ctx)
 	s.proxy = proxy.New(s.fs, cfg, s.secret)
 	if err = s.config.Init(ctx, fs); err == nil {
 		err = s.UpdateSecrets(ctx)
