@@ -13,6 +13,6 @@ func Singleton(config *Config) Service {
 		return singleton
 	}
 	fs := afs.New()
-	singleton = New(fs, secret.New(config.SourceScheme, fs))
+	singleton = New(fs, config, secret.New(config.SourceScheme, fs))
 	return singleton
 }

@@ -2,6 +2,7 @@ package cron
 
 import (
 	"context"
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
@@ -175,11 +176,15 @@ func (s *service) addLastModifiedTimeMatcher(options []storage.Option) []storage
 }
 
 func (s *service) Init(ctx context.Context, fs afs.Service) error {
-	var err error
 	if s.config.SourceScheme == "" {
 		s.config.SourceScheme = url.Scheme(s.config.MetaURL, "")
 	}
-	s.proxy = proxy.New(s.fs, s.secret)
+
+	cfg, err := proxy.NewConfig(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to crate proxy config: %w", err)
+	}
+	s.proxy = proxy.New(s.fs, cfg, s.secret)
 	if err = s.config.Init(ctx, fs); err == nil {
 		err = s.UpdateSecrets(ctx)
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
+	"github.com/viant/afs/file"
 	"github.com/viant/afs/option"
 	"github.com/viant/afs/storage"
 	"github.com/viant/afs/url"
@@ -16,6 +17,7 @@ import (
 	"smirror/base"
 	"smirror/event"
 	"smirror/secret"
+	"time"
 )
 
 const partSize = 32 * 1024 * 1024
@@ -28,16 +30,24 @@ type Service interface {
 type service struct {
 	fs     afs.Service
 	secret secret.Service
+	config *Config
 }
 
 //Trigger triggers lambda execution
 func (s *service) Proxy(ctx context.Context, request *Request) *Response {
-	respose := NewResponse()
-	if err := s.proxy(ctx, request, respose); err != nil {
-		respose.Status = base.StatusError
-		respose.Error = err.Error()
+	response := NewResponse()
+	location := url.Path(request.Source.URL)
+	parent, name := path.Split(location)
+	canProxy :=  s.config.Source.Match(parent, file.NewInfo(name, 0, 0644, time.Now(), false))
+	if ! canProxy {
+		response.Status = base.StatusNoMatch
+		return response
 	}
-	return respose
+	if err := s.proxy(ctx, request, response); err != nil {
+		response.Status = base.StatusError
+		response.Error = err.Error()
+	}
+	return response
 }
 
 //Trigger triggers lambda execution
@@ -142,6 +152,6 @@ func (s *service) propagate(ctx context.Context, isMove bool, sourceURL, destURL
 }
 
 //New create trigger service
-func New(fs afs.Service, secret secret.Service) Service {
-	return &service{fs: fs, secret: secret}
+func New(fs afs.Service, config *Config, secret secret.Service) Service {
+	return &service{fs: fs, secret: secret, config: config}
 }
