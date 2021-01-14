@@ -63,6 +63,9 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 		response.Status = base.StatusError
 		response.Error = err.Error()
 	}
+	if s.config.ResponseURL != "" {
+		s.logResponse(ctx, response)
+	}
 	if response.Error == "" {
 		return response
 	}
