@@ -11,6 +11,7 @@ require (
 	github.com/frankban/quicktest v1.9.0 // indirect
 	github.com/go-errors/errors v1.0.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/google/uuid v1.1.4
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/linkedin/goAVRO v1.0.5 // indirect
 	github.com/linkedin/goavro v2.1.0+incompatible

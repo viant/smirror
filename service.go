@@ -1,9 +1,11 @@
 package smirror
 
 import (
+	"bytes"
 	"compress/gzip"
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
@@ -72,6 +74,9 @@ func (s *service) Mirror(ctx context.Context, request *contract.Request) *contra
 		if request.Attempt < s.config.MaxRetries {
 			return s.Mirror(ctx, request)
 		}
+	}
+	if s.config.ResponseURL != "" {
+		s.logResponse(ctx, response)
 	}
 	return response
 }
@@ -422,6 +427,24 @@ func (s *service) replay(ctx context.Context, parentURL, doneMarker string) erro
 		replayer.Schedule(object.URL())
 	}
 	return replayer.Wait()
+}
+
+func (s *service) logResponse(ctx context.Context, response *contract.Response) {
+	if response.Rule != nil {
+		response.RuleURL = response.Rule.Info.URL
+	}
+	response.Rule = nil
+	JSON,err := json.Marshal(response)
+	if err != nil {
+		response.LogError = err.Error()
+		return
+	}
+	UUID :=  uuid.New().String()
+	logURL := url.Join(s.config.ResponseURL, UUID +".json")
+	err = s.fs.Upload(ctx, logURL, file.DefaultFileOsMode, bytes.NewReader(JSON))
+	if err != nil {
+		response.LogError = err.Error()
+	}
 }
 
 //NewSlack creates a new mirror service

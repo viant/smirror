@@ -12,21 +12,22 @@ import (
 //Response represents a response
 type Response struct {
 	TriggeredBy   string
-	FileSize      int64
+	FileSize      int64 `json:",omitempty"`
+	LogError      string `json:",omitempty"`
 	DestURLs      []string `json:",omitempty"`
 	MessageIDs    []string `json:",omitempty"`
 	TimeTakenMs   int
 	Rule          *config.Rule `json:",omitempty"`
+	RuleURL       string
 	TotalRules    int
 	Status        string
 	Error         string `json:",omitempty"`
 	SchemaError   string `json:",omitempty"`
 	NotFoundError string `json:",omitempty"`
 	StartTime     time.Time
-	BadRecords    int               `json:",omitempty"`
-	Triggered     map[string]string `json:",omitempty"`
-	ChecksumSkip  bool              `json:",omitempty"`
-	StreamOption  *option.Stream    `json:",omitempty"`
+	BadRecords    int            `json:",omitempty"`
+	ChecksumSkip  bool           `json:",omitempty"`
+	StreamOption  *option.Stream `json:",omitempty"`
 	mutex         *sync.Mutex
 }
 
@@ -43,7 +44,6 @@ func NewResponse(triggeredBy string) *Response {
 		Status:      base.StatusOK,
 		TriggeredBy: triggeredBy,
 		StartTime:   time.Now(),
-		Triggered:   make(map[string]string),
 		DestURLs:    make([]string, 0),
 		MessageIDs:  make([]string, 0),
 		mutex:       &sync.Mutex{},

@@ -25,6 +25,7 @@ type Config struct {
 	SlackCredentials *auth.Credentials
 	Mirrors          config.Ruleset
 	Streaming        config.Streaming
+	ResponseURL      string
 }
 
 //Load initialises routes
