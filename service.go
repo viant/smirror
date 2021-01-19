@@ -436,6 +436,11 @@ func (s *service) logResponse(ctx context.Context, response *contract.Response) 
 	if response.Rule != nil {
 		response.RuleURL = response.Rule.Info.URL
 	}
+
+	//avoid event infinitive cycle
+	if strings.Contains(response.TriggeredBy,  s.config.ResponseURL) {
+		return
+	}
 	response.Rule = nil
 	JSON,err := json.Marshal(response)
 	if err != nil {
