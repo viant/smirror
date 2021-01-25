@@ -20,10 +20,11 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/rogpeppe/fastuuid v1.2.0 // indirect
+	github.com/sakjain92/govec v0.0.0-20190224014342-c277794b4638 // indirect
 	github.com/stretchr/testify v1.3.0
 	github.com/tealeg/xlsx v1.0.5
 	github.com/twmb/murmur3 v1.0.0
-	github.com/viant/afs v1.6.0
+	github.com/viant/afs v1.7.0
 	github.com/viant/afsc v1.2.0
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.30.0

@@ -301,7 +301,9 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 	if transfer.skipChecksum {
 		options = append(options, option.NewSkipChecksum(true))
 	}
-
+	if rule := transfer.rule; rule != nil && rule.AllowEmpty {
+		options = append(options, option.NewEmpty(rule.AllowEmpty))
+	}
 	writer, err := s.fs.NewWriter(ctx, transfer.Dest.URL, file.DefaultFileOsMode, options...)
 	if err != nil {
 		return err

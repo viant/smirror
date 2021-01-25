@@ -14,7 +14,6 @@ import (
 	"time"
 )
 
-
 //Rule represent matching resource route rule
 type Rule struct {
 	Info       base.Info
@@ -26,6 +25,7 @@ type Rule struct {
 	Transcoder *Transcoding `json:",omitempty"`
 	Streaming  *Streaming   `json:",omitempty"`
 	Split      *Split       `json:",omitempty"`
+	AllowEmpty bool         `json:",omitempty"`
 	job.Actions
 	*Compression
 	//PreserveDepth  - preserves specified folder depth in dest URL
@@ -137,7 +137,7 @@ func normalizeURL(ctx context.Context, fs afs.Service, URL, parentURL string) st
 	}
 	currentDirectory, _ := os.Getwd()
 	ownerParent, _ := url.Split(parentURL, file.Scheme)
-	for _, baseURL := range []string{fmt.Sprintf("%v://%v", file.Scheme,currentDirectory), ownerParent} {
+	for _, baseURL := range []string{fmt.Sprintf("%v://%v", file.Scheme, currentDirectory), ownerParent} {
 		URL := url.Join(baseURL, URL)
 		if exists, _ := fs.Exists(ctx, URL); exists {
 			return URL
