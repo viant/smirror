@@ -35,6 +35,7 @@ func handleMessages(ctx context.Context, sqsEvent events.SQSEvent) (err error) {
 				Dest:   &config.Dest,
 				Move:   config.Move,
 			})
+			response.SourceURL = URL
 			if data, err := json.Marshal(response); err == nil {
 				fmt.Printf("%v\n", string(data))
 			}

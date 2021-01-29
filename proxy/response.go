@@ -6,6 +6,7 @@ import (
 )
 
 type Response struct {
+	SourceURL string  `json:",omitempty"`
 	Copied  map[string]string `json:",omitempty"`
 	Moved   map[string]string `json:",omitempty"`
 	Invoked map[string]string `json:",omitempty"`

@@ -1,4 +1,7 @@
 {
+  "Source": {
+      "Exclusion": ".+frag1.+"
+  },
   "Dest": {
     "URL": "s3://${triggerBucket}"
   }
