@@ -203,9 +203,12 @@ func (s *service) transferStream(ctx context.Context, reader io.Reader, URL stri
 		return errors.Wrapf(err, "failed to create reader")
 	}
 	destName := rule.Name(URL)
-	destURL := url.Join(rule.Dest.URL, destName)
+	baseDestURL, err := rule.Dest.ExpandURL(URL)
+	if err != nil {
+		return errors.Wrapf(err, "failed to expanded URL")
+	}
+	destURL := url.Join(baseDestURL, destName)
 	destCompression := rule.Compression
-
 	if path.Ext(URL) == path.Ext(destURL) && !rule.HasTransformer() {
 		destCompression = nil
 	}
@@ -397,8 +400,12 @@ func (s *service) chunkWriter(ctx context.Context, URL string, rule *config.Rule
 	return func(partition interface{}) io.WriteCloser {
 		splitCounter := atomic.AddInt32(counter, 1)
 		destName := rule.Split.Name(rule, URL, splitCounter, partition)
-		destURL := url.Join(rule.Dest.URL, destName)
 		return NewWriter(rule, func(writer *Writer) error {
+			baseDestURL, err := rule.Dest.ExpandURL(URL)
+			if err != nil {
+				return fmt.Errorf("failed to expand URL due to %w", err)
+			}
+			destURL := url.Join(baseDestURL, destName)
 			if writer.Reader == nil {
 				return fmt.Errorf("reader was empty")
 			}
