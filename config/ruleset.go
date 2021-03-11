@@ -134,6 +134,9 @@ func (c *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 func (c *Ruleset) loadResources(ctx context.Context, fs afs.Service, object storage.Object) error {
 	reader, err := fs.Open(ctx, object)
 	defer func() {
+		if reader == nil {
+			return
+		}
 		_ = reader.Close()
 	}()
 
