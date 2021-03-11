@@ -133,6 +133,9 @@ func (c *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 
 func (c *Ruleset) loadResources(ctx context.Context, fs afs.Service, object storage.Object) error {
 	reader, err := fs.Open(ctx, object)
+	if err != nil {
+		return fmt.Errorf("failed to open: %v, %w", object.URL(), err)
+	}
 	defer func() {
 		if reader == nil {
 			return
