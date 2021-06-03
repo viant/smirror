@@ -30,6 +30,13 @@
     {
       "Effect": "Allow",
       "Action": [
+        "sqs:*"
+      ],
+      "Resource": "arn:aws:sqs:*:${aws.accountID}:${s3OverflowQueue}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "s3:*"
       ],
       "Resource": [
@@ -40,7 +47,9 @@
         "arn:aws:s3:::${s3OpsBucket}",
         "arn:aws:s3:::${s3OpsBucket}/*",
         "arn:aws:s3:::${s3TriggerBucket}",
-        "arn:aws:s3:::${s3TriggerBucket}/*"
+        "arn:aws:s3:::${s3TriggerBucket}/*",
+        "arn:aws:s3:::${s3OverflowBucket}",
+        "arn:aws:s3:::${s3OverflowBucket}/*"
       ]
     },
     {

@@ -1,5 +1,8 @@
 init:
 
+  target:
+    URL: ssh://127.0.0.1/
+    Credentials: localhost
 
   gcpCredentials: gcp-e2e
   awsCredentials: aws-e2e
@@ -20,7 +23,8 @@ init:
   s3DestBucket:  ${s3bucketPrefix}-mirrored
   s3Queue: ${s3bucketPrefix}-queue
   s3TriggerQueue: ${s3bucketPrefix}-trigger-queue
-
+  s3OverflowQueue: ${s3bucketPrefix}-overflow-queue
+  s3OverflowBucket: ${s3bucketPrefix}-overflow
   s3ExternalBucket: ${s3bucketPrefix}-external
   customer001CustomKey: this is secret :3rd party phrase
 

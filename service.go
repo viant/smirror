@@ -5,8 +5,8 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
-	"github.com/google/uuid"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
 	"github.com/viant/afs/cache"
@@ -43,14 +43,14 @@ type Service interface {
 }
 
 type service struct {
-	mux      *sync.Mutex
-	config   *Config
-	fs       afs.Service
-	cfs      afs.Service
-	secret   secret.Service
-	msgbus   msgbus.Service
+	mux          *sync.Mutex
+	config       *Config
+	fs           afs.Service
+	cfs          afs.Service
+	secret       secret.Service
+	msgbus       msgbus.Service
 	msgbusVendor string
-	notifier slack.Slack
+	notifier     slack.Slack
 }
 
 func (s *service) Mirror(ctx context.Context, request *contract.Request) *contract.Response {
@@ -111,7 +111,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	}
 
 	if err := s.initRule(ctx, rule); err != nil {
-		return errors.Wrapf(err, "railed to initialise rule: %v", rule.Info.Workflow)
+		return errors.Wrapf(err, "frailed to initialise rule: %v", rule.Info.Workflow)
 	}
 	response.Rule = rule
 	options, err := s.secret.StorageOpts(ctx, rule.Source.CloneWithURL(request.URL))
@@ -125,6 +125,11 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 		return nil
 	}
 	response.FileSize = object.Size()
+	if rule.Source.Overflow != nil {
+		if rule.Source.Overflow.Size() < object.Size() {
+			return s.handleOverflow(ctx, object, rule.Source.Overflow, response)
+		}
+	}
 
 	if rule.DoneMarker != "" {
 		parentURL, _ := url.Split(request.URL, file.Scheme)
@@ -198,7 +203,7 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 
 func (s *service) transferStream(ctx context.Context, reader io.Reader, URL string, rule *config.Rule, response *contract.Response) (err error) {
 
-	reader, err = NewReader(rule, reader,response, URL)
+	reader, err = NewReader(rule, reader, response, URL)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
 	}
@@ -224,7 +229,7 @@ func (s *service) transferStream(ctx context.Context, reader io.Reader, URL stri
 }
 
 func (s *service) transferChunkStream(ctx context.Context, reader io.Reader, URL string, rule *config.Rule, response *contract.Response) (err error) {
-	reader, err = NewReader(rule, reader,response,  URL)
+	reader, err = NewReader(rule, reader, response, URL)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
 	}
@@ -254,7 +259,6 @@ func (s *service) transfer(ctx context.Context, transfer *Transfer, response *co
 	JSON, _ := json.Marshal(transfer)
 	return fmt.Errorf("dest.URL was empty: invalid transfer: %s: ", JSON)
 }
-
 
 func (s *service) publish(ctx context.Context, transfer *Transfer, response *contract.Response) error {
 	reader, err := transfer.GetReader()
@@ -447,21 +451,59 @@ func (s *service) logResponse(ctx context.Context, response *contract.Response) 
 	}
 
 	//avoid event infinitive cycle
-	if strings.Contains(response.TriggeredBy,  s.config.ResponseURL) {
+	if strings.Contains(response.TriggeredBy, s.config.ResponseURL) {
 		return
 	}
 	response.Rule = nil
-	JSON,err := json.Marshal(response)
+	JSON, err := json.Marshal(response)
 	if err != nil {
 		response.LogError = err.Error()
 		return
 	}
-	UUID :=  uuid.New().String()
-	logURL := url.Join(s.config.ResponseURL, UUID +".json")
+	UUID := uuid.New().String()
+	logURL := url.Join(s.config.ResponseURL, UUID+".json")
 	err = s.fs.Upload(ctx, logURL, file.DefaultFileOsMode, bytes.NewReader(JSON))
 	if err != nil {
 		response.LogError = err.Error()
 	}
+}
+
+func (s *service) handleOverflow(ctx context.Context, object storage.Object, overflow *config.Overflow, response *contract.Response) error {
+	response.Status = base.StatusOverflow
+	_, URLPath := url.Base(object.URL(), file.Scheme)
+	destURL := url.Join(overflow.DestURL, URLPath)
+	err := s.fs.Move(ctx, object.URL(), destURL)
+	if err != nil {
+		response.Error = err.Error()
+	}
+	response.DestURLs = append(response.DestURLs, destURL)
+	msgService, err := s.overflowBusService(ctx, overflow)
+	if err != nil || msgService == nil {
+		fmt.Printf("msg service empty\n")
+		return nil
+	}
+	data, _ := json.Marshal(overflow.MessageEvent(destURL))
+	msg := &msgbus.Request{
+		Dest: overflow.MessageDest(),
+		Data: data,
+	}
+	output, err := msgService.Publish(ctx, msg)
+	if err != nil {
+		return err
+	}
+	response.MessageIDs = output.MessageIDs
+	return err
+}
+
+func (s *service) overflowBusService(ctx context.Context, overflow *config.Overflow) (msgbus.Service, error) {
+	var service msgbus.Service
+	var err error
+	if overflow.Queue != "" {
+		service, err = sqs.New(ctx)
+	} else if overflow.Topic != "" {
+		service, err = pubsub.New(ctx, overflow.ProjectID)
+	}
+	return service, err
 }
 
 //NewSlack creates a new mirror service

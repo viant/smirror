@@ -23,6 +23,14 @@ func (e S3Event) Each(handler func(URL string) error) error {
 	return nil
 }
 
+func (e S3Event) URL() string {
+	if len(e.Records) == 0 {
+		return ""
+	}
+	return resourceURL(e.Records[0])
+}
+
+
 //resourceURL returns resource URL
 func resourceURL(resource events.S3EventRecord) string {
 	return fmt.Sprintf("s3://%s/%s", resource.S3.Bucket.Name, resource.S3.Object.Key)

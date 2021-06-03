@@ -14,7 +14,7 @@ pipeline:
   set_sdk:
     action: sdk.set
     target: $target
-    sdk: go:1.15
+    sdk: go:1.16
 
   package:
     action: exec:run
@@ -47,24 +47,24 @@ pipeline:
       - tar cvzf smirror_osx_${AppVersion}.tar.gz smirror
       - cp smirror /usr/local/bin
 
-  deployCludFunction:
-    action: gcp/cloudfunctions:deploy
-    credentials: $gcpCredentials
-    '@name': $functionName
-    timeout: 540s
-    entryPoint: StorageMirror
-    serviceAccount: ${gcp.serviceAccount}
-    runtime: go111
-    availableMemoryMB: 2048
-    eventTrigger:
-      eventType: google.storage.object.finalize
-      resource: projects/_/buckets/${gsTriggerBucket}
-    environmentVariables:
-      LOGGING: 'true'
-      CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
-    source:
-      URL: ${fnAppPath}/
-    sleepTimeMs: 5000
+#  deployCludFunction:
+#    action: gcp/cloudfunctions:deploy
+#    credentials: $gcpCredentials
+#    '@name': $functionName
+#    timeout: 540s
+#    entryPoint: StorageMirror
+#    serviceAccount: ${gcp.serviceAccount}
+#    runtime: go111
+#    availableMemoryMB: 2048
+#    eventTrigger:
+#      eventType: google.storage.object.finalize
+#      resource: projects/_/buckets/${gsTriggerBucket}
+#    environmentVariables:
+#      LOGGING: 'true'
+#      CONFIG: gs://${gsConfigBucket}/StorageMirror/config.json
+#    source:
+#      URL: ${fnAppPath}/
+#    sleepTimeMs: 5000
 
   deployLambda:
     action: aws/lambda:deploy
@@ -119,25 +119,25 @@ pipeline:
 
 
 
-  deployCronLambad:
-    action: aws/lambda:deploy
-    credentials: $awsCredentials
-    functionname: ${functionName}Cron
-    runtime:  go1.x
-    handler: smirrorcron
-    timeout: 360
-    memorySize: 256
-    environment:
-      variables:
-        LOGGING: 'true'
-        CONFIG: s3://${s3ConfigBucket}/StorageMirrorCron/config.json
-    code:
-      zipfile: $LoadBinary(${mirrorCronZip})
-    schedule:
-      expression: rate(1 minute)
-    rolename: ${functionName}Cron-executor
-    define:
-      - policyname: ${functionName}Cron-role
-        policydocument: $Cat('${privilegePolicyCron}')
-    attach:
-      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+#  deployCronLambad:
+#    action: aws/lambda:deploy
+#    credentials: $awsCredentials
+#    functionname: ${functionName}Cron
+#    runtime:  go1.x
+#    handler: smirrorcron
+#    timeout: 360
+#    memorySize: 256
+#    environment:
+#      variables:
+#        LOGGING: 'true'
+#        CONFIG: s3://${s3ConfigBucket}/StorageMirrorCron/config.json
+#    code:
+#      zipfile: $LoadBinary(${mirrorCronZip})
+#    schedule:
+#      expression: rate(1 minute)
+#    rolename: ${functionName}Cron-executor
+#    define:
+#      - policyname: ${functionName}Cron-role
+#        policydocument: $Cat('${privilegePolicyCron}')
+#    attach:
+#      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole

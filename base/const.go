@@ -11,6 +11,8 @@ const (
 	StatusNoMatch = "noMatch"
 	//StatusNoFound status no found
 	StatusNoFound = "notFound"
+	//StatusOverflow status overflow
+	StatusOverflow = "overflow"
 
 	//StatusPartial partial match (waiting for done marker)
 	StatusPartial = "partial"

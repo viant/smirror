@@ -1,0 +1,18 @@
+Source:
+  Prefix: "/data/024"
+  Overflow:
+    SizeMB: 1
+    Queue: ${s3OverflowQueue}
+    DestURL: s3://${s3OverflowBucket}
+
+Dest:
+  URL: gs://${gsDestBucket}/data
+  Credentials:
+    Parameter: storagemirror.gcp
+    Key: alias/smirror
+OnSuccess:
+  - Action: delete
+OnFailure:
+  - Action: move
+    URL: s3:///${s3OpsBucket}/StorageMirror/errors/
+PreserveDepth: 1

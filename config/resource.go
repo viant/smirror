@@ -17,6 +17,7 @@ import (
 //Represents a destination
 type Resource struct {
 	matcher.Basic
+	Overflow    *Overflow
 	Bucket      string            `json:",omitempty"`
 	URL         string            `json:",omitempty"`
 	Region      string            `json:",omitempty"`
@@ -33,10 +34,9 @@ type Resource struct {
 	Parameters []*pattern.Param `json:",omitempty"`
 }
 
-
 func (r *Resource) ExpandURL(sourceURL string) (string, error) {
 	var err error
-	if r.Pattern != "" && len(r.Parameters) > 0{
+	if r.Pattern != "" && len(r.Parameters) > 0 {
 		if r.compiled == nil {
 			r.compiled, err = regexp.Compile(r.Pattern)
 			if err != nil {
@@ -68,7 +68,6 @@ func expandWithPattern(expr *regexp.Regexp, sourceURL string, expression string)
 	}
 	return expression
 }
-
 
 //CloneWithURL clone resource with URL
 func (r Resource) CloneWithURL(URL string) *Resource {

@@ -1,0 +1,39 @@
+pipeline:
+
+
+  cleanUp:
+    action: storage:remove
+    sleepTimeMs: 1000
+    assets:
+      - URL: 'gs://${s3ConfigBucket}/StorageMirror/_.cache'
+        credentials: $gcpCredentials
+      - URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.yaml
+        credentials: $awsCredentials
+
+
+  setupRule:
+    action: storage:copy
+    expand: true
+    source:
+      URL: ${parent.path}/rule.yaml
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.yaml
+
+
+  trigger:
+    action: storage:copy
+    sleepTimeMs: 20000
+    source:
+      URL: ${parent.path}/data/prepare/
+    dest:
+      credentials: $awsCredentials
+      URL: s3://${s3TriggerBucket}/data/024
+
+#  validate:
+#    action: storage:download
+#    source:
+#      credentials: $gcpCredentials
+#      URL: gs://${gsDestBucket}/data/p5/events.csv
+#    destKey: events
+#    expect: $Cat('${parent.path}/data/expect/events.csv')

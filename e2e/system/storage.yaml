@@ -1,3 +1,6 @@
+init:
+  defaultContent: 'endly e2e'
+
 pipeline:
 
   cleanup:
@@ -42,6 +45,13 @@ pipeline:
       dest:
         credentials: $awsCredentials
         URL: s3://${s3TriggerBucket}/
+
+    overflow:
+      action: storage:upload
+      sourceKey: defaultContent
+      dest:
+        credentials: $awsCredentials
+        URL: s3://${s3OverflowBucket}/info
 
     data:
       action: storage:create
