@@ -3,7 +3,7 @@ Source:
   Overflow:
     SizeMB: 1
     Queue: ${s3OverflowQueue}
-    DestURL: s3://${s3OverflowBucket}
+    DestURL: s3://${s3OverflowBucket}/overflow
 
 Dest:
   URL: gs://${gsDestBucket}/data
