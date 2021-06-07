@@ -127,7 +127,7 @@ func (s *service) mirror(ctx context.Context, request *contract.Request, respons
 	response.FileSize = object.Size()
 	if rule.Source.Overflow != nil {
 		if rule.Source.Overflow.Size() < object.Size() {
-			return s.handleOverflow(ctx, object, rule.Source.Overflow, response)
+			return s.handleOverflow(ctx, object, rule.Source.Overflow, rule, request, response)
 		}
 	}
 
@@ -468,7 +468,7 @@ func (s *service) logResponse(ctx context.Context, response *contract.Response) 
 	}
 }
 
-func (s *service) handleOverflow(ctx context.Context, object storage.Object, overflow *config.Overflow, response *contract.Response) error {
+func (s *service) handleOverflow(ctx context.Context, object storage.Object, overflow *config.Overflow, rule *config.Rule, request *contract.Request, response *contract.Response) error {
 	response.Status = base.StatusOverflow
 	_, URLPath := url.Base(object.URL(), file.Scheme)
 	destURL := url.Join(overflow.DestURL, URLPath)
@@ -492,6 +492,11 @@ func (s *service) handleOverflow(ctx context.Context, object storage.Object, ove
 		return err
 	}
 	response.MessageIDs = output.MessageIDs
+	jobContent := job.NewContext(ctx, err, request.URL, response.Rule.Name(request.URL))
+	response.TimeTakenMs = int(time.Now().Sub(request.Timestamp) / time.Millisecond)
+	if e := rule.Actions.Run(jobContent, s.fs, s.notifier.Notify, &response.Rule.Info, response); e != nil && err == nil {
+		err = e
+	}
 	return err
 }
 
