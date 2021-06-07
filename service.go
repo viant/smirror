@@ -472,7 +472,7 @@ func (s *service) handleOverflow(ctx context.Context, object storage.Object, ove
 	response.Status = base.StatusOverflow
 	_, URLPath := url.Base(object.URL(), file.Scheme)
 	destURL := url.Join(overflow.DestURL, URLPath)
-	err := s.fs.Move(ctx, object.URL(), destURL)
+	err := s.fs.Copy(ctx, object.URL(), destURL)
 	if err != nil {
 		response.Error = err.Error()
 	}

@@ -36,6 +36,13 @@ func (s *service) Build(ctx context.Context, request *build.Request) error {
 		},
 	}
 
+	if request.OverflowDest != "" {
+		rule.Source.Overflow = &config.Overflow{
+			SizeMB: request.OverflowMb,
+			DestURL: request.OverflowDest,
+			Queue: request.Queue,
+		}
+	}
 	if request.MatchPrefix != "" {
 		rule.Source.Prefix = request.MatchPrefix
 	}

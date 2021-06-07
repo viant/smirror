@@ -40,6 +40,10 @@ type Options struct {
 	Topic string `short:"t" long:"topic" description:"Google Cloud Pub/Sub topic"`
 
 	Queue string `short:"q" long:"queue" description:"AWS SQS queue"`
+
+	OverflowMb    int64  `short:"x" long:"overflowSize" description:"overflow size in Mb"`
+	OverflowDest  string `short:"O" long:"overflowDest" description:"overflow destination"`
+	OverflowQueue string `short:"Q" long:"overflowQueue" description:"overflow queue"`
 }
 
 //HistoryPathURL return history URL
