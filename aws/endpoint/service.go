@@ -54,7 +54,7 @@ func (s *Service) consume(ctx context.Context) error {
 	}
 	i := 0
 	pullCount := s.config.BatchSize
-	receivedInput := buildReceiveMessageInput(queueURL, pullCount, s.config.WaitTimeSec, true)
+	receivedInput := buildReceiveMessageInput(queueURL, pullCount, s.config.WaitTimeSec,  s.config.VisibilityTimeout,true)
 	output, err := s.sqs.ReceiveMessage(receivedInput)
 	if err != nil {
 		return fmt.Errorf("failed to receive queue messages: %v, %w", queueURL, err)
@@ -129,12 +129,12 @@ func (s *Service) getQueueURL() (string, error) {
 	return *result.QueueUrl, nil
 }
 
-func buildReceiveMessageInput(queueURL string, pullCount int, waitTime int64, includeAttr bool) *sqs.ReceiveMessageInput {
+func buildReceiveMessageInput(queueURL string, pullCount int, waitTime int64, visibilityTimeout int64, includeAttr bool) *sqs.ReceiveMessageInput {
 	input := &sqs.ReceiveMessageInput{
 		QueueUrl:            aws.String(queueURL),
 		MaxNumberOfMessages: aws.Int64(int64(pullCount)),
 		WaitTimeSeconds:     aws.Int64(waitTime),
-		VisibilityTimeout:   aws.Int64(1),
+		VisibilityTimeout:   aws.Int64(visibilityTimeout),
 	}
 	if includeAttr {
 		input.MessageAttributeNames = aws.StringSlice([]string{"All"})

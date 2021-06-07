@@ -10,9 +10,10 @@ import (
 
 //Config represent  subscriber config
 type Config struct {
-	Queue       string
-	BatchSize   int
-	WaitTimeSec int64
+	Queue             string
+	BatchSize         int
+	WaitTimeSec       int64
+	VisibilityTimeout int64
 }
 
 //Initinitialises config
@@ -22,6 +23,9 @@ func (c *Config) Init(ctx context.Context, fs afs.Service) error {
 	}
 	if c.WaitTimeSec == 0 {
 		c.WaitTimeSec = 5
+	}
+	if c.VisibilityTimeout == 0 {
+		c.VisibilityTimeout = 60
 	}
 	return nil
 }
@@ -40,4 +44,3 @@ func NewConfigFromEnv(key string) (*Config, error) {
 	err := json.Unmarshal([]byte(data), cfg)
 	return cfg, err
 }
-
