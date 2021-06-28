@@ -1,0 +1,16 @@
+Source:
+  Prefix: "/data/025"
+  Overflow:
+    SizeMB: 1
+    Topic: ${gsPrefix}_storage_mirror_overflow
+    DestURL: gs://${gsOverflowBucket}/overflow
+
+Dest:
+  URL: gs://${gsDestBucket}/data
+
+OnSuccess:
+  - Action: delete
+OnFailure:
+  - Action: move
+    URL: gs:///${gsOpsBucket}/StorageMirror/errors/
+PreserveDepth: 1

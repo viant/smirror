@@ -15,6 +15,7 @@ init:
   gsTriggerBucket: ${gsPrefix}_trigger
   gsOpsBucket: ${gsPrefix}_operation
   gsDestBucket: ${gsPrefix}_mirrored
+  gsOverflowBucket: ${gsPrefix}_overflow
 
   s3bucketPrefix: $Replace($gcpProject,'_','-')
   s3ConfigBucket: ${s3bucketPrefix}-config

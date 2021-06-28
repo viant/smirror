@@ -386,6 +386,10 @@ func (s *service) initRule(ctx context.Context, rule *config.Rule) (err error) {
 		s.msgbusVendor = rule.Dest.Vendor
 		switch rule.Dest.Vendor {
 		case shared.VendorPubsub:
+			if s.config.ProjectID == "" {
+				s.config.ProjectID = os.Getenv("GCLOUD_PROJECT")
+			}
+
 			if s.msgbus, err = pubsub.New(ctx, s.config.ProjectID); err != nil {
 				return errors.Wrapf(err, "unable to create pubsub publisher for %v", rule.Dest.Vendor)
 			}
@@ -472,17 +476,20 @@ func (s *service) handleOverflow(ctx context.Context, object storage.Object, ove
 	response.Status = base.StatusOverflow
 	_, URLPath := url.Base(object.URL(), file.Scheme)
 	destURL := url.Join(overflow.DestURL, URLPath)
-	err := s.fs.Copy(ctx, object.URL(), destURL)
+	err := s.fs.Copy(ctx, object.URL(), destURL)//change to move
 	if err != nil {
 		response.Error = err.Error()
+		return err
 	}
 	response.DestURLs = append(response.DestURLs, destURL)
 	msgService, err := s.overflowBusService(ctx, overflow)
 	if err != nil || msgService == nil {
-		fmt.Printf("msg service empty\n")
-		return nil
+		return fmt.Errorf("msg bus service was empty")
 	}
-	data, _ := json.Marshal(overflow.MessageEvent(destURL))
+	data, err := json.Marshal(overflow.MessageEvent(destURL))
+	if err != nil {
+		return fmt.Errorf("failed to marshal message: %+v",overflow.MessageEvent(destURL))
+	}
 	msg := &msgbus.Request{
 		Dest: overflow.MessageDest(),
 		Data: data,
@@ -499,6 +506,7 @@ func (s *service) handleOverflow(ctx context.Context, object storage.Object, ove
 	}
 	return err
 }
+
 
 func (s *service) overflowBusService(ctx context.Context, overflow *config.Overflow) (msgbus.Service, error) {
 	var service msgbus.Service

@@ -46,6 +46,7 @@ pipeline:
         credentials: $awsCredentials
         URL: s3://${s3TriggerBucket}/
 
+
     overflow:
       action: storage:upload
       sourceKey: defaultContent
@@ -76,6 +77,12 @@ pipeline:
         credentials: $gcpCredentials
         URL: s3://${s3ConfigBucket}/
 
+    overflow:
+      action: storage:upload
+      sourceKey: defaultContent
+      dest:
+        credentials: $gcpCredentials
+        URL: gs://${gsOverflowBucket}/info
 
     ops:
       action: storage:create

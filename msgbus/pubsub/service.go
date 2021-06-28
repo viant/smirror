@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/pubsub/v1"
 	"smirror/msgbus"
 	"strings"
@@ -41,7 +42,6 @@ func (s *service) publish(ctx context.Context, request *msgbus.Request, response
 			publishRequest.Messages[0].Attributes[k] = fmt.Sprintf("%s", v)
 		}
 	}
-
 	topic := s.topicInProject(request.Dest)
 	publishCall := pubsub.NewProjectsService(s.Service).Topics.Publish(topic, publishRequest)
 	publishCall.Context(ctx)
@@ -55,6 +55,11 @@ func (s *service) publish(ctx context.Context, request *msgbus.Request, response
 //New creates a service
 func New(ctx context.Context, projectId string) (msgbus.Service, error) {
 	srv, err := pubsub.NewService(ctx)
+	if projectId == "" {
+		if credentials, err := google.FindDefaultCredentials(context.Background()); err == nil {
+			projectId = credentials.ProjectID
+		}
+	}
 	if err != nil {
 		return nil, err
 	}

@@ -1,18 +1,20 @@
 package endpoint
 
 import (
+	"cloud.google.com/go/pubsub"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"cloud.google.com/go/pubsub"
 	"github.com/viant/afs"
+	"golang.org/x/oauth2/google"
 	"log"
 	"os"
 	"smirror"
 	"smirror/base"
 	"smirror/contract"
 	"smirror/event"
+	"strings"
 	"sync"
 	"time"
 )
@@ -52,6 +54,7 @@ func (s *Service) consume(ctx context.Context) error {
 	}
 	subscription.ReceiveSettings.MaxOutstandingMessages = s.config.BatchSize
 	subscription.ReceiveSettings.NumGoroutines = s.config.BatchSize
+	subscription.ReceiveSettings.MaxExtension  = time.Duration(s.config.VisibilityTimeout) * time.Millisecond
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	mutex := &sync.Mutex{}
@@ -110,6 +113,9 @@ func (s *Service) getSubscription() (*pubsub.Subscription, error) {
 	if s.config.Subscription == "" {
 		return nil, fmt.Errorf("subscription was empty")
 	}
+	if !strings.Contains(s.config.Subscription, "/") {
+
+	}
 	if s.config.ProjectID == "" {
 		return s.client.Subscription(s.config.Subscription), nil
 	}
@@ -118,6 +124,11 @@ func (s *Service) getSubscription() (*pubsub.Subscription, error) {
 
 //New creates a new client
 func New(config *Config, fs afs.Service) (*Service, error) {
+	if config.ProjectID == "" {
+		if credentials, err := google.FindDefaultCredentials(context.Background()); err == nil {
+			config.ProjectID = credentials.ProjectID
+		}
+	}
 	client, err := pubsub.NewClient(context.Background(), config.ProjectID)
 	if err != nil {
 		return nil, err

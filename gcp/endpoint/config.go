@@ -14,6 +14,7 @@ type Config struct {
 	ProjectID    string
 	BatchSize    int
 	WaitTimeSec  int64
+	VisibilityTimeout int64
 }
 
 //Initinitialises config
@@ -23,6 +24,9 @@ func (c *Config) Init(ctx context.Context, fs afs.Service) error {
 	}
 	if c.WaitTimeSec == 0 {
 		c.WaitTimeSec = 5
+	}
+	if c.VisibilityTimeout == 0 {
+		c.VisibilityTimeout = 60
 	}
 	return nil
 }

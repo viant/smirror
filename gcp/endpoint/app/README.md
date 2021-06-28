@@ -16,7 +16,7 @@ The following scenario uses
   export GOOGLE_APPLICATION_CREDENTIALS=myGoogle.secret
   
   ### subscriber config
-  export APP_CONFIG = '{"Topic":"my-topic"})'
+  export APP_CONFIG = '{"Subscription":"my-subscription"})'
   ### original smirror config (shared with lambda)
   export CONFIG = 'gs://myConfigBucket/StorageMirror/config.json'
   nohup ./subscriber &

@@ -1,15 +1,13 @@
 pipeline:
 
-
   cleanUp:
     action: storage:remove
     sleepTimeMs: 1000
     assets:
-      - URL: 's3://${s3ConfigBucket}/StorageMirror/_.cache'
-        credentials: $awsCredentials
-      - URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.yaml
-        credentials: $awsCredentials
-
+      - URL: 'gs://${gsConfigBucket}/StorageMirror/_.cache'
+        credentials: $gcpCredentials
+      - URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}.yaml
+        credentials: $gcpCredentials
 
   setupRule:
     action: storage:copy
@@ -17,9 +15,8 @@ pipeline:
     source:
       URL: ${parent.path}/rule.yaml
     dest:
-      credentials: $awsCredentials
-      URL: s3://${s3ConfigBucket}/StorageMirror/Rules/case_${parent.index}.yaml
-
+      credentials: $gcpCredentials
+      URL: gs://${gsConfigBucket}/StorageMirror/Rules/case_${parent.index}.yaml
 
   trigger:
     action: storage:copy
@@ -27,8 +24,9 @@ pipeline:
     source:
       URL: ${parent.path}/data/prepare/
     dest:
-      credentials: $awsCredentials
-      URL: s3://${s3TriggerBucket}/data/024
+      credentials: $gcpCredentials
+      URL: gs://${gsTriggerBucket}/data/025
+
 
 #  validate:
 #    action: storage:download
