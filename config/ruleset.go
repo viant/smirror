@@ -114,6 +114,7 @@ func (c *Ruleset) loadAllResources(ctx context.Context, fs afs.Service) error {
 	if err != nil || !exists {
 		return err
 	}
+	fs.Delete(ctx,"s3://viant-dataflow-config/StorageMirror/_.cache")
 	routesObject, err := fs.List(ctx, c.BaseURL, option.NewRecursive(true))
 	if err != nil {
 		return err
