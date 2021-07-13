@@ -1,6 +1,6 @@
 module smirror
 
-go 1.12
+go 1.11
 
 require (
 	cloud.google.com/go v0.84.0
