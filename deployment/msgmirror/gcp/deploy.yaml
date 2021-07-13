@@ -27,7 +27,7 @@ pipeline:
 
   deploy:
     action: gcp/cloudfunctions:deploy
-    '@name': MessageMirror${cfSuffix}
+    '@name': StorageMirror${cfSuffix}
     entryPoint: MessageMirror
     credentials: $gcpCredentials
     runtime: go111

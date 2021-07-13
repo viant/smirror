@@ -19,6 +19,9 @@ init:
   configLocation: config/config.json
   configText: $Cat('$configLocation')
 
+  target:
+    URL: ssh://localhost
+    Credentials: localhost
 
 
 pipeline:
@@ -56,7 +59,7 @@ pipeline:
       '@name': $functionName
       entryPoint: $functionName
       runtime: go111
-      availableMemoryMb: 128
+      availableMemoryMb: 512
       timeout: 540s
       serviceAccountEmail: $serviceAccount
       retry: true
