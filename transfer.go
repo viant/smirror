@@ -13,6 +13,8 @@ type Transfer struct {
 	partition    string
 	splitCounter int32
 	skipChecksum bool
+	stream       *config.Streaming
+	partSize     int
 	Resource     *config.Resource
 	Reader       io.Reader
 	Dest         *Datafile

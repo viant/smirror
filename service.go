@@ -202,7 +202,6 @@ func (s *service) mirrorAsset(ctx context.Context, rule *config.Rule, URL string
 }
 
 func (s *service) transferStream(ctx context.Context, reader io.Reader, URL string, rule *config.Rule, response *contract.Response) (err error) {
-
 	reader, err = NewReader(rule, reader, response, URL)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create reader")
@@ -220,6 +219,7 @@ func (s *service) transferStream(ctx context.Context, reader io.Reader, URL stri
 
 	dataCopy := &Transfer{
 		skipChecksum: response.ChecksumSkip,
+		stream:       rule.Streaming,
 		rule:         rule,
 		Resource:     rule.Dest,
 		Reader:       reader,
@@ -307,6 +307,9 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 	}
 	if transfer.skipChecksum {
 		options = append(options, option.NewSkipChecksum(true))
+		if stream := transfer.stream; stream != nil && stream.PartSizeMb > 0 {
+			options = append(options, option.NewStream(stream.PartSize(), int(response.FileSize)))
+		}
 	}
 	if rule := transfer.rule; rule != nil && rule.AllowEmpty {
 		options = append(options, option.NewEmpty(rule.AllowEmpty))
@@ -316,7 +319,6 @@ func (s *service) upload(ctx context.Context, transfer *Transfer, response *cont
 		return err
 	}
 	response.AddURL(transfer.Dest.URL)
-
 	if transfer.Dest.CompressionCodec() == config.GZipCodec {
 		gzipWriter := gzip.NewWriter(writer)
 		if _, err = io.Copy(gzipWriter, reader); err != nil {
@@ -424,6 +426,7 @@ func (s *service) chunkWriter(ctx context.Context, URL string, rule *config.Rule
 				splitCounter: splitCounter,
 				partition:    fmt.Sprintf("%v", partition),
 				skipChecksum: response.ChecksumSkip,
+				stream:       rule.Streaming,
 				Resource:     rule.Dest,
 				Reader:       writer.Reader,
 				Dest:         NewDatafile(destURL, nil),
@@ -476,7 +479,7 @@ func (s *service) handleOverflow(ctx context.Context, object storage.Object, ove
 	response.Status = base.StatusOverflow
 	_, URLPath := url.Base(object.URL(), file.Scheme)
 	destURL := url.Join(overflow.DestURL, URLPath)
-	err := s.fs.Copy(ctx, object.URL(), destURL)//change to move
+	err := s.fs.Copy(ctx, object.URL(), destURL) //change to move
 	if err != nil {
 		response.Error = err.Error()
 		return err
@@ -488,7 +491,7 @@ func (s *service) handleOverflow(ctx context.Context, object storage.Object, ove
 	}
 	data, err := json.Marshal(overflow.MessageEvent(destURL))
 	if err != nil {
-		return fmt.Errorf("failed to marshal message: %+v",overflow.MessageEvent(destURL))
+		return fmt.Errorf("failed to marshal message: %+v", overflow.MessageEvent(destURL))
 	}
 	msg := &msgbus.Request{
 		Dest: overflow.MessageDest(),
@@ -506,7 +509,6 @@ func (s *service) handleOverflow(ctx context.Context, object storage.Object, ove
 	}
 	return err
 }
-
 
 func (s *service) overflowBusService(ctx context.Context, overflow *config.Overflow) (msgbus.Service, error) {
 	var service msgbus.Service
