@@ -22,6 +22,7 @@ type Resource struct {
 	URL         string            `json:",omitempty"`
 	Region      string            `json:",omitempty"`
 	CustomKey   *CustomKey        `json:",omitempty"`
+	Grant       *option.Grant     `json:",omitempty"`
 	Credentials *auth.Credentials `json:",omitempty"`
 	Proxy       *option.Proxy
 	Topic       string `json:",omitempty"`
@@ -76,6 +77,8 @@ func (r Resource) CloneWithURL(URL string) *Resource {
 		URL:         URL,
 		Region:      r.Region,
 		CustomKey:   r.CustomKey,
+		Proxy:       r.Proxy,
+		Grant:       r.Grant,
 		Credentials: r.Credentials,
 		Topic:       r.Topic,
 		Queue:       r.Queue,

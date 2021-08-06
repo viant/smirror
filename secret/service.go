@@ -117,6 +117,9 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 	if resource.Proxy != nil {
 		result = append(result, resource.Proxy)
 	}
+	if resource.Grant != nil {
+		result = append(result, resource.Grant)
+	}
 	if resource.URL == "" {
 		return result, nil
 	}

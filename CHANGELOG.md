@@ -1,3 +1,6 @@
+## August 5th 2020 1.5.0
+- Added option.Grant
+
 ## Jan 25th 2020 1.4.0
  - Added dest.Pattern, and dest.Params to extract data from source URL and expand in dest URL
  
