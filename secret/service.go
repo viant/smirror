@@ -120,6 +120,9 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 	if resource.Grant != nil {
 		result = append(result, resource.Grant)
 	}
+	if resource.ACL != nil {
+		result = append(result, resource.ACL)
+	}
 	if resource.URL == "" {
 		return result, nil
 	}

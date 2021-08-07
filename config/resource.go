@@ -23,6 +23,7 @@ type Resource struct {
 	Region      string            `json:",omitempty"`
 	CustomKey   *CustomKey        `json:",omitempty"`
 	Grant       *option.Grant     `json:",omitempty"`
+	ACL         *option.ACL       `json:",omitempty"`
 	Credentials *auth.Credentials `json:",omitempty"`
 	Proxy       *option.Proxy
 	Topic       string `json:",omitempty"`
