@@ -24,6 +24,7 @@ type Resource struct {
 	CustomKey   *CustomKey        `json:",omitempty"`
 	Grant       *option.Grant     `json:",omitempty"`
 	ACL         *option.ACL       `json:",omitempty"`
+	ServerSideEncryption *option.ServerSideEncryption `json:",omitempty"`
 	Credentials *auth.Credentials `json:",omitempty"`
 	Proxy       *option.Proxy
 	Topic       string `json:",omitempty"`

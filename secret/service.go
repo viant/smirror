@@ -123,6 +123,9 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 	if resource.ACL != nil {
 		result = append(result, resource.ACL)
 	}
+	if resource.ServerSideEncryption != nil {
+		result = append(result, resource.ServerSideEncryption)
+	}
 	if resource.URL == "" {
 		return result, nil
 	}
