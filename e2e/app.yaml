@@ -54,7 +54,7 @@ pipeline:
     timeout: 540s
     entryPoint: StorageMirror
     serviceAccount: ${gcp.serviceAccount}
-    runtime: go111
+    runtime: go116
     availableMemoryMB: 2048
     eventTrigger:
       eventType: google.storage.object.finalize
