@@ -29,5 +29,5 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210615190721-d04028783cf1
 	google.golang.org/api v0.48.0
 	gopkg.in/linkedin/goavro.v1 v1.0.5 // indirect
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/yaml.v2 v2.2.8
 )
