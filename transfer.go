@@ -3,8 +3,8 @@ package smirror
 import (
 	"fmt"
 	"io"
-	"smirror/config"
-	"smirror/transcoder"
+	"github.com/viant/smirror/config"
+	"github.com/viant/smirror/transcoder"
 )
 
 //Transfer represents a data transfer

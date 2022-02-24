@@ -3,10 +3,10 @@ package cmd
 import (
 	"context"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror/cmd/validate"
+	"github.com/viant/smirror/shared"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
-	"smirror/cmd/validate"
-	"smirror/shared"
 )
 
 

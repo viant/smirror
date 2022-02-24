@@ -2,10 +2,10 @@ package slack
 
 import (
 	"context"
+	"github.com/viant/smirror/auth"
+	"github.com/viant/smirror/job"
+	"github.com/viant/smirror/secret"
 	"github.com/viant/afs"
-	"smirror/auth"
-	"smirror/job"
-	"smirror/secret"
 )
 
 //Slack represents storage service

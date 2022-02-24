@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"github.com/viant/smirror/aws/endpoint"
 	"github.com/viant/afs"
 	"log"
-	"smirror/aws/endpoint"
 )
 
 const envConfig = "APP_CONFIG"

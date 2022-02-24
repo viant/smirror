@@ -1,6 +1,6 @@
 package smirror
 
-import "smirror/config"
+import "github.com/viant/smirror/config"
 
 //Datafile represents a data file
 type Datafile struct {

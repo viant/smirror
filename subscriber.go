@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror/event"
+	"github.com/viant/smirror/proxy"
 	"log"
-	"smirror/event"
-	"smirror/proxy"
 )
 
 var proxyConfug *proxy.Config

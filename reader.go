@@ -3,9 +3,9 @@ package smirror
 import (
 	"compress/gzip"
 	"io"
-	"smirror/config"
-	"smirror/config/schema"
-	"smirror/contract"
+	"github.com/viant/smirror/config"
+	"github.com/viant/smirror/config/schema"
+	"github.com/viant/smirror/contract"
 )
 
 //NewReader returns a reader for a rule

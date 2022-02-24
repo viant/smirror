@@ -12,7 +12,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path"
-	"smirror/base"
+	"github.com/viant/smirror/base"
 	"strings"
 	"sync/atomic"
 	"time"

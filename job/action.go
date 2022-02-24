@@ -5,8 +5,8 @@ import (
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
-	"smirror/auth"
-	"smirror/base"
+	"github.com/viant/smirror/auth"
+	"github.com/viant/smirror/base"
 	"strings"
 )
 

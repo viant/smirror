@@ -8,8 +8,8 @@ import (
 	akms "github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/pkg/errors"
-	"smirror/auth"
-	"smirror/secret/kms"
+	"github.com/viant/smirror/auth"
+	"github.com/viant/smirror/secret/kms"
 	"strings"
 )
 

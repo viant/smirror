@@ -6,14 +6,14 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/actgardner/gogen-avro/container"
+	"github.com/actgardner/gogen-avro/v10/container"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror/config"
+	"github.com/viant/smirror/transcoder/avro"
+	"github.com/viant/smirror/transcoder/avro/schma"
+	"github.com/viant/smirror/transcoder/xlsx"
 	"github.com/viant/toolbox/data"
 	"io"
-	"smirror/config"
-	"smirror/transcoder/avro"
-	"smirror/transcoder/avro/schma"
-	"smirror/transcoder/xlsx"
 )
 
 const (

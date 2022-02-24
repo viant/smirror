@@ -1,7 +1,7 @@
 package proxy
 
 import (
-	"smirror/base"
+	"github.com/viant/smirror/base"
 	"sync"
 )
 

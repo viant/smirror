@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/afs/matcher"
-	"smirror/base"
+	"github.com/viant/smirror/base"
 	"testing"
 )
 

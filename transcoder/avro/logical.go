@@ -2,9 +2,9 @@ package avro
 
 import (
 	"fmt"
+	"github.com/viant/smirror/transcoder/avro/schma"
 	"github.com/viant/toolbox"
 	"io"
-	"smirror/transcoder/avro/schma"
 	"strings"
 	"time"
 )

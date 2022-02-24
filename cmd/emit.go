@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/viant/afs/storage"
 	"github.com/viant/afs/url"
-	"smirror/cmd/history"
-	"smirror/cmd/mirror"
-	"smirror/contract"
+	"github.com/viant/smirror/cmd/history"
+	"github.com/viant/smirror/cmd/mirror"
+	"github.com/viant/smirror/contract"
 	"time"
 )
 

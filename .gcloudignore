@@ -5,8 +5,6 @@
 .git/**
 .gitignore
 node_modules
-go.mod
-go.sum
 cron/
 cron/*
 cmd/
@@ -31,3 +29,4 @@ aws/**
 *.zip
 smirror
 local_test.go
+vendor/

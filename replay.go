@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror/replay"
 	"log"
 	"net/http"
-	"smirror/replay"
 )
 
 //StorageReplay cloud function entry point

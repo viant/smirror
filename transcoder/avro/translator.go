@@ -1,8 +1,8 @@
 package avro
 
 import (
+	"github.com/viant/smirror/transcoder/avro/schma"
 	"github.com/viant/toolbox"
-	"smirror/transcoder/avro/schma"
 )
 
 //TranslateRecord translates record according avro schema

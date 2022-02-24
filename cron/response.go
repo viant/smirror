@@ -1,9 +1,9 @@
 package cron
 
 import (
+	"github.com/viant/smirror/cron/config"
+	"github.com/viant/smirror/proxy"
 	"github.com/viant/afs/storage"
-	"smirror/cron/config"
-	"smirror/proxy"
 )
 
 //Response represents schedule response

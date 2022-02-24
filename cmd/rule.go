@@ -7,8 +7,8 @@ import (
 	"github.com/viant/afs/url"
 	"github.com/viant/toolbox"
 	"gopkg.in/yaml.v2"
-	"smirror/config"
-	"smirror/shared"
+	"github.com/viant/smirror/config"
+	"github.com/viant/smirror/shared"
 	"time"
 )
 

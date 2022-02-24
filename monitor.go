@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
-	"smirror/base"
-	"smirror/mon"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/mon"
 )
 
 //StorageMirrorMonitor cloud function entry point

@@ -6,8 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/viant/smirror/msgbus"
 	"github.com/viant/toolbox"
-	"smirror/msgbus"
 )
 
 type service struct {

@@ -4,7 +4,7 @@ init:
     URL: ssh://127.0.0.1/
     Credentials: localhost
 
-  gcpCredentials: gcp-e2e
+  gcpCredentials: viant-e2e
   awsCredentials: aws-e2e
 
   gcp: ${secrets.$gcpCredentials}

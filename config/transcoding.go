@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
-	"smirror/config/transcoding"
+	"github.com/viant/smirror/config/transcoding"
 )
 
 const defaultRecordPerBlock = 40

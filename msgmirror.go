@@ -5,9 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/viant/smirror/msg"
 	"github.com/viant/toolbox"
 	"os"
-	"smirror/msg"
 )
 
 //MessageMirror represents a message mirror

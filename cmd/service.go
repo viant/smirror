@@ -3,12 +3,12 @@ package cmd
 import (
 	"context"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror"
+	"github.com/viant/smirror/cmd/build"
+	"github.com/viant/smirror/cmd/mirror"
+	"github.com/viant/smirror/cmd/validate"
+	"github.com/viant/smirror/contract"
 	"github.com/viant/afs"
-	"smirror"
-	"smirror/cmd/build"
-	"smirror/cmd/mirror"
-	"smirror/cmd/validate"
-	"smirror/contract"
 	"sync/atomic"
 )
 

@@ -9,7 +9,6 @@ init:
   privilegePolicySQS: privilege-policy-sqs.json
   AppVersion: $Cat(${fnAppPath}/Version)
 
-
 pipeline:
   set_sdk:
     action: sdk.set
@@ -21,12 +20,12 @@ pipeline:
     target: $target
     checkError: true
     commands:
+      - export GIT_TERMINAL_PROMPT=1
       - unset GOPATH
       - cd ${fnAppPath}
-      - export GO111MODULE=on
+      - go mod vendor
       - export GOOS=linux
       - export GOARCH=amd64
-      - go mod vendor
       - cd aws
       - go build smirror.go
       - zip -j smirror.zip smirror
@@ -66,35 +65,35 @@ pipeline:
       URL: ${fnAppPath}/
     sleepTimeMs: 5000
 
-  deployLambda:
-    action: aws/lambda:deploy
-    credentials: $awsCredentials
-    functionname: $functionName
-    runtime:  go1.x
-    handler: smirror
-    timeout: 360
-    environment:
-      variables:
-        LOGGING: 'true'
-        CONFIG: s3://${s3ConfigBucket}/StorageMirror/config.json
-    code:
-      zipfile: $LoadBinary(${mirrorAppZip})
-    rolename: lambda-${functionName}-executor
-    define:
-      - policyname: kms-${functionName}-role
-        policydocument: $Cat('${privilegePolicy}')
-    attach:
-      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-
-  setTrigger:
-    action: aws/s3:setupBucketNotification
-    sleepTimeMs: 20000
-    bucket: ${s3TriggerBucket}
-    lambdaFunctionConfigurations:
-      - functionName: $functionName
-        id: ObjectCreatedEvents
-        events:
-          - s3:ObjectCreated:*
+#  deployLambda:
+#    action: aws/lambda:deploy
+#    credentials: $awsCredentials
+#    functionname: $functionName
+#    runtime:  go1.x
+#    handler: smirror
+#    timeout: 360
+#    environment:
+#      variables:
+#        LOGGING: 'true'
+#        CONFIG: s3://${s3ConfigBucket}/StorageMirror/config.json
+#    code:
+#      zipfile: $LoadBinary(${mirrorAppZip})
+#    rolename: lambda-${functionName}-executor
+#    define:
+#      - policyname: kms-${functionName}-role
+#        policydocument: $Cat('${privilegePolicy}')
+#    attach:
+#      - policyarn: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+#
+#  setTrigger:
+#    action: aws/s3:setupBucketNotification
+#    sleepTimeMs: 20000
+#    bucket: ${s3TriggerBucket}
+#    lambdaFunctionConfigurations:
+#      - functionName: $functionName
+#        id: ObjectCreatedEvents
+#        events:
+#          - s3:ObjectCreated:*
 
 #
 #  deployStorageMirrorSqs:

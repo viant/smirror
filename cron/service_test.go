@@ -3,6 +3,8 @@ package cron
 import (
 	"context"
 	"encoding/json"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/cron/meta"
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/afs"
 	"github.com/viant/afs/asset"
@@ -11,8 +13,6 @@ import (
 	"github.com/viant/afs/url"
 	"github.com/viant/assertly"
 	"os"
-	"smirror/base"
-	"smirror/cron/meta"
 	"strings"
 	"testing"
 	"time"

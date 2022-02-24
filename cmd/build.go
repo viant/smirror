@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"context"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/cmd/build"
+	"github.com/viant/smirror/config"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/mem"
 	"github.com/viant/afs/option"
@@ -11,9 +14,6 @@ import (
 	"gopkg.in/yaml.v2"
 	"os"
 	"path"
-	"smirror/base"
-	"smirror/cmd/build"
-	"smirror/config"
 )
 
 func (s *service) Build(ctx context.Context, request *build.Request) error {

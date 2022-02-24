@@ -1,6 +1,6 @@
 package mon
 
-import "smirror/base"
+import "github.com/viant/smirror/base"
 
 //Config represents monitoring config
 type Config struct {

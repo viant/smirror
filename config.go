@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror/auth"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/config"
 	"github.com/viant/afs"
 	"github.com/viant/afs/cache"
 	"github.com/viant/toolbox"
 	"os"
-	"smirror/auth"
-	"smirror/base"
-	"smirror/config"
 	"strings"
 )
 

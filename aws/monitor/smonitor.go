@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/lambda"
 	"runtime/debug"
-	"smirror/base"
-	"smirror/mon"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/mon"
 )
 
 func main() {

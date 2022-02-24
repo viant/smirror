@@ -3,13 +3,13 @@ package cmd
 import (
 	"context"
 	"github.com/jessevdk/go-flags"
+	"github.com/viant/smirror/cmd/build"
+	"github.com/viant/smirror/cmd/mirror"
+	"github.com/viant/smirror/cmd/option"
+	"github.com/viant/smirror/cmd/validate"
+	"github.com/viant/smirror/shared"
 	"log"
 	"os"
-	"smirror/cmd/build"
-	"smirror/cmd/mirror"
-	"smirror/cmd/option"
-	"smirror/cmd/validate"
-	"smirror/shared"
 )
 
 //RunClient run client

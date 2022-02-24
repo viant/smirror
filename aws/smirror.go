@@ -8,10 +8,10 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	_ "github.com/viant/afsc/gs"
 	_ "github.com/viant/afsc/s3"
+	"github.com/viant/smirror"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/contract"
 	"runtime/debug"
-	"smirror"
-	"smirror/base"
-	"smirror/contract"
 )
 
 func main() {

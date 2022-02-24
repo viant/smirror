@@ -2,12 +2,12 @@ package schema
 
 import (
 	"context"
+	"github.com/viant/smirror/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/afs"
 	"github.com/viant/assertly"
 	"io"
 	"io/ioutil"
-	"smirror/config"
 	"strings"
 	"testing"
 )
@@ -199,7 +199,7 @@ func TestTransformer_Read(t *testing.T) {
 
 	for _, useCase := range useCases {
 		_ = useCase.rule.Init(context.Background() ,afs.New())
-		transformer, err := NewReader(useCase.reader, useCase.rule)
+		transformer, err := NewReader(useCase.reader, useCase.rule,nil)
 		if !assert.Nil(t, err, useCase.description) {
 			continue
 		}

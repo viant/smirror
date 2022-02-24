@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/stretchr/testify/assert"
-	"smirror/base"
+	"github.com/viant/smirror/base"
 	"testing"
 )
 
