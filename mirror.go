@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/pkg/errors"
-	"smirror/base"
-	"smirror/contract"
-	"smirror/event"
-	"smirror/shared"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/contract"
+	"github.com/viant/smirror/event"
+	"github.com/viant/smirror/shared"
 )
 
 //StorageMirror cloud function entry point

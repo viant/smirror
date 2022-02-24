@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/viant/afs"
 	"log"
-	"smirror/gcp/endpoint"
+	"github.com/viant/smirror/gcp/endpoint"
 )
 
 const envConfig = "APP_CONFIG"

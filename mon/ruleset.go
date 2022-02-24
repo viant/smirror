@@ -1,6 +1,6 @@
 package mon
 
-import "smirror/config"
+import "github.com/viant/smirror/config"
 
 //Ruleset represents route config
 type Routes struct {

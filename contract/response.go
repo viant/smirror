@@ -2,8 +2,8 @@ package contract
 
 import (
 	"github.com/viant/afs/option"
-	"smirror/base"
-	"smirror/config"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/config"
 
 	"sync"
 	"time"

@@ -5,6 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror/auth"
+	"github.com/viant/smirror/config"
+	"github.com/viant/smirror/secret/kms"
+	"github.com/viant/smirror/secret/kms/aws"
+	"github.com/viant/smirror/secret/kms/gcp"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/option"
@@ -12,11 +17,6 @@ import (
 	"github.com/viant/afs/url"
 	"github.com/viant/afsc/gs"
 	"github.com/viant/afsc/s3"
-	"smirror/auth"
-	"smirror/config"
-	"smirror/secret/kms"
-	"smirror/secret/kms/aws"
-	"smirror/secret/kms/gcp"
 )
 
 //Service represents kms service

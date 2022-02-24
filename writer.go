@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"io"
-	"smirror/config"
+	"github.com/viant/smirror/config"
 )
 
 //OnClose represents on close writer listener

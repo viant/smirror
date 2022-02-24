@@ -1,6 +1,6 @@
 package msg
 
-import "smirror/base"
+import "github.com/viant/smirror/base"
 
 //Response represents a response
 type Response struct {

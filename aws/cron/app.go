@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/aws/aws-lambda-go/lambda"
-	"smirror/base"
-	"smirror/cron"
-	"smirror/shared"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/cron"
+	"github.com/viant/smirror/shared"
 )
 
 func main() {

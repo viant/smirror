@@ -7,8 +7,8 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/pkg/errors"
-	"smirror/event"
-	"smirror/proxy"
+	"github.com/viant/smirror/event"
+	"github.com/viant/smirror/proxy"
 )
 
 var config *proxy.Config

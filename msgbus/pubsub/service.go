@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"github.com/viant/smirror/msgbus"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/pubsub/v1"
-	"smirror/msgbus"
 	"strings"
 )
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/nlopes/slack"
 	"github.com/pkg/errors"
-	"smirror/job"
+	"github.com/viant/smirror/job"
 )
 
 func (s *service) Notify(ctx context.Context, request *job.NotifyRequest) error {

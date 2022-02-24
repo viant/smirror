@@ -2,7 +2,7 @@ package proxy
 
 import (
 	"github.com/pkg/errors"
-	"smirror/config"
+	"github.com/viant/smirror/config"
 )
 
 //Request represents proxy

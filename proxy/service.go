@@ -14,9 +14,9 @@ import (
 	"github.com/viant/afs/storage"
 	"github.com/viant/afs/url"
 	"path"
-	"smirror/base"
-	"smirror/event"
-	"smirror/secret"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/event"
+	"github.com/viant/smirror/secret"
 	"time"
 )
 

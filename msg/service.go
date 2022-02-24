@@ -5,9 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/viant/smirror/base"
 	"github.com/viant/afs"
 	"github.com/viant/afs/url"
-	"smirror/base"
 	"strings"
 )
 

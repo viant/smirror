@@ -7,8 +7,8 @@ import (
 	"github.com/viant/afs"
 	"github.com/viant/toolbox"
 	"os"
-	"smirror/base"
-	"smirror/config"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/config"
 	"strings"
 )
 

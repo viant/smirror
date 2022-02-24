@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/config"
 	"github.com/viant/afs"
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/option"
@@ -11,8 +13,6 @@ import (
 	_ "github.com/viant/afsc/gs"
 	_ "github.com/viant/afsc/s3"
 	"io/ioutil"
-	"smirror/base"
-	"smirror/config"
 	"strings"
 	"time"
 )

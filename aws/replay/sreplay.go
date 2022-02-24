@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/lambda"
 	"runtime/debug"
-	"smirror/replay"
+	"github.com/viant/smirror/replay"
 )
 
 func main() {

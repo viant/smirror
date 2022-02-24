@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/pkg/errors"
 	"github.com/viant/afs"
-	"smirror/base"
+	"github.com/viant/smirror/base"
 )
 
 //Actions represents a job completion

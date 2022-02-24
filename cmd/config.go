@@ -5,11 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror"
+	"github.com/viant/smirror/base"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
-	"smirror"
-	"smirror/base"
 	"strings"
 )
 

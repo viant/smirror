@@ -8,7 +8,7 @@ import (
 	"github.com/viant/afs"
 	"github.com/viant/afs/matcher"
 	"github.com/viant/afs/storage"
-	"smirror/base"
+	"github.com/viant/smirror/base"
 	"sync/atomic"
 	"time"
 )

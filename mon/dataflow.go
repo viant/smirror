@@ -1,7 +1,7 @@
 package mon
 
 import (
-	"smirror/base"
+	"github.com/viant/smirror/base"
 )
 
 //RuleInfo represents workflow info with unprocessed files

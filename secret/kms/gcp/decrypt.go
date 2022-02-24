@@ -9,8 +9,8 @@ import (
 	"google.golang.org/api/cloudkms/v1"
 	"google.golang.org/api/option"
 	"io/ioutil"
-	"smirror/auth"
-	"smirror/secret/kms"
+	"github.com/viant/smirror/auth"
+	"github.com/viant/smirror/secret/kms"
 )
 
 type service struct {

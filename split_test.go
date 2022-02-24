@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io"
-	"smirror/config"
+	"github.com/viant/smirror/config"
 	"strings"
 	"testing"
 )

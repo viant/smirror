@@ -1,7 +1,7 @@
 package config
 
 import (
-	"smirror/config"
+	"github.com/viant/smirror/config"
 )
 
 //Rule represents a cron resource

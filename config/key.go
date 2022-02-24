@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/viant/afs/option"
-	"smirror/auth"
+	"github.com/viant/smirror/auth"
 )
 
 //CustomKey represents custom key

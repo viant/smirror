@@ -1,7 +1,7 @@
 package history
 
 import (
-	"smirror/base"
+	"github.com/viant/smirror/base"
 	"time"
 )
 

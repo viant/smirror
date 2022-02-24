@@ -2,7 +2,7 @@ package avro
 
 import (
 	"fmt"
-	"smirror/transcoder/avro/schma"
+	"github.com/viant/smirror/transcoder/avro/schma"
 )
 
 //SetWriter initialises avro schema

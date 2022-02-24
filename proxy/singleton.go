@@ -1,8 +1,8 @@
 package proxy
 
 import (
+	"github.com/viant/smirror/secret"
 	"github.com/viant/afs"
-	"smirror/secret"
 )
 
 var singleton Service

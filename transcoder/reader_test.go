@@ -9,10 +9,10 @@ import (
 	"github.com/viant/toolbox"
 	"io/ioutil"
 	"path"
-	"smirror/config"
-	"smirror/config/transcoding"
-	"smirror/transcoder/avro/schma"
-	"smirror/transcoder/xlsx"
+	"github.com/viant/smirror/config"
+	"github.com/viant/smirror/config/transcoding"
+	"github.com/viant/smirror/transcoder/avro/schma"
+	"github.com/viant/smirror/transcoder/xlsx"
 	"testing"
 )
 func TestReader_Read(t *testing.T) {

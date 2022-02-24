@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/url"
-	"smirror/event"
+	"github.com/viant/smirror/event"
 )
 
 //Overflow defines overflow controls

@@ -3,10 +3,10 @@ package mon
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/config"
 	"github.com/viant/afs/storage"
 	"github.com/viant/toolbox"
-	"smirror/base"
-	"smirror/config"
 	"strings"
 	"time"
 )

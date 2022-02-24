@@ -8,8 +8,8 @@ import (
 	"github.com/viant/afs/url"
 	"os"
 	"path"
-	"smirror/base"
-	"smirror/job"
+	"github.com/viant/smirror/base"
+	"github.com/viant/smirror/job"
 	"strings"
 	"time"
 )

@@ -3,7 +3,7 @@ package avro
 import (
 	"github.com/viant/toolbox"
 	"io"
-	"smirror/transcoder/avro/schma"
+	"github.com/viant/smirror/transcoder/avro/schma"
 )
 
 func translateToRecord(schema *schma.Schema) schma.Translator {

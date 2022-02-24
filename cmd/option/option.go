@@ -4,11 +4,11 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"fmt"
+	"github.com/viant/smirror"
+	"github.com/viant/smirror/base"
 	"github.com/viant/afs/url"
 	"os"
 	"path"
-	"smirror"
-	"smirror/base"
 	"strings"
 )
 

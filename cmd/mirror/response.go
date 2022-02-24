@@ -1,7 +1,7 @@
 package mirror
 
 import (
-	"smirror/base"
+	"github.com/viant/smirror/base"
 	"strings"
 	"sync"
 	"sync/atomic"

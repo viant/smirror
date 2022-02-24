@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/assertly"
 	"github.com/viant/toolbox"
-	"smirror/transcoder/avro/schma"
+	"github.com/viant/smirror/transcoder/avro/schma"
 	"testing"
 )
 

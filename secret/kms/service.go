@@ -2,7 +2,7 @@ package kms
 
 import (
 	"context"
-	"smirror/auth"
+	"github.com/viant/smirror/auth"
 )
 
 type Service interface {

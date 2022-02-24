@@ -1,9 +1,9 @@
 package avro
 
 import (
+	"github.com/viant/smirror/transcoder/avro/schma"
 	"github.com/viant/toolbox"
 	"io"
-	"smirror/transcoder/avro/schma"
 	"strings"
 )
 

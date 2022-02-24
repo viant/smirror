@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"github.com/pkg/errors"
 	"io"
-	"smirror/config"
+	"github.com/viant/smirror/config"
 )
 
 const bufferSize = 1024 * 1024

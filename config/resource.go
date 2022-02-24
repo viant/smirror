@@ -9,8 +9,8 @@ import (
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/data/udf"
 	"regexp"
-	"smirror/auth"
-	"smirror/config/pattern"
+	"github.com/viant/smirror/auth"
+	"github.com/viant/smirror/config/pattern"
 	"strings"
 )
 
