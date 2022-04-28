@@ -8,6 +8,14 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"github.com/viant/afs"
+	"github.com/viant/afs/cache"
+	"github.com/viant/afs/file"
+	"github.com/viant/afs/option"
+	"github.com/viant/afs/storage"
+	"github.com/viant/afs/url"
+	"github.com/viant/afsc/gs"
+	"github.com/viant/afsc/s3"
 	"github.com/viant/smirror/base"
 	"github.com/viant/smirror/config"
 	"github.com/viant/smirror/contract"
@@ -18,14 +26,6 @@ import (
 	"github.com/viant/smirror/secret"
 	"github.com/viant/smirror/shared"
 	"github.com/viant/smirror/slack"
-	"github.com/viant/afs"
-	"github.com/viant/afs/cache"
-	"github.com/viant/afs/file"
-	"github.com/viant/afs/option"
-	"github.com/viant/afs/storage"
-	"github.com/viant/afs/url"
-	"github.com/viant/afsc/gs"
-	"github.com/viant/afsc/s3"
 	"io"
 	"io/ioutil"
 	"os"
@@ -477,12 +477,15 @@ func (s *service) logResponse(ctx context.Context, response *contract.Response) 
 
 func (s *service) handleOverflow(ctx context.Context, object storage.Object, overflow *config.Overflow, rule *config.Rule, request *contract.Request, response *contract.Response) error {
 	response.Status = base.StatusOverflow
-	_, URLPath := url.Base(object.URL(), file.Scheme)
-	destURL := url.Join(overflow.DestURL, URLPath)
-	err := s.fs.Copy(ctx, object.URL(), destURL) //change to move
-	if err != nil {
-		response.Error = err.Error()
-		return err
+	destURL := object.URL()
+	if overflow.DestURL == "" {
+		_, URLPath := url.Base(object.URL(), file.Scheme)
+		destURL = url.Join(overflow.DestURL, URLPath)
+		err := s.fs.Copy(ctx, object.URL(), destURL) //change to move
+		if err != nil {
+			response.Error = err.Error()
+			return err
+		}
 	}
 	response.DestURLs = append(response.DestURLs, destURL)
 	msgService, err := s.overflowBusService(ctx, overflow)
