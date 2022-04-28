@@ -478,7 +478,7 @@ func (s *service) logResponse(ctx context.Context, response *contract.Response) 
 func (s *service) handleOverflow(ctx context.Context, object storage.Object, overflow *config.Overflow, rule *config.Rule, request *contract.Request, response *contract.Response) error {
 	response.Status = base.StatusOverflow
 	destURL := object.URL()
-	if overflow.DestURL == "" {
+	if overflow.DestURL != "" {
 		_, URLPath := url.Base(object.URL(), file.Scheme)
 		destURL = url.Join(overflow.DestURL, URLPath)
 		err := s.fs.Copy(ctx, object.URL(), destURL) //change to move
