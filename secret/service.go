@@ -5,18 +5,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/viant/smirror/auth"
-	"github.com/viant/smirror/config"
-	"github.com/viant/smirror/secret/kms"
-	"github.com/viant/smirror/secret/kms/aws"
-	"github.com/viant/smirror/secret/kms/gcp"
 	"github.com/viant/afs"
 	"github.com/viant/afs/file"
 	"github.com/viant/afs/option"
 	"github.com/viant/afs/storage"
 	"github.com/viant/afs/url"
+	sauth "github.com/viant/afsc/auth"
 	"github.com/viant/afsc/gs"
 	"github.com/viant/afsc/s3"
+
+	"github.com/viant/smirror/auth"
+	"github.com/viant/smirror/config"
+	"github.com/viant/smirror/secret/kms"
+	"github.com/viant/smirror/secret/kms/aws"
+	"github.com/viant/smirror/secret/kms/gcp"
 )
 
 //Service represents kms service
@@ -138,7 +140,7 @@ func (s service) StorageOpts(ctx context.Context, resource *config.Resource) ([]
 		var authOpt interface{}
 		switch scheme {
 		case gs.Scheme:
-			authOpt, err = gs.NewJwtConfig(resource.Credentials.Auth)
+			authOpt, err = sauth.NewJwtConfig(resource.Credentials.Auth)
 			if err != nil {
 				return nil, errors.Wrapf(err, "failed to create goolge secrets: %s", resource.Credentials.Auth)
 			}
