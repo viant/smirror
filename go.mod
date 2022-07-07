@@ -32,4 +32,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-replace github.com/viant/afs v1.16.1-0.20220601210902-dc23d64dda15 => /Users/awitas/go/src/github.com/viant/afs
