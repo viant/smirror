@@ -23,7 +23,7 @@ require (
 	github.com/tealeg/xlsx v1.0.5
 	github.com/twmb/murmur3 v1.0.0
 	github.com/viant/afs v1.16.1-0.20220601210902-dc23d64dda15
-	github.com/viant/afsc  v1.8.1-0.20220707193227-b701c18cb4ed
+	github.com/viant/afsc v1.8.1-0.20220707193227-b701c18cb4ed
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.34.5
 	golang.org/x/oauth2 v0.0.0-20220608161450-d0670ef3b1eb
@@ -31,4 +31,3 @@ require (
 	gopkg.in/linkedin/goavro.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )
-
