@@ -22,7 +22,7 @@ require (
 	github.com/stretchr/testify v1.7.1
 	github.com/tealeg/xlsx v1.0.5
 	github.com/twmb/murmur3 v1.0.0
-	github.com/viant/afs v1.16.1-0.20220708144144-30dd64db2d09
+	github.com/viant/afs v1.16.1-0.20220708154004-5cc767a16d95
 	github.com/viant/afsc v1.8.1-0.20220707193227-b701c18cb4ed
 	github.com/viant/assertly v0.5.1
 	github.com/viant/toolbox v0.34.5
