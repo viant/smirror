@@ -10,8 +10,8 @@ require (
 	github.com/actgardner/gogen-avro v6.3.1+incompatible
 	github.com/actgardner/gogen-avro/v10 v10.2.0
 	github.com/adrianwit/xlsx v2.0.2-0.20200408043318-ca3997ba547f+incompatible
-	github.com/aws/aws-lambda-go v1.12.0
-	github.com/aws/aws-sdk-go v1.44.12
+	github.com/aws/aws-lambda-go v1.41.0
+	github.com/aws/aws-sdk-go v1.47.13
 	github.com/frankban/quicktest v1.9.0 // indirect
 	github.com/google/uuid v1.1.4
 	github.com/jessevdk/go-flags v1.5.0
